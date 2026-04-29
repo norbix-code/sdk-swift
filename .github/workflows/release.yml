@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    branches: [main, next, beta]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Install x tool
+        run: dotnet tool install --global x
+      - name: Install release tooling
+        run: npm ci
+      - name: Generate SDK and validate
+        run: |
+          python3 scripts/sync_types.py
+          python3 scripts/generate_endpoints.py
+          swift test
+          swift build
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release

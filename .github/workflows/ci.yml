@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, next, beta]
+
+jobs:
+  test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      # Note: SDK generation (sync_types + generate_endpoints) is a developer
+      # task run locally via `make generate`. CI never regenerates — the
+      # generated *.dtos.swift and resource files are gitignored, and the
+      # handwritten code committed in Sources/ must compile and pass tests
+      # on its own.
+      - name: Swift test
+        run: swift test
+      - name: Swift build
+        run: swift build
