@@ -9,6 +9,17 @@ public enum NorbixDefaults {
     public static let apiVersion = "v2"
     public static let hubVersion = "v2"
     public static let timeout: TimeInterval = 30.0
+
+    /// Composes the regional variant of an SDK-default base URL by prefixing
+    /// the region code as a subdomain (`https://{region}.api.norbix.ai` /
+    /// `https://{region}.hub.norbix.ai`). Only the SDK defaults are composed —
+    /// a user-supplied custom base URL is never rewritten and is returned
+    /// unchanged. Returns the input unchanged when `region` is unset.
+    public static func regionalBaseUrl(_ baseUrl: String, region: String?) -> String {
+        guard let region, !region.isEmpty else { return baseUrl }
+        guard baseUrl == apiBaseUrl || baseUrl == hubBaseUrl else { return baseUrl }
+        return baseUrl.replacingOccurrences(of: "https://", with: "https://\(region).")
+    }
 }
 
 /// Authentication strategy for a Norbix client.
@@ -55,6 +66,16 @@ public struct NorbixConfig: Sendable {
 
     public var projectId: String
     public var accountId: String?
+    /// Project environment every request targets, sent as the `norbix-env`
+    /// header. `PROD` (the default) sends no header; a non-PROD env (e.g.
+    /// `TEST`, `STAGING`) scopes every read and write to that environment's
+    /// integrations. There is no cross-env fallback.
+    public var env: String
+    /// Norbix region every request targets (e.g. `nb-eu-germany`), sent as
+    /// the `nb-region` header. Unlike `env` there is **no default region**:
+    /// when unset (`nil`, the default) no header is sent and the backend
+    /// picks its own default.
+    public var region: String?
     public var auth: NorbixAuth
     public var baseUrl: String
     public var version: String
@@ -71,6 +92,8 @@ public struct NorbixConfig: Sendable {
     public init(
         projectId: String,
         accountId: String? = nil,
+        env: String = "PROD",
+        region: String? = nil,
         auth: NorbixAuth = .unauthenticated,
         baseUrl: String,
         version: String,
@@ -93,6 +116,8 @@ public struct NorbixConfig: Sendable {
         }
         self.projectId = projectId
         self.accountId = accountId
+        self.env = env
+        self.region = (region?.isEmpty == false) ? region : nil
         self.auth = auth
         self.baseUrl = baseUrl
         self.version = version
@@ -110,6 +135,8 @@ public struct NorbixConfig: Sendable {
     /// - `NORBIX_BEARER_TOKEN` then `NORBIX_API_KEY` (bearer wins if both set)
     /// - `NORBIX_API_URL` / `NORBIX_HUB_URL` (override base URL)
     /// - `NORBIX_API_VERSION` / `NORBIX_HUB_VERSION` (override version)
+    /// - `NORBIX_ENV` (project environment, defaults to `PROD`)
+    /// - `NORBIX_REGION` (Norbix region code, e.g. `nb-eu-germany`; unset by default)
     public static func fromEnvironment(
         target: Target,
         environment: [String: String] = ProcessInfo.processInfo.environment
@@ -151,6 +178,8 @@ public struct NorbixConfig: Sendable {
         return try NorbixConfig(
             projectId: projectId,
             accountId: environment["NORBIX_ACCOUNT_ID"],
+            env: environment["NORBIX_ENV"] ?? "PROD",
+            region: environment["NORBIX_REGION"],
             auth: auth,
             baseUrl: baseUrl,
             version: version,

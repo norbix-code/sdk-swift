@@ -30,6 +30,28 @@ public final class DatabaseModule: Sendable {
         )
     }
 
+    public func findTermTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/{taxonomyName}/terms/tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func findTaxonomyTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func getDatabaseSchema(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/schemas/{id}",

@@ -104,11 +104,14 @@ public final class Transport: @unchecked Sendable {
         request: [String: Any] = [:],
         scope: NorbixScope = .project,
         timeout: TimeInterval? = nil,
-        bearerToken: String? = nil
+        bearerToken: String? = nil,
+        env: String? = nil,
+        region: String? = nil
     ) async throws -> Any? {
         let data = try await performRequest(
             path: path, method: method, request: request,
-            scope: scope, timeout: timeout, bearerToken: bearerToken
+            scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
+            region: region
         )
         if data.isEmpty { return nil }
         return try? JSONSerialization.jsonObject(with: data)
@@ -133,12 +136,15 @@ public final class Transport: @unchecked Sendable {
         scope: NorbixScope = .project,
         timeout: TimeInterval? = nil,
         bearerToken: String? = nil,
+        env: String? = nil,
+        region: String? = nil,
         as type: T.Type,
         decoder: JSONDecoder = .norbixDefault
     ) async throws -> T {
         let data = try await performRequest(
             path: path, method: method, request: request,
-            scope: scope, timeout: timeout, bearerToken: bearerToken
+            scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
+            region: region
         )
         do {
             return try decoder.decode(T.self, from: data)
@@ -159,11 +165,14 @@ public final class Transport: @unchecked Sendable {
         request: [String: Any] = [:],
         scope: NorbixScope = .project,
         timeout: TimeInterval? = nil,
-        bearerToken: String? = nil
+        bearerToken: String? = nil,
+        env: String? = nil,
+        region: String? = nil
     ) async throws -> Data {
         try await performRequest(
             path: path, method: method, request: request,
-            scope: scope, timeout: timeout, bearerToken: bearerToken
+            scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
+            region: region
         )
     }
 
@@ -175,7 +184,9 @@ public final class Transport: @unchecked Sendable {
         request: [String: Any],
         scope: NorbixScope,
         timeout: TimeInterval?,
-        bearerToken: String?
+        bearerToken: String?,
+        env: String? = nil,
+        region: String? = nil
     ) async throws -> Data {
         // Take one consistent snapshot of the config for this request — avoids
         // the request seeing a half-mutated state if another thread calls
@@ -223,6 +234,23 @@ public final class Transport: @unchecked Sendable {
         httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "X-CM-ProjectId")
         if let accountId = snapshot.accountId {
             httpRequest.setValue(accountId, forHTTPHeaderField: "X-CM-AccountId")
+        }
+
+        // Environment selector: per-call override wins over the client default.
+        // "PROD" is the backend default, so the header is omitted for it.
+        let resolvedEnv = env ?? snapshot.env
+        if !resolvedEnv.isEmpty && resolvedEnv != "PROD" {
+            httpRequest.setValue(resolvedEnv, forHTTPHeaderField: "norbix-env")
+        }
+
+        // Region selector: per-call override wins over the client default.
+        // There is no default region, so the header is sent only when
+        // resolved. A per-call region only sets the header — it never
+        // changes the request URL (the regional base URL is composed once,
+        // at the client level).
+        let resolvedRegion = region ?? snapshot.region
+        if let resolvedRegion, !resolvedRegion.isEmpty {
+            httpRequest.setValue(resolvedRegion, forHTTPHeaderField: "nb-region")
         }
 
         if let body = built.body {

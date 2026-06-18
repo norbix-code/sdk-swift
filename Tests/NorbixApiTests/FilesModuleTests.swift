@@ -3,84 +3,235 @@ import XCTest
 import NorbixCore
 
 final class FilesModuleTests: XCTestCase {
-    func testListReturnsTypedPage() async throws {
-        let mock = MockHTTPExecutor()
-        mock.responseBody = Data(#"""
-        {"items":[{"id":"f1","originalFileName":"a.pdf","sizeBytes":12}],"total":1,"take":50,"skip":0}
-        """#.utf8)
-        let client = try NorbixApiClient(
-            projectId: "p1", apiKey: "k", executor: mock
-        )
 
-        let page = try await client.files.list(take: 50)
-        XCTAssertEqual(page.items.count, 1)
-        XCTAssertEqual(page.items.first?.id, "f1")
-        XCTAssertEqual(page.items.first?.sizeBytes, 12)
+    private func makeClient(_ mock: MockHTTPExecutor) throws -> NorbixApiClient {
+        try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
     }
 
-    func testGetInfoReturnsTypedFileInfo() async throws {
+    // MARK: - Upload
+
+    func testRequestUploadUrlReturnsUrlAndHitsUploadUrlRoute() async throws {
         let mock = MockHTTPExecutor()
         mock.responseBody = Data(#"""
-        {"id":"f_123","originalFileName":"invoice.pdf","sizeBytes":4096}
+        {"url":"https://provider/put?sig=abc","responseStatus":{}}
         """#.utf8)
-        let client = try NorbixApiClient(
-            projectId: "p1", apiKey: "k", executor: mock
+        let client = try makeClient(mock)
+
+        let url = try await client.files.requestUploadUrl(
+            integrationId: "nbin_1",
+            path: "docs/x.pdf",
+            contentType: "application/pdf"
         )
 
-        let info = try await client.files.getInfo(id: "f_123")
-        XCTAssertEqual(info.id, "f_123")
-        XCTAssertEqual(info.originalFileName, "invoice.pdf")
+        XCTAssertEqual(url, "https://provider/put?sig=abc")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/upload-url")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+
+        let body = try XCTUnwrap(mock.lastRequest?.httpBody)
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: body) as? [String: Any]
+        )
+        XCTAssertEqual(json["path"] as? String, "docs/x.pdf")
+        XCTAssertEqual(json["contentType"] as? String, "application/pdf")
+        // The integration id is consumed by the route, not the body.
+        XCTAssertNil(json["filesIntegrationId"])
     }
 
-    func testSignReturnsSignedUploadResponse() async throws {
+    func testRequestUploadUrlThrowsWhenNoUrlReturned() async throws {
         let mock = MockHTTPExecutor()
-        mock.responseBody = Data(#"""
-        {"url":"https://s3.example.com/upload?token=abc","method":"PUT","fileId":"f_new"}
-        """#.utf8)
-        let client = try NorbixApiClient(
-            projectId: "p1", apiKey: "k", executor: mock
-        )
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
 
-        let signed = try await client.files.sign(
-            originalFileName: "report.pdf",
+        do {
+            _ = try await client.files.requestUploadUrl(
+                integrationId: "nbin_1", path: "docs/x.pdf", contentType: "application/pdf"
+            )
+            XCTFail("Expected an error when the gateway returns no URL")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.code, "NORBIX_EMPTY_RESPONSE")
+        }
+    }
+
+    func testCommitUploadHitsCommitRoute() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
+
+        try await client.files.commitUpload(
+            integrationId: "nbin_1",
+            path: "docs/x.pdf",
             contentType: "application/pdf",
-            sizeBytes: 1024
+            sizeBytes: 2048,
+            fileName: "x.pdf"
         )
-        XCTAssertTrue(signed.url.hasPrefix("https://s3.example.com"))
-        XCTAssertEqual(signed.method, "PUT")
-        XCTAssertEqual(signed.fileId, "f_new")
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/commit")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+
+        let body = try XCTUnwrap(mock.lastRequest?.httpBody)
+        let json = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: body) as? [String: Any]
+        )
+        XCTAssertEqual(json["path"] as? String, "docs/x.pdf")
+        XCTAssertEqual(json["sizeBytes"] as? Int, 2048)
+        XCTAssertEqual(json["fileName"] as? String, "x.pdf")
+    }
+
+    // MARK: - Browse
+
+    func testListDecodesFilesAndFolders() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {
+          "list": {
+            "items": [
+              {
+                "resource": {
+                  "id": "nbfl_1", "originalFileName": "a.pdf",
+                  "extension": "pdf", "storedFileName": "s.pdf", "sizeBytes": 12
+                },
+                "integrationId": "nbin_1", "provider": "AwsS3",
+                "path": "docs", "publicUrl": "docs/s.pdf"
+              }
+            ],
+            "hasMore": true,
+            "startingAfter": "CURSOR2"
+          },
+          "folders": ["docs/", "images/"],
+          "responseStatus": {}
+        }
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let page = try await client.files.list(integrationId: "nbin_1", path: "docs")
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(page.files.count, 1)
+        XCTAssertEqual(page.files.first?.resource.id, "nbfl_1")
+        XCTAssertEqual(page.files.first?.resource.sizeBytes, 12)
+        XCTAssertEqual(page.files.first?.resource.fileExtension, "pdf")
+        XCTAssertEqual(page.files.first?.provider, .awsS3)
+        XCTAssertEqual(page.folders, ["docs/", "images/"])
+        XCTAssertTrue(page.hasMore)
+        XCTAssertEqual(page.nextCursor, "CURSOR2")
+    }
+
+    func testListToleratesEmptyResponseBody() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
+
+        let page = try await client.files.list(integrationId: "nbin_1")
+
+        XCTAssertTrue(page.files.isEmpty)
+        XCTAssertTrue(page.folders.isEmpty)
+        XCTAssertFalse(page.hasMore)
+        XCTAssertNil(page.nextCursor)
+    }
+
+    func testGetInfoDecodesDetailsAndNumericProvider() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {
+          "file": {
+            "resource": { "id": "nbfl_9", "originalFileName": "invoice.pdf" },
+            "integrationId": "nbin_1", "provider": 1, "path": "docs"
+          },
+          "isPublic": true,
+          "publicUrl": "https://cdn/x.pdf",
+          "responseStatus": {}
+        }
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let details = try await client.files.getInfo(
+            integrationId: "nbin_1", path: "docs/invoice.pdf"
+        )
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/info")
+        XCTAssertEqual(details.file?.resource.id, "nbfl_9")
+        // Provider sent as numeric ordinal 1 -> AwsS3.
+        XCTAssertEqual(details.file?.provider, .awsS3)
+        XCTAssertEqual(details.isPublic, true)
+        XCTAssertEqual(details.publicUrl, "https://cdn/x.pdf")
+    }
+
+    // MARK: - Download
+
+    func testGetSignedUrlReturnsUrlAndHitsSignRoute() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {"url":"https://provider/get?sig=xyz","responseStatus":{}}
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let url = try await client.files.getSignedUrl(
+            integrationId: "nbin_1", path: "docs/x.pdf"
+        )
+
+        XCTAssertEqual(url, "https://provider/get?sig=xyz")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/sign")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
     }
 
     func testDownloadReturnsRawData() async throws {
         let mock = MockHTTPExecutor()
         let raw = Data("PDF-binary-bytes".utf8)
         mock.responseBody = raw
-        let client = try NorbixApiClient(
-            projectId: "p1", apiKey: "k", executor: mock
+        let client = try makeClient(mock)
+
+        let bytes = try await client.files.download(
+            integrationId: "nbin_1", path: "docs/x.pdf"
         )
 
-        let bytes = try await client.files.download(id: "f_123")
         XCTAssertEqual(bytes, raw)
-        XCTAssertEqual(
-            mock.lastRequest?.url?.path,
-            "/v2/files/f_123/download"
-        )
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/download")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
     }
 
     func testDownloadToFile() async throws {
         let mock = MockHTTPExecutor()
         let raw = Data("hello".utf8)
         mock.responseBody = raw
-        let client = try NorbixApiClient(
-            projectId: "p1", apiKey: "k", executor: mock
-        )
+        let client = try makeClient(mock)
 
         let dest = FileManager.default.temporaryDirectory
             .appendingPathComponent("norbix-test-\(UUID().uuidString).bin")
-        try await client.files.download(id: "f_123", to: dest)
+        try await client.files.download(
+            integrationId: "nbin_1", path: "docs/x.pdf", to: dest
+        )
         defer { try? FileManager.default.removeItem(at: dest) }
 
         let onDisk = try Data(contentsOf: dest)
         XCTAssertEqual(onDisk, raw)
+    }
+
+    // MARK: - Delete
+
+    func testDeleteHitsDeleteRoute() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
+
+        try await client.files.delete(integrationId: "nbin_1", path: "docs/x.pdf")
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
+    }
+
+    func testDeleteManyUsesBulkRouteAndPathsParam() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
+
+        try await client.files.deleteMany(
+            integrationId: "nbin_1", paths: ["docs/a.pdf", "docs/b.pdf"]
+        )
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/bulk")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
+        let query = mock.lastRequest?.url?.query ?? ""
+        XCTAssertTrue(query.contains("paths"), "expected paths in query, got: \(query)")
     }
 }

@@ -105,6 +105,109 @@ let hub = try NorbixHubClient(
 If you do not pass `baseUrl`, the SDK uses Norbix' production endpoints:
 `https://api.norbix.ai` and `https://hub.norbix.ai`.
 
+## Multi-region support
+
+Norbix projects can live in more than one region. The SDK targets a region
+by sending its code (e.g. `nb-eu-germany`) in the `nb-region` header.
+There is **no default region**: when no region is configured, no header is
+sent and the backend picks its own default.
+
+### Selecting a region
+
+Pass `region` when constructing either client:
+
+```swift
+let client = try NorbixApiClient(
+    projectId: "proj_123",
+    apiKey: "sk_live_xxx",
+    region: "nb-eu-germany"
+)
+
+let hub = try NorbixHubClient(
+    projectId: "proj_123",
+    apiKey: "sk_live_xxx",
+    accountId: "acc_456",
+    region: "nb-eu-germany"
+)
+```
+
+Or set the `NORBIX_REGION` environment variable — the convenience
+initializers and `NorbixConfig.fromEnvironment` fall back to it when no
+`region` argument is given:
+
+```bash
+NORBIX_REGION=nb-eu-germany
+```
+
+### Switching at runtime
+
+Both clients expose `setRegion(_:)` and a `region` getter:
+
+```swift
+hub.setRegion("nb-eu-germany")
+print(hub.region ?? "unset") // "nb-eu-germany"
+
+hub.setRegion(nil)           // unset: no nb-region header is sent again
+print(hub.region ?? "unset") // "unset"
+```
+
+Passing `nil` (or an empty string) unsets the region. Unlike `setEnv`
+there is no value that means "the default region" — unset simply omits the
+header.
+
+### Per-call override
+
+The `hub.regions` methods accept a `region:` argument that overrides the
+client's region for that single request. The override affects the
+`nb-region` header **only** — it never changes the request URL:
+
+```swift
+let regions = try await hub.regions.getAccountRegions([:], region: "nb-us-east")
+```
+
+### Regional base URLs
+
+When a client uses an SDK-default base URL, configuring a region (at init
+or via `setRegion`) also composes the regional endpoint by prefixing the
+region code as a subdomain:
+
+- `https://api.norbix.ai` → `https://nb-eu-germany.api.norbix.ai`
+- `https://hub.norbix.ai` → `https://nb-eu-germany.hub.norbix.ai`
+
+`setRegion(nil)` restores the default URL. A custom `baseUrl` (self-hosted
+/ on-prem / local development) is **never rewritten**: the `nb-region`
+header is still sent, but the URL stays exactly as you configured it.
+
+### Managing a project's regions (Hub)
+
+`hub.regions` wraps the regions endpoints. Both are account-scoped, so the
+client needs `accountId`:
+
+```swift
+// GET /v2/account/regions — regions available to the account.
+// Response carries "items"; each item has "id" (the region code,
+// e.g. "nb-eu-germany"), "continent", and "name".
+let available = try await hub.regions.getAccountRegions([:])
+
+// PATCH /v2/account/projects/{projectId}/settings/regions
+// Pass nil to leave a field unchanged. Empty response on success.
+_ = try await hub.regions.updateProjectRegions(
+    projectId: "proj_123",
+    primaryRegion: "nb-eu-germany",
+    additionalRegions: ["nb-us-east"]
+)
+```
+
+The SDK is untyped on the wire, so region fields on other endpoints pass
+straight through — for example, creating a project with a primary region:
+
+```swift
+_ = try await hub.account.createProject([
+    "primaryRegion": "nb-eu-germany"
+    // ...other project fields
+])
+```
+
 ## Real-world examples
 
 ### 1) Fetch recent orders (API)
@@ -176,6 +279,7 @@ NORBIX_API_URL=https://api.norbix.ai
 NORBIX_HUB_URL=https://hub.norbix.ai
 NORBIX_API_VERSION=v2
 NORBIX_HUB_VERSION=v2
+NORBIX_REGION=nb-eu-germany
 ```
 
 You can also build a config explicitly:
