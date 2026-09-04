@@ -17,7 +17,7 @@ public extension MembershipModule {
         as type: T.Type
     ) async throws -> T {
         try await transport.send(
-            path: "/{version}/membership/users/{id}",
+            path: "/{version}/membership/auth/{id}",
             method: "GET",
             request: ["id": id],
             scope: .project,
@@ -35,7 +35,7 @@ public extension MembershipModule {
         as itemType: T.Type
     ) async throws -> Page<T> {
         try await transport.send(
-            path: "/{version}/membership/users",
+            path: "/{version}/membership/auth",
             method: "GET",
             request: query,
             scope: .project,

@@ -10,7 +10,7 @@ public final class MembershipModule: Sendable {
 
     public func blockUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/block",
+            path: "/{version}/membership/auth/block",
             method: "PATCH",
             request: request,
             scope: .project,
@@ -21,7 +21,7 @@ public final class MembershipModule: Sendable {
 
     public func saveSystemUserWithPermissions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/service",
+            path: "/{version}/membership/auth/register/service",
             method: "POST",
             request: request,
             scope: .project,
@@ -32,7 +32,7 @@ public final class MembershipModule: Sendable {
 
     public func saveGuestUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/guest",
+            path: "/{version}/membership/auth/register/guest",
             method: "POST",
             request: request,
             scope: .project,
@@ -43,7 +43,7 @@ public final class MembershipModule: Sendable {
 
     public func saveUserNameUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/user-name",
+            path: "/{version}/membership/auth/register/user-name",
             method: "POST",
             request: request,
             scope: .project,
@@ -54,7 +54,7 @@ public final class MembershipModule: Sendable {
 
     public func saveEmailUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/email",
+            path: "/{version}/membership/auth/register/email",
             method: "POST",
             request: request,
             scope: .project,
@@ -65,7 +65,7 @@ public final class MembershipModule: Sendable {
 
     public func savePhoneUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/phone",
+            path: "/{version}/membership/auth/register/phone",
             method: "POST",
             request: request,
             scope: .project,
@@ -76,7 +76,7 @@ public final class MembershipModule: Sendable {
 
     public func savePhoneUserNameWithPermissions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/phone-with-permissions",
+            path: "/{version}/membership/auth/register/phone-with-permissions",
             method: "POST",
             request: request,
             scope: .project,
@@ -87,7 +87,7 @@ public final class MembershipModule: Sendable {
 
     public func saveEmailUserNameWithPermissions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/email-with-permissions",
+            path: "/{version}/membership/auth/register/email-with-permissions",
             method: "POST",
             request: request,
             scope: .project,
@@ -98,7 +98,7 @@ public final class MembershipModule: Sendable {
 
     public func saveUserNameWithPermissions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/register/user-name-with-permissions",
+            path: "/{version}/membership/auth/register/user-name-with-permissions",
             method: "POST",
             request: request,
             scope: .project,
@@ -109,7 +109,7 @@ public final class MembershipModule: Sendable {
 
     public func deleteUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users",
+            path: "/{version}/membership/auth",
             method: "DELETE",
             request: request,
             scope: .project,
@@ -120,7 +120,7 @@ public final class MembershipModule: Sendable {
 
     public func getUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/{id}",
+            path: "/{version}/membership/auth/{id}",
             method: "GET",
             request: request,
             scope: .project,
@@ -131,7 +131,7 @@ public final class MembershipModule: Sendable {
 
     public func getUsers(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users",
+            path: "/{version}/membership/auth",
             method: "GET",
             request: request,
             scope: .project,
@@ -142,7 +142,7 @@ public final class MembershipModule: Sendable {
 
     public func getUserPreferences(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/{id}/preferences",
+            path: "/{version}/membership/auth/{id}/preferences",
             method: "GET",
             request: request,
             scope: .project,
@@ -153,7 +153,7 @@ public final class MembershipModule: Sendable {
 
     public func inviteUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/invite",
+            path: "/{version}/membership/auth/invite",
             method: "POST",
             request: request,
             scope: .project,
@@ -164,7 +164,7 @@ public final class MembershipModule: Sendable {
 
     public func assignRolePermissions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/assign-roles",
+            path: "/{version}/membership/auth/assign-roles",
             method: "PUT",
             request: request,
             scope: .project,
@@ -175,7 +175,7 @@ public final class MembershipModule: Sendable {
 
     public func unblockUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/unblock",
+            path: "/{version}/membership/auth/unblock",
             method: "PATCH",
             request: request,
             scope: .project,
@@ -186,7 +186,7 @@ public final class MembershipModule: Sendable {
 
     public func updateUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users",
+            path: "/{version}/membership/auth",
             method: "PUT",
             request: request,
             scope: .project,
@@ -197,7 +197,7 @@ public final class MembershipModule: Sendable {
 
     public func updateUserPreferences(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/users/{id}/preferences",
+            path: "/{version}/membership/auth/{id}/preferences",
             method: "PUT",
             request: request,
             scope: .project,
