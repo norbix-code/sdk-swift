@@ -86,21 +86,55 @@ public struct FileRef: Codable, Sendable, Equatable {
     public let provider: FileStorageProvider
     /// Provider path / prefix the file sits under.
     public let path: String
-    /// Public URL of the file, when the provider exposes one.
+    /// The address anyone can open without signing in. `nil` unless the file
+    /// really is public.
     public let publicUrl: String?
+    /// `true` when anyone holding `publicUrl` can read this file without
+    /// signing in — because the file was made public, or because a folder
+    /// above it was. `nil` when the gateway did not say.
+    public let isPublic: Bool?
 
     public init(
         resource: FileResource,
         integrationId: String,
         provider: FileStorageProvider,
         path: String,
-        publicUrl: String? = nil
+        publicUrl: String? = nil,
+        isPublic: Bool? = nil
     ) {
         self.resource = resource
         self.integrationId = integrationId
         self.provider = provider
         self.path = path
         self.publicUrl = publicUrl
+        self.isPublic = isPublic
+    }
+}
+
+/// One folder in a listing that anyone can read from without signing in.
+///
+/// Sent alongside the plain `folders` prefix list, so a client that does not
+/// know about public folders keeps working.
+public struct PublicFolder: Codable, Sendable, Equatable {
+    /// The folder prefix, exactly as it appears in `folders`.
+    public let path: String
+    /// The record that makes it public — its own, or a folder above it.
+    public let publicId: String
+    /// The base a file inside this folder is served from. Ends with a slash.
+    public let publicUrl: String?
+    /// `true` when a folder ABOVE this one is what makes it public.
+    public let inherited: Bool?
+
+    public init(
+        path: String,
+        publicId: String,
+        publicUrl: String? = nil,
+        inherited: Bool? = nil
+    ) {
+        self.path = path
+        self.publicId = publicId
+        self.publicUrl = publicUrl
+        self.inherited = inherited
     }
 }
 
@@ -114,6 +148,9 @@ public struct FileListPage: Sendable {
     public let files: [FileRef]
     /// Immediate sub-folder names one level down.
     public let folders: [String]
+    /// The subset of `folders` anyone can read from without signing in.
+    /// Empty when nothing under this path is public.
+    public let publicFolders: [PublicFolder]
     /// `true` when more files can be fetched with `nextCursor`.
     public let hasMore: Bool
     /// Cursor to pass back as `startingAfter` to fetch the next page.
@@ -122,11 +159,13 @@ public struct FileListPage: Sendable {
     public init(
         files: [FileRef] = [],
         folders: [String] = [],
+        publicFolders: [PublicFolder] = [],
         hasMore: Bool = false,
         nextCursor: String? = nil
     ) {
         self.files = files
         self.folders = folders
+        self.publicFolders = publicFolders
         self.hasMore = hasMore
         self.nextCursor = nextCursor
     }
@@ -136,6 +175,7 @@ extension FileListPage: Decodable {
     private enum CodingKeys: String, CodingKey {
         case list
         case folders
+        case publicFolders
     }
 
     /// Mirrors the gateway `PaginatedResponse<FileResourceRefDto>` block.
@@ -152,6 +192,9 @@ extension FileListPage: Decodable {
         self.hasMore = block?.hasMore ?? false
         self.nextCursor = block?.startingAfter
         self.folders = try container.decodeIfPresent([String].self, forKey: .folders) ?? []
+        self.publicFolders = try container.decodeIfPresent(
+            [PublicFolder].self, forKey: .publicFolders
+        ) ?? []
     }
 }
 
@@ -453,6 +496,45 @@ public final class FilesModule: Sendable {
             scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Public links
+
+    /// Read a file somebody made public.
+    ///
+    /// Gateway route: `GET /{version}/files/public/{PublicId}/{Name*}`
+    ///
+    /// **No sign-in.** The call deliberately goes out with no `Authorization`
+    /// header (`scope: .unauthenticated`), because the link has to work in an
+    /// e-mail, in an `<img src>`, or in a browser on a stranger's phone. The
+    /// unguessable `nbpf_…` id is the whole credential.
+    ///
+    /// Answers with the file's raw bytes. When the storage provider can sign
+    /// its own links (Amazon S3, Azure Blob, Google Cloud Storage) the gateway
+    /// replies `302` and `URLSession` follows it, so the bytes come straight
+    /// from the provider and never pass through Norbix.
+    ///
+    /// Every miss — unknown id, wrong name, made private again, file gone — is
+    /// the same plain `404`. That is deliberate: a more precise answer would
+    /// tell a stranger that the file exists.
+    ///
+    /// - Parameters:
+    ///   - publicId: the `nbpf_…` id from the link.
+    ///   - name: what follows the id — the file's name for a file link, or the
+    ///     path inside the folder for a folder link (`2026/q1/report.pdf`).
+    ///     Its slashes stay slashes.
+    public func getPublicFile(
+        publicId: String,
+        name: String,
+        timeout: TimeInterval? = nil
+    ) async throws -> Data {
+        try await transport.downloadData(
+            path: "/{version}/files/public/{publicId}/{name}",
+            method: "GET",
+            request: ["publicId": publicId, "name": name],
+            scope: .unauthenticated,
+            timeout: timeout
         )
     }
 

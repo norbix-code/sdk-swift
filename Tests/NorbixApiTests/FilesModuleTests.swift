@@ -234,4 +234,115 @@ final class FilesModuleTests: XCTestCase {
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("paths"), "expected paths in query, got: \(query)")
     }
+
+    // MARK: - Public links
+
+    func testGetPublicFileSendsNoAuthorizationHeader() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data("PDF-BYTES".utf8)
+        let client = try makeClient(mock)
+
+        _ = try await client.files.getPublicFile(publicId: "nbpf_abc", name: "report.pdf")
+
+        XCTAssertNil(
+            mock.lastRequest?.value(forHTTPHeaderField: "Authorization"),
+            "a public link must work without signing in"
+        )
+    }
+
+    func testGetPublicFileHitsPublicRouteAndReturnsBytes() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data("PDF-BYTES".utf8)
+        let client = try makeClient(mock)
+
+        let data = try await client.files.getPublicFile(
+            publicId: "nbpf_abc", name: "report.pdf"
+        )
+
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/public/nbpf_abc/report.pdf")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(String(data: data, encoding: .utf8), "PDF-BYTES")
+    }
+
+    func testGetPublicFileKeepsSlashesInFolderRelativeName() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data("X".utf8)
+        let client = try makeClient(mock)
+
+        _ = try await client.files.getPublicFile(
+            publicId: "nbpf_folder", name: "2026/q1/report.pdf"
+        )
+
+        // The gateway route ends in a wildcard token, so the slashes of a
+        // folder-relative name have to survive as slashes.
+        XCTAssertEqual(
+            mock.lastRequest?.url?.path,
+            "/v2/files/public/nbpf_folder/2026/q1/report.pdf"
+        )
+    }
+
+    func testGetPublicFileSurfacesNotFound() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseStatus = 404
+        mock.responseBody = Data(#"{"responseStatus":{"message":"Not Found"}}"#.utf8)
+        let client = try makeClient(mock)
+
+        do {
+            _ = try await client.files.getPublicFile(publicId: "nbpf_gone", name: "x.pdf")
+            XCTFail("Expected a 404 to throw")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.status, 404)
+        }
+    }
+
+    // MARK: - Public fields on the listings
+
+    func testListDecodesIsPublicAndPublicUrlOnAFile() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {"list":{"items":[{"resource":{"id":"nbfl_1","originalFileName":"a.pdf"},
+        "integrationId":"nbin_1","provider":"AwsS3","path":"docs/a.pdf",
+        "isPublic":true,"publicUrl":"https://api.norbix.ai/v2/files/public/nbpf_a/a.pdf"}],
+        "hasMore":false}}
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let page = try await client.files.list(integrationId: "nbin_1", path: "docs")
+
+        XCTAssertEqual(page.files.first?.isPublic, true)
+        XCTAssertEqual(
+            page.files.first?.publicUrl,
+            "https://api.norbix.ai/v2/files/public/nbpf_a/a.pdf"
+        )
+    }
+
+    func testListDecodesPublicFolders() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {"list":{"items":[],"hasMore":false},
+         "folders":["docs","private"],
+         "publicFolders":[{"path":"docs","publicId":"nbpf_docs",
+         "publicUrl":"https://api.norbix.ai/v2/files/public/nbpf_docs/","inherited":false}]}
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let page = try await client.files.list(integrationId: "nbin_1")
+
+        XCTAssertEqual(page.folders, ["docs", "private"])
+        XCTAssertEqual(page.publicFolders.count, 1)
+        XCTAssertEqual(page.publicFolders.first?.path, "docs")
+        XCTAssertEqual(page.publicFolders.first?.publicId, "nbpf_docs")
+        XCTAssertEqual(page.publicFolders.first?.inherited, false)
+    }
+
+    func testListWithoutPublicFoldersDecodesToEmpty() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"list":{"items":[],"hasMore":false},"folders":["docs"]}"#.utf8)
+        let client = try makeClient(mock)
+
+        let page = try await client.files.list(integrationId: "nbin_1")
+
+        XCTAssertTrue(page.publicFolders.isEmpty)
+    }
+
 }
