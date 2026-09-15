@@ -25,20 +25,17 @@ let package = Package(
     targets: [
         .target(
             name: "NorbixCore",
-            path: "Sources/NorbixCore",
-            swiftSettings: [.swiftLanguageVersion(.v5)]
+            path: "Sources/NorbixCore"
         ),
         .target(
             name: "NorbixApi",
             dependencies: ["NorbixCore"],
-            path: "Sources/NorbixApi",
-            swiftSettings: [.swiftLanguageVersion(.v5)]
+            path: "Sources/NorbixApi"
         ),
         .target(
             name: "NorbixHub",
             dependencies: ["NorbixCore"],
-            path: "Sources/NorbixHub",
-            swiftSettings: [.swiftLanguageVersion(.v5)]
+            path: "Sources/NorbixHub"
         ),
         .testTarget(
             name: "NorbixCoreTests",
