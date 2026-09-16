@@ -442,6 +442,9 @@ public final class Transport: @unchecked Sendable {
         let url = "\(root)\(finalPath)"
 
         if method == "GET" || method == "DELETE" {
+            // An empty queryItems array still makes URLComponents emit a bare
+            // "?", so only build a query when there is something to send.
+            guard !remaining.isEmpty else { return (url, nil) }
             var components = URLComponents(string: url)
             components?.queryItems = remaining.flatMap { key, value in
                 if let array = value as? [Any] {
