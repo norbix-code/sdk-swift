@@ -206,4 +206,103 @@ public final class MembershipModule: Sendable {
         )
     }
 
+    public func linkIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/auth/{userId}/link-identity",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func changePassword(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/userauth/password/change",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func requestPasswordReset(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/userauth/password/reset/request",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func confirmPasswordReset(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/userauth/password/reset/confirm",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func mapAuthToUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{userId}/map-auth",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func setContactRoles(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{userId}/roles",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func grantContactConsent(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/marketing-state/{channel}/consent",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func unsubscribeContact(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/marketing-state/{channel}/unsubscribe",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func setContactTagSubscription(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/marketing-state/{commChannel}/{channel}/tags/{tag}",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }

@@ -282,9 +282,9 @@ This refactor is a **green-field, breaking-change** rewrite of the package layou
 Each plane is its own Swift module — apps import only what they use:
 
 ```swift
-.product(name: "NorbixApi", package: "norbix-swift")
+.product(name: "NorbixApi", package: "sdk-swift")
 // or
-.product(name: "NorbixHub", package: "norbix-swift")
+.product(name: "NorbixHub", package: "sdk-swift")
 ```
 
 Platforms expanded to iOS 14, macOS 12, tvOS 14, watchOS 7, visionOS 1.

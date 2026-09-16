@@ -2,8 +2,8 @@
 # sdk-swift
 # NorbixSwift
 
-[![CI](https://github.com/norbix-dev/norbix-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/norbix-dev/norbix-swift/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/norbix-dev/norbix-swift)](https://github.com/norbix-dev/norbix-swift/releases)
+[![CI](https://github.com/norbix-code/sdk-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/norbix-code/sdk-swift/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/norbix-code/sdk-swift)](https://github.com/norbix-code/sdk-swift/releases)
 [![Swift](https://img.shields.io/badge/swift-5.9+-orange.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
@@ -25,7 +25,7 @@ semantic-release based tagging.
 In Xcode:
 
 1. **File -> Add Packages...**
-2. Use URL: `https://github.com/norbix-dev/norbix-swift`
+2. Use URL: `https://github.com/norbix-code/sdk-swift`
 3. Pick a version rule (recommended: Up to Next Major)
 4. Add **`NorbixApi`** and/or **`NorbixHub`** to your target — only the planes
    you need.
@@ -33,15 +33,15 @@ In Xcode:
 Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/norbix-dev/norbix-swift.git", from: "0.1.0")
+.package(url: "https://github.com/norbix-code/sdk-swift.git", from: "0.1.0")
 ```
 
 ```swift
 .target(
     name: "MyApp",
     dependencies: [
-        .product(name: "NorbixApi", package: "norbix-swift"),
-        // .product(name: "NorbixHub", package: "norbix-swift"),
+        .product(name: "NorbixApi", package: "sdk-swift"),
+        // .product(name: "NorbixHub", package: "sdk-swift"),
     ]
 )
 ```

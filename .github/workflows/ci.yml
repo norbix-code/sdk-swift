@@ -5,17 +5,29 @@ on:
   push:
     branches: [main, next, beta]
 
+permissions:
+  contents: read
+
 jobs:
   test:
-    runs-on: macos-14
+    name: swift test · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-14 ships Xcode 15.4 / Swift 5.10: the oldest toolchain that can
+        # read `swift-tools-version: 5.9`. macos-26 has the newest Xcode. The
+        # manifest must resolve on both (it broke on Swift 6 in 2026-09).
+        os: [macos-14, macos-26]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Note: SDK generation (sync_types + generate_endpoints) is a developer
       # task run locally via `make generate`. CI never regenerates — the
-      # generated *.dtos.swift and resource files are gitignored, and the
-      # handwritten code committed in Sources/ must compile and pass tests
-      # on its own.
-      - name: Swift test
-        run: swift test
+      # handwritten and generated code committed in Sources/ must compile and
+      # pass tests on its own.
+      - name: Toolchain
+        run: swift --version
       - name: Swift build
         run: swift build
+      - name: Swift test
+        run: swift test

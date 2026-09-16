@@ -283,4 +283,114 @@ public final class MembershipModule: Sendable {
         )
     }
 
+    public func createContact(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getAllContacts(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getContact(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func deleteContact(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func mergeContacts(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/merge",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func addContactIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/identities",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func removeContactIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/identities/{authId}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func promoteContactIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{contactId}/identities/{authId}/promote",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func updateAuthenticationSettings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/authentication",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func updatePasswordComplexity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/authorization/password-complexity",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }

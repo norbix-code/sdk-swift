@@ -8,3 +8,6 @@ Package.resolved
 # outputs (references/*.dtos.swift, Sources/*) ARE committed and used by CI.
 scripts/sync_types.py
 scripts/generate_endpoints.py
+
+# semantic-release tooling (package.json / package-lock.json are committed)
+node_modules/
