@@ -235,6 +235,71 @@ final class FilesModuleTests: XCTestCase {
         XCTAssertTrue(query.contains("paths"), "expected paths in query, got: \(query)")
     }
 
+    // MARK: - Integration test
+
+    func testTestFilesIntegrationPostsToTestRouteAndParsesItems() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {
+          "items": [
+            {"operation":"Upload","result":"OK"},
+            {"operation":"Read","result":"OK","errors":[]},
+            {"operation":"List","result":"OK"},
+            {"operation":"Delete","result":"Failed","errors":["Access denied"]}
+          ],
+          "responseStatus": {}
+        }
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        let result = try await client.files.testFilesIntegration(integrationId: "nbin_1")
+
+        XCTAssertEqual(mock.capturedRequests.count, 1)
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/test")
+        XCTAssertNil(mock.lastRequest?.url?.query)
+        // Project scope, like the other Api Files calls.
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer k")
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "X-CM-ProjectId"), "p1")
+        // The integration id is consumed by the route, so nothing is left for a body.
+        XCTAssertNil(mock.lastRequest?.httpBody)
+
+        XCTAssertEqual(result.items, [
+            IntegrationTestResultItem(operation: "Upload", result: "OK"),
+            IntegrationTestResultItem(operation: "Read", result: "OK", errors: []),
+            IntegrationTestResultItem(operation: "List", result: "OK"),
+            IntegrationTestResultItem(operation: "Delete", result: "Failed", errors: ["Access denied"])
+        ])
+    }
+
+    func testTestFilesIntegrationToleratesMissingItems() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let client = try makeClient(mock)
+
+        let result = try await client.files.testFilesIntegration(integrationId: "nbin_1")
+
+        XCTAssertTrue(result.items.isEmpty)
+    }
+
+    func testTestFilesIntegrationSurfacesErrorStatus() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseStatus = 400
+        mock.responseBody = Data(#"""
+        {"responseStatus":{"errorCode":"ValidationFailed","message":"Integration not found"}}
+        """#.utf8)
+        let client = try makeClient(mock)
+
+        do {
+            _ = try await client.files.testFilesIntegration(integrationId: "nbin_missing")
+            XCTFail("Expected a 400 to throw")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.status, 400)
+            XCTAssertEqual(error.rawBody?.contains("Integration not found"), true)
+        }
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_missing/test")
+    }
+
     // MARK: - Public links
 
     func testGetPublicFileSendsNoAuthorizationHeader() async throws {

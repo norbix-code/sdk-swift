@@ -215,6 +215,46 @@ public struct FileDetails: Decodable, Sendable {
     }
 }
 
+/// One step of a files-integration test — for example the upload, the read,
+/// the listing or the delete. Mirrors the gateway `IntegrationTestResultItemDto`.
+public struct IntegrationTestResultItem: Codable, Sendable, Equatable {
+    /// What was tried, e.g. `"Upload"`.
+    public let operation: String
+    /// How it went, e.g. `"OK"` or `"Failed"`.
+    public let result: String
+    /// Why the step failed. `nil` or empty when it passed.
+    public let errors: [String]?
+
+    public init(operation: String, result: String, errors: [String]? = nil) {
+        self.operation = operation
+        self.result = result
+        self.errors = errors
+    }
+}
+
+/// Answer of `testFilesIntegration(...)`: one entry per step of the live
+/// probe. Mirrors the gateway `TestFilesIntegrationResponse`.
+public struct TestFilesIntegrationResponse: Decodable, Sendable, Equatable {
+    /// The steps in the order the gateway ran them. Empty when the gateway
+    /// sent none.
+    public let items: [IntegrationTestResultItem]
+
+    public init(items: [IntegrationTestResultItem] = []) {
+        self.items = items
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case items
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.items = try container.decodeIfPresent(
+            [IntegrationTestResultItem].self, forKey: .items
+        ) ?? []
+    }
+}
+
 /// Decodes the `{ "url": ... }` envelope shared by the upload-url and
 /// signed-url endpoints. The sibling `responseStatus` field is ignored.
 private struct FileUrlEnvelope: Decodable {
@@ -496,6 +536,46 @@ public final class FilesModule: Sendable {
             scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Integration
+
+    /// Run a live probe against a files integration: the gateway uploads a
+    /// small file, reads it, lists the folder and deletes the file again, and
+    /// answers one result per step.
+    ///
+    /// Gateway route: `POST /{version}/files/{filesIntegrationId}/test`
+    ///
+    /// The probe writes to the storage, so the caller needs the
+    /// `files:create` permission. This is the API-plane twin of the Hub's
+    /// `testFilesIntegration` (`POST /{version}/files/integrations/test`),
+    /// which is meant for the dashboard.
+    ///
+    /// ```swift
+    /// let result = try await client.files.testFilesIntegration(integrationId: "nbin_123")
+    /// for step in result.items where step.result != "OK" {
+    ///     print(step.operation, step.errors ?? [])
+    /// }
+    /// ```
+    ///
+    /// - Parameter integrationId: the files integration to probe, e.g. `nbin_xxx`.
+    /// - Returns: one `IntegrationTestResultItem` per step.
+    /// - Throws: `NorbixError` when the gateway answers with an error status
+    ///   (for example an unknown integration or a missing permission).
+    public func testFilesIntegration(
+        integrationId: String,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> TestFilesIntegrationResponse {
+        try await transport.send(
+            path: "/{version}/files/{filesIntegrationId}/test",
+            method: "POST",
+            request: ["filesIntegrationId": integrationId],
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken,
+            as: TestFilesIntegrationResponse.self
         )
     }
 
