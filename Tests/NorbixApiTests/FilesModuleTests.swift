@@ -242,10 +242,10 @@ final class FilesModuleTests: XCTestCase {
         mock.responseBody = Data(#"""
         {
           "items": [
-            {"operation":"Upload","result":"OK"},
-            {"operation":"Read","result":"OK","errors":[]},
-            {"operation":"List","result":"OK"},
-            {"operation":"Delete","result":"Failed","errors":["Access denied"]}
+            {"operation":"UploadFile","result":"OK"},
+            {"operation":"GetFile","result":"FAILED","errors":["Access denied"]},
+            {"operation":"GetAllFiles","result":"NOT_TESTED","errors":[]},
+            {"operation":"DeleteFile","result":"NOT_TESTED"}
           ],
           "responseStatus": {}
         }
@@ -265,10 +265,10 @@ final class FilesModuleTests: XCTestCase {
         XCTAssertNil(mock.lastRequest?.httpBody)
 
         XCTAssertEqual(result.items, [
-            IntegrationTestResultItem(operation: "Upload", result: "OK"),
-            IntegrationTestResultItem(operation: "Read", result: "OK", errors: []),
-            IntegrationTestResultItem(operation: "List", result: "OK"),
-            IntegrationTestResultItem(operation: "Delete", result: "Failed", errors: ["Access denied"])
+            IntegrationTestResultItem(operation: "UploadFile", result: "OK"),
+            IntegrationTestResultItem(operation: "GetFile", result: "FAILED", errors: ["Access denied"]),
+            IntegrationTestResultItem(operation: "GetAllFiles", result: "NOT_TESTED", errors: []),
+            IntegrationTestResultItem(operation: "DeleteFile", result: "NOT_TESTED")
         ])
     }
 

@@ -218,9 +218,9 @@ public struct FileDetails: Decodable, Sendable {
 /// One step of a files-integration test — for example the upload, the read,
 /// the listing or the delete. Mirrors the gateway `IntegrationTestResultItemDto`.
 public struct IntegrationTestResultItem: Codable, Sendable, Equatable {
-    /// What was tried, e.g. `"Upload"`.
+    /// What was tried: `"UploadFile"`, `"GetFile"`, `"GetAllFiles"` or `"DeleteFile"`.
     public let operation: String
-    /// How it went, e.g. `"OK"` or `"Failed"`.
+    /// How it went: `"OK"`, `"FAILED"`, or `"NOT_TESTED"` once an earlier step failed.
     public let result: String
     /// Why the step failed. `nil` or empty when it passed.
     public let errors: [String]?

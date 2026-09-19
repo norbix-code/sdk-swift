@@ -34,8 +34,10 @@ Use `getSignedUrl(...)` to download straight from the provider, or
 
 `testFilesIntegration(integrationId:)` runs a live probe against a files
 integration: the gateway uploads a small file, reads it, lists the folder and
-deletes the file again. The answer has one item per step, with `operation`,
-`result` (`"OK"` or `"Failed"`) and `errors`.
+deletes the file again. The answer has one item per step — `UploadFile`,
+`GetFile`, `GetAllFiles`, `DeleteFile`, in that order — with `operation`,
+`result` (`"OK"`, `"FAILED"`, or `"NOT_TESTED"` once an earlier step failed)
+and `errors`.
 
 ```swift
 let result = try await client.files.testFilesIntegration(integrationId: "nbin_123")
