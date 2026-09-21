@@ -13,6 +13,7 @@ and are addressed by a **path** inside that integration's storage.
 | `download` | `GET` | `/{version}/files/{filesIntegrationId}/download` | `project` |
 | `delete` | `DELETE` | `/{version}/files/{filesIntegrationId}` | `project` |
 | `deleteMany` | `DELETE` | `/{version}/files/{filesIntegrationId}/bulk` | `project` |
+| `testFilesIntegration` | `POST` | `/{version}/files/{filesIntegrationId}/test` | `project` |
 | `getPublicFile` | `GET` | `/{version}/files/public/{PublicId}/{Name*}` | `unauthenticated` |
 
 ## Uploading
@@ -28,6 +29,27 @@ Norbix:
 
 Use `getSignedUrl(...)` to download straight from the provider, or
 `download(...)` to stream the bytes through the API.
+
+## Testing an integration
+
+`testFilesIntegration(integrationId:)` runs a live probe against a files
+integration: the gateway uploads a small file, reads it, lists the folder and
+deletes the file again. The answer has one item per step — `UploadFile`,
+`GetFile`, `GetAllFiles`, `DeleteFile`, in that order — with `operation`,
+`result` (`"OK"`, `"FAILED"`, or `"NOT_TESTED"` once an earlier step failed)
+and `errors`.
+
+```swift
+let result = try await client.files.testFilesIntegration(integrationId: "nbin_123")
+for step in result.items where step.result != "OK" {
+    print(step.operation, step.errors ?? [])
+}
+```
+
+The probe writes to the storage, so the key needs the `files:create`
+permission. The Hub has its own `testFilesIntegration`
+(`POST /{version}/files/integrations/test`) for the dashboard; this one is the
+API-plane route.
 
 ## Public links
 
