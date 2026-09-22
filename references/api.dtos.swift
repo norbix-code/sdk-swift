@@ -1,7 +1,7 @@
 /* Options:
-Date: 2026-09-04 14:55:57
+Date: 2026-09-21 16:45:23
 SwiftVersion: 6.0
-Version: 10.08
+Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://localhost:5002
 
@@ -1501,6 +1501,154 @@ public class UpdateUserPreferencesRequest : CodeMashRequestBase, IReturn
         if id != nil { try container.encode(id, forKey: .id) }
         if blockAllMarketingMessages != nil { try container.encode(blockAllMarketingMessages, forKey: .blockAllMarketingMessages) }
         if blockedTags != nil { try container.encode(blockedTags, forKey: .blockedTags) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
+/**
+* Membership · Password
+*/
+// @Route("/{version}/membership/userauth/password/change", "POST")
+// @Api(Description="Membership · Password")
+// @DataContract
+public class ChangePasswordRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = PasskeyOkResponse
+
+    /**
+    * The member's current password.
+    */
+    // @DataMember
+    // @ApiMember(Description="The member's current password.", IsRequired=true)
+    public var currentPassword:String?
+
+    /**
+    * The new password. Validated against the project's complexity policy.
+    */
+    // @DataMember
+    // @ApiMember(Description="The new password. Validated against the project's complexity policy.", IsRequired=true)
+    public var newPassword:String?
+
+    /**
+    * Database integration id. Optional — defaults to the request environment's default integration.
+    */
+    // @DataMember
+    // @ApiMember(Description="Database integration id. Optional — defaults to the request environment's default integration.")
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case currentPassword
+        case newPassword
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        currentPassword = try container.decodeIfPresent(String.self, forKey: .currentPassword)
+        newPassword = try container.decodeIfPresent(String.self, forKey: .newPassword)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if currentPassword != nil { try container.encode(currentPassword, forKey: .currentPassword) }
+        if newPassword != nil { try container.encode(newPassword, forKey: .newPassword) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
+/**
+* Membership · Password
+*/
+// @Route("/{version}/membership/userauth/password/reset/request", "POST")
+// @Api(Description="Membership · Password")
+// @DataContract
+public class RequestPasswordResetRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = PasskeyOkResponse
+
+    /**
+    * Email address to send the reset link to.
+    */
+    // @DataMember
+    // @ApiMember(Description="Email address to send the reset link to.", IsRequired=true)
+    public var email:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case email
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if email != nil { try container.encode(email, forKey: .email) }
+    }
+}
+
+/**
+* Membership · Password
+*/
+// @Route("/{version}/membership/userauth/password/reset/confirm", "POST")
+// @Api(Description="Membership · Password")
+// @DataContract
+public class ConfirmPasswordResetRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = PasskeyOkResponse
+
+    /**
+    * One-time reset token from the email link.
+    */
+    // @DataMember
+    // @ApiMember(Description="One-time reset token from the email link.", IsRequired=true)
+    public var token:String?
+
+    /**
+    * The new password. Validated against the project's complexity policy.
+    */
+    // @DataMember
+    // @ApiMember(Description="The new password. Validated against the project's complexity policy.", IsRequired=true)
+    public var newPassword:String?
+
+    /**
+    * Database integration id. Optional — defaults to the request environment's default integration.
+    */
+    // @DataMember
+    // @ApiMember(Description="Database integration id. Optional — defaults to the request environment's default integration.")
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case token
+        case newPassword
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        token = try container.decodeIfPresent(String.self, forKey: .token)
+        newPassword = try container.decodeIfPresent(String.self, forKey: .newPassword)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if token != nil { try container.encode(token, forKey: .token) }
+        if newPassword != nil { try container.encode(newPassword, forKey: .newPassword) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
     }
 }
@@ -3133,6 +3281,94 @@ public class CommitUploadRequest : CodeMashRequestBase, IReturn
 /**
 * Files
 */
+// @Route("/{version}/files/{filesIntegrationId}/content", "GET")
+// @Api(Description="Files")
+// @DataContract
+public class GetFileContentRequest : RequestBase, IReturn
+{
+    public typealias Return = [UInt8]
+
+    // @DataMember
+    public var filesIntegrationId:String?
+
+    // @DataMember
+    public var path:String?
+
+    // @DataMember
+    public var token:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+        case token
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+        token = try container.decodeIfPresent(String.self, forKey: .token)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+        if token != nil { try container.encode(token, forKey: .token) }
+    }
+}
+
+/**
+* Files
+*/
+// @Route("/{version}/files/{filesIntegrationId}/content", "PUT")
+// @Api(Description="Files")
+// @DataContract
+public class PutFileContentRequest : RequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    // @DataMember
+    public var filesIntegrationId:String?
+
+    // @DataMember
+    public var path:String?
+
+    // @DataMember
+    public var token:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+        case token
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+        token = try container.decodeIfPresent(String.self, forKey: .token)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+        if token != nil { try container.encode(token, forKey: .token) }
+    }
+}
+
+/**
+* Files
+*/
 // @Route("/{version}/files/{filesIntegrationId}", "DELETE")
 // @Api(Description="Files")
 // @DataContract
@@ -3367,6 +3603,44 @@ public class ListFilesRequest : CodeMashListPaginationRequestBase, IReturn
 /**
 * Files
 */
+// @Route("/{version}/files/public/{PublicId}/{Name*}", "GET")
+// @Api(Description="Files")
+// @DataContract
+public class GetPublicFileRequest : RequestBase, IReturn
+{
+    public typealias Return = [UInt8]
+
+    // @DataMember
+    public var publicId:String?
+
+    // @DataMember
+    public var name:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case publicId
+        case name
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        publicId = try container.decodeIfPresent(String.self, forKey: .publicId)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if publicId != nil { try container.encode(publicId, forKey: .publicId) }
+        if name != nil { try container.encode(name, forKey: .name) }
+    }
+}
+
+/**
+* Files
+*/
 // @Route("/{version}/files/{filesIntegrationId}/upload-url", "POST")
 // @Api(Description="Files")
 // @DataContract
@@ -3411,6 +3685,38 @@ public class RequestUploadUrlRequest : CodeMashRequestBase, IReturn
         if path != nil { try container.encode(path, forKey: .path) }
         if contentType != nil { try container.encode(contentType, forKey: .contentType) }
         if expirationSeconds != nil { try container.encode(expirationSeconds, forKey: .expirationSeconds) }
+    }
+}
+
+/**
+* Files
+*/
+// @Route("/{version}/files/{filesIntegrationId}/test", "POST")
+// @Api(Description="Files")
+// @DataContract
+public class TestFilesIntegrationRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = TestFilesIntegrationResponse
+
+    // @DataMember
+    public var filesIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
     }
 }
 
@@ -3768,6 +4074,19 @@ public class GetUserPreferencesResponse : ResponseBase
     }
 }
 
+public class PasskeyOkResponse : ResponseBase
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
 public class PasskeyCeremonyOptionsResponse : ResponseBase
 {
     public var ceremonyId:String?
@@ -3850,19 +4169,6 @@ public class PasskeyListResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if passkeys.count > 0 { try container.encode(passkeys, forKey: .passkeys) }
-    }
-}
-
-public class PasskeyOkResponse : ResponseBase
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
     }
 }
 
@@ -4281,12 +4587,14 @@ public class ListFilesResponse : ResponseBase
 {
     public var list:PaginatedResponse<FileResourceRefDto>?
     public var folders:IList<String>?
+    public var publicFolders:IList<PublicFolderDto>?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case list
         case folders
+        case publicFolders
     }
 
     required public init(from decoder: Decoder) throws {
@@ -4294,6 +4602,7 @@ public class ListFilesResponse : ResponseBase
         let container = try decoder.container(keyedBy: CodingKeys.self)
         list = try container.decodeIfPresent(PaginatedResponse<FileResourceRefDto>.self, forKey: .list)
         folders = try container.decodeIfPresent(IList<String>.self, forKey: .folders)
+        publicFolders = try container.decodeIfPresent(IList<PublicFolderDto>.self, forKey: .publicFolders)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -4301,6 +4610,7 @@ public class ListFilesResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if list != nil { try container.encode(list, forKey: .list) }
         if folders != nil { try container.encode(folders, forKey: .folders) }
+        if publicFolders != nil { try container.encode(publicFolders, forKey: .publicFolders) }
     }
 }
 
@@ -4324,6 +4634,31 @@ public class RequestUploadUrlResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if url != nil { try container.encode(url, forKey: .url) }
+    }
+}
+
+// @DataContract
+public class TestFilesIntegrationResponse : ResponseBase
+{
+    // @DataMember
+    public var items:IReadOnlyList<IntegrationTestResultItemDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case items
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decodeIfPresent(IReadOnlyList<IntegrationTestResultItemDto>.self, forKey: .items)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if items != nil { try container.encode(items, forKey: .items) }
     }
 }
 
@@ -5401,6 +5736,45 @@ public class FileResourceRefDto : Codable
     // @DataMember(Order=4)
     public var path:String?
 
+    // @DataMember(Order=5)
+    public var publicUrl:String?
+
+    // @DataMember(Order=6)
+    public var isPublic:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PublicFolderDto : Codable
+{
+    // @DataMember(Order=1)
+    public var path:String?
+
+    // @DataMember(Order=2)
+    public var publicId:String?
+
+    // @DataMember(Order=3)
+    public var publicUrl:String?
+
+    // @DataMember(Order=4)
+    public var inherited:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class IntegrationTestResultItemDto : Codable
+{
+    // @DataMember
+    public var operation:String?
+
+    // @DataMember
+    public var result:String?
+
+    // @DataMember
+    public var errors:IReadOnlyList<String>?
+
     required public init(){}
 }
 
@@ -5851,6 +6225,9 @@ public class TriggerDto : IHasViewId, Codable
 
     // @DataMember
     public var activationCode:String?
+
+    // @DataMember
+    public var savedByAuthId:String?
 
     required public init(){}
 }

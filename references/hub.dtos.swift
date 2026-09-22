@@ -1,7 +1,7 @@
 /* Options:
-Date: 2026-09-04 14:55:57
+Date: 2026-09-21 16:45:23
 SwiftVersion: 6.0
-Version: 10.08
+Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://localhost:5001
 
@@ -200,6 +200,7 @@ public class InternalsTypeGen : Codable
     public var typegen_169_TelnyxSmsIntegrationDto:TelnyxSmsIntegrationDto?
     public var typegen_170_TwilioSmsIntegrationDto:TwilioSmsIntegrationDto?
     public var typegen_171_VonageSmsIntegrationDto:VonageSmsIntegrationDto?
+    public var typegen_246_FakeSmsIntegrationDto:FakeSmsIntegrationDto?
     public var typegen_172_AndroidFirebasePushIntegrationDto:AndroidFirebasePushIntegrationDto?
     public var typegen_173_AppleApnsPushIntegrationDto:AppleApnsPushIntegrationDto?
     public var typegen_174_ChromePluginPushIntegrationDto:ChromePluginPushIntegrationDto?
@@ -207,11 +208,13 @@ public class InternalsTypeGen : Codable
     public var typegen_176_EdgeWebPushIntegrationDto:EdgeWebPushIntegrationDto?
     public var typegen_177_FirefoxWebPushIntegrationDto:FirefoxWebPushIntegrationDto?
     public var typegen_178_SafariPushIntegrationDto:SafariPushIntegrationDto?
+    public var typegen_247_FakePushIntegrationDto:FakePushIntegrationDto?
     public var typegen_179_AwsCrossAccountRoleEmailIntegrationDto:AwsCrossAccountRoleEmailIntegrationDto?
     public var typegen_180_AwsIamEmailIntegrationDto:AwsIamEmailIntegrationDto?
     public var typegen_181_MailGunEmailIntegrationDto:MailGunEmailIntegrationDto?
     public var typegen_182_SendGridEmailIntegrationDto:SendGridEmailIntegrationDto?
     public var typegen_183_SmtpEmailIntegrationDto:SmtpEmailIntegrationDto?
+    public var typegen_248_FakeEmailIntegrationDto:FakeEmailIntegrationDto?
     public var typegen_192_WebhookIntegrationDto:WebhookIntegrationDto?
     public var typegen_193_WebhookDestinationDto:WebhookDestinationDto?
     public var typegen_194_SchedulerTaskDto:SchedulerTaskDto?
@@ -8559,7 +8562,7 @@ public class SseCallTriggered : Codable
     public var sourceEvent:String?
     public var targetUserAuthId:String?
     public var schemaId:String?
-    public var tokenMappings:IReadOnlyDictionary<String, String>?
+    public var tokenMappings:[String:String]?
     public var correlationId:String?
 
     required public init(){}
@@ -8767,6 +8770,162 @@ public class SaveFilesTrigger : SaveTrigger, IReturn
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+    }
+}
+
+// @Route("/{version}/files/item/private", "POST")
+public class MakeFilePrivateRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * The files integration the file lives on.
+    */
+    // @ApiMember(Description="The files integration the file lives on.", IsRequired=true)
+    public var filesIntegrationId:String?
+
+    /**
+    * Path of the file, relative to the integration.
+    */
+    // @ApiMember(Description="Path of the file, relative to the integration.", IsRequired=true)
+    public var path:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+    }
+}
+
+// @Route("/{version}/files/item/public", "POST")
+public class MakeFilePublicRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The files integration the file lives on.
+    */
+    // @ApiMember(Description="The files integration the file lives on.", IsRequired=true)
+    public var filesIntegrationId:String?
+
+    /**
+    * Path of the file to publish, relative to the integration.
+    */
+    // @ApiMember(Description="Path of the file to publish, relative to the integration.", IsRequired=true)
+    public var path:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+    }
+}
+
+// @Route("/{version}/files/folder/private", "POST")
+public class MakeFolderPrivateRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * The files integration the folder lives on.
+    */
+    // @ApiMember(Description="The files integration the folder lives on.", IsRequired=true)
+    public var filesIntegrationId:String?
+
+    /**
+    * Folder prefix, relative to the integration.
+    */
+    // @ApiMember(Description="Folder prefix, relative to the integration.", IsRequired=true)
+    public var path:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+    }
+}
+
+// @Route("/{version}/files/folder/public", "POST")
+public class MakeFolderPublicRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The files integration the folder lives on.
+    */
+    // @ApiMember(Description="The files integration the folder lives on.", IsRequired=true)
+    public var filesIntegrationId:String?
+
+    /**
+    * Folder prefix to publish, relative to the integration.
+    */
+    // @ApiMember(Description="Folder prefix to publish, relative to the integration.", IsRequired=true)
+    public var path:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
     }
 }
 
@@ -9242,6 +9401,7 @@ public class FileUploaded : Codable
     public var projectId:ProjectId?
     public var integrationId:IntegrationId?
     public var fileRef:FileResourceRef?
+    public var verified:Bool?
 
     required public init(){}
 }
@@ -11462,11 +11622,12 @@ public class EmailCampaignFailed : Codable
 public class EmailCampaignTriggered : Codable
 {
     public var projectId:ProjectId?
+    public var accountId:AccountId?
     public var triggerId:TriggerId?
     public var triggerType:TriggerType?
     public var sourceEvent:String?
     public var schemaId:String?
-    public var tokenMappings:IReadOnlyDictionary<String, String>?
+    public var tokenMappings:[String:String]?
 
     required public init(){}
 }
@@ -13075,11 +13236,12 @@ public class SmsCampaignFailed : Codable
 public class SmsCampaignTriggered : Codable
 {
     public var projectId:ProjectId?
+    public var accountId:AccountId?
     public var triggerId:TriggerId?
     public var triggerType:TriggerType?
     public var sourceEvent:String?
     public var schemaId:String?
-    public var tokenMappings:IReadOnlyDictionary<String, String>?
+    public var tokenMappings:[String:String]?
 
     required public init(){}
 }
@@ -14316,6 +14478,23 @@ public class ServerlessEnabled : Codable
 
 public class ServerlessDisabled : Codable
 {
+    required public init(){}
+}
+
+public class MarketplaceFunctionTriggered : Codable
+{
+    public var projectId:ProjectId?
+    public var accountId:AccountId?
+    public var triggerId:TriggerId?
+    public var triggerType:TriggerType?
+    public var sourceEvent:String?
+    public var schemaId:String?
+    public var targetUserAuthId:String?
+    public var oldDocumentJson:String?
+    public var newDocumentJson:String?
+    public var collection:String?
+    public var correlationId:String?
+
     required public init(){}
 }
 
@@ -15885,6 +16064,78 @@ public class PushTemplateUnArchived : Codable
 {
     public var templateId:TemplateId?
     public var env:Env?
+
+    required public init(){}
+}
+
+public class PushBatchRegistered : Codable
+{
+    public var campaignId:CampaignId?
+    public var campaignBatchId:CampaignBatchId?
+    public var startingAfter:String?
+
+    required public init(){}
+}
+
+public class PushNotificationRead : Codable
+{
+    public var campaignId:CampaignId?
+    public var campaignBatchId:CampaignBatchId?
+    public var notificationId:NotificationId?
+
+    required public init(){}
+}
+
+public class PushNotificationClicked : Codable
+{
+    public var campaignId:CampaignId?
+    public var campaignBatchId:CampaignBatchId?
+    public var notificationId:NotificationId?
+    public var sourceId:String?
+
+    required public init(){}
+}
+
+public class PushCampaignStarted : Codable
+{
+    public var campaignId:CampaignId?
+
+    required public init(){}
+}
+
+public class PushCampaignStopped : Codable
+{
+    public var campaignId:CampaignId?
+    public var reason:CampaignStopReason?
+
+    required public init(){}
+}
+
+public class PushCampaignCompleted : Codable
+{
+    public var campaignId:CampaignId?
+    public var errors:[ErrorDto]?
+
+    required public init(){}
+}
+
+public class PushCampaignFailed : Codable
+{
+    public var campaignId:CampaignId?
+    public var errors:[ErrorDto] = []
+
+    required public init(){}
+}
+
+public class PushCampaignTriggered : Codable
+{
+    public var projectId:ProjectId?
+    public var accountId:AccountId?
+    public var triggerId:TriggerId?
+    public var triggerType:TriggerType?
+    public var sourceEvent:String?
+    public var schemaId:String?
+    public var tokenMappings:[String:String]?
 
     required public init(){}
 }
@@ -18622,10 +18873,8 @@ public class UpdateWebhookIntegrationExtraHeadersRequest : CodeMashRequestBase, 
 }
 
 // @Route("/{version}/webhooks/{source}/{integrationInstanceId}", "POST")
-public class ReceiveWebhook : IReturn, Codable
+public class ReceiveWebhook : IReturnVoid, Codable
 {
-    public typealias Return = HttpResult
-
     public var source:String?
     public var integrationInstanceId:String?
     public var requestStream:Data?
@@ -22731,12 +22980,14 @@ public class GetFilesIntegrationsResponse : ResponseBase
 {
     public var defaultIntegrationId:String?
     public var list:PaginatedResponse<FilesIntegrationListProjection>?
+    public var availableProviders:[FileProvider] = []
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case defaultIntegrationId
         case list
+        case availableProviders
     }
 
     required public init(from decoder: Decoder) throws {
@@ -22744,6 +22995,7 @@ public class GetFilesIntegrationsResponse : ResponseBase
         let container = try decoder.container(keyedBy: CodingKeys.self)
         defaultIntegrationId = try container.decodeIfPresent(String.self, forKey: .defaultIntegrationId)
         list = try container.decodeIfPresent(PaginatedResponse<FilesIntegrationListProjection>.self, forKey: .list)
+        availableProviders = try container.decodeIfPresent([FileProvider].self, forKey: .availableProviders) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -22751,6 +23003,7 @@ public class GetFilesIntegrationsResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if defaultIntegrationId != nil { try container.encode(defaultIntegrationId, forKey: .defaultIntegrationId) }
         if list != nil { try container.encode(list, forKey: .list) }
+        if availableProviders.count > 0 { try container.encode(availableProviders, forKey: .availableProviders) }
     }
 }
 
@@ -22814,12 +23067,14 @@ public class GetFolderFilesResponse : ResponseBase
 {
     public var list:PaginatedResponse<FileResourceRefDto>?
     public var folders:IList<String>?
+    public var publicFolders:IList<PublicFolderDto>?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case list
         case folders
+        case publicFolders
     }
 
     required public init(from decoder: Decoder) throws {
@@ -22827,6 +23082,7 @@ public class GetFolderFilesResponse : ResponseBase
         let container = try decoder.container(keyedBy: CodingKeys.self)
         list = try container.decodeIfPresent(PaginatedResponse<FileResourceRefDto>.self, forKey: .list)
         folders = try container.decodeIfPresent(IList<String>.self, forKey: .folders)
+        publicFolders = try container.decodeIfPresent(IList<PublicFolderDto>.self, forKey: .publicFolders)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -22834,6 +23090,7 @@ public class GetFolderFilesResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if list != nil { try container.encode(list, forKey: .list) }
         if folders != nil { try container.encode(folders, forKey: .folders) }
+        if publicFolders != nil { try container.encode(publicFolders, forKey: .publicFolders) }
     }
 }
 
@@ -31493,6 +31750,19 @@ public class VonageSmsIntegrationDto : SmsIntegrationDto
     }
 }
 
+public class FakeSmsIntegrationDto : SmsIntegrationDto
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
 public class AndroidFirebasePushIntegrationDto : PushIntegrationDto
 {
     public var projectId:String?
@@ -31682,6 +31952,19 @@ public class SafariPushIntegrationDto : PushIntegrationDto
     }
 }
 
+public class FakePushIntegrationDto : PushIntegrationDto
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
 public class AwsCrossAccountRoleEmailIntegrationDto : AwsSesEmailIntegrationDto
 {
     public var roleArn:String?
@@ -31786,6 +32069,19 @@ public class SmtpEmailIntegrationDto : EmailIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if hostName != nil { try container.encode(hostName, forKey: .hostName) }
         if port != nil { try container.encode(port, forKey: .port) }
+    }
+}
+
+public class FakeEmailIntegrationDto : EmailIntegrationDto
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
     }
 }
 
@@ -32653,6 +32949,12 @@ public class FileResourceRefDto : Codable
 
     // @DataMember(Order=4)
     public var path:String?
+
+    // @DataMember(Order=5)
+    public var publicUrl:String?
+
+    // @DataMember(Order=6)
+    public var isPublic:Bool?
 
     required public init(){}
 }
@@ -36564,6 +36866,36 @@ public class FilesIntegrationListProjection : IntegrationListProjection
     }
 }
 
+public enum FileProvider : String, Codable
+{
+    case Local
+    case AwsS3
+    case AzureBlobStorage
+    case GoogleCloudStorage
+    case Ftp
+    case AppleICloud
+    case DropBox
+    case GoogleDrive
+}
+
+// @DataContract
+public class PublicFolderDto : Codable
+{
+    // @DataMember(Order=1)
+    public var path:String?
+
+    // @DataMember(Order=2)
+    public var publicId:String?
+
+    // @DataMember(Order=3)
+    public var publicUrl:String?
+
+    // @DataMember(Order=4)
+    public var inherited:Bool?
+
+    required public init(){}
+}
+
 // @DataContract
 public class NotificationModuleDisableDependenciesDto : Codable
 {
@@ -38453,18 +38785,6 @@ public enum DatabaseProvider : String, Codable
     case CodeMashMongoDbAtlasFlexManaged
 }
 
-public enum FileProvider : String, Codable
-{
-    case Local
-    case AwsS3
-    case AzureBlobStorage
-    case GoogleCloudStorage
-    case Ftp
-    case AppleICloud
-    case DropBox
-    case GoogleDrive
-}
-
 public enum AwsS3IntegrationType : String, Codable
 {
     case Iam
@@ -39759,7 +40079,6 @@ public class TriggerEventName : Codable
 public class CronExpression : Codable
 {
     public var value:String?
-    public var parsed:CronExpression?
 
     required public init(){}
 }
@@ -40193,6 +40512,9 @@ public class TriggerDto : IHasViewId, Codable
 
     // @DataMember
     public var activationCode:String?
+
+    // @DataMember
+    public var savedByAuthId:String?
 
     required public init(){}
 }
@@ -41487,11 +41809,6 @@ public class PushBody : Codable
 {
     public var value:TemplateCode?
 
-    required public init(){}
-}
-
-public class CronExpression : Codable
-{
     required public init(){}
 }
 
