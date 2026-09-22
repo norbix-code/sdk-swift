@@ -308,8 +308,36 @@ do {
     case "NORBIX_NETWORK_ERROR":          /* retry */ break
     default:                              print(error.localizedDescription)
     }
+
+    // httpStatus / errorCode are the names every Norbix SDK uses.
+    // status / code are the same values, kept for older code.
+    print(error.httpStatus, error.errorCode, error.message)
+    for item in error.errors {
+        print(item.errorCode ?? "", item.fieldName ?? "", item.message ?? "")
+    }
+    print(error.body ?? "") // the answer exactly as it arrived
 }
 ```
+
+`message` and `errorCode` are the gateway's own. The gateway puts them inside
+`responseStatus.errors[]`, so the SDK reads that list first, takes the first
+entry for the message and the code, and keeps every entry in `errors`. Only
+when the body has no `responseStatus` are the top-level `message` and
+`errorCode` read. `Request failed (HTTP N)` with the code `HTTP_<status>` is
+the last fallback, used when the body says nothing — a 500 page that is not
+JSON, say.
+
+### Breaking change — a refused call now throws
+
+The gateway answers a business refusal (an unknown id, a rule that says no)
+with **HTTP 200** and `responseStatus.isSuccess = false`. The SDK used to hand
+that answer back as a normal value, so code carried on as if the call had
+worked. It now throws a `NorbixError` with `httpStatus` 200 and the gateway's
+message and error code.
+
+If your code checked the `responseStatus` of the answer itself, move that check
+into a `catch`. `downloadData` (file download, the public file link) answers
+with raw bytes rather than a document, is not JSON, and is unchanged.
 
 ## SDK maintenance
 
