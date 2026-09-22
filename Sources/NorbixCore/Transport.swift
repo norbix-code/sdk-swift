@@ -114,6 +114,13 @@ public final class Transport: @unchecked Sendable {
             region: region
         )
         if data.isEmpty { return nil }
+        // A 2xx does not mean the call worked: the gateway answers a business
+        // refusal with HTTP 200 and responseStatus.isSuccess = false, and that
+        // is a failure the caller must see (10b-files, issue #67). File
+        // content goes through downloadData, which never reaches this line.
+        if NorbixError.saysItFailed(data: data) {
+            throw NorbixError.fromHTTPResponse(status: 200, data: data)
+        }
         return try? JSONSerialization.jsonObject(with: data)
     }
 
@@ -146,6 +153,11 @@ public final class Transport: @unchecked Sendable {
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
             region: region
         )
+        // Same rule as the untyped variant: a 200 the gateway marked as failed
+        // is a failure, not a value to decode (10b-files, issue #67).
+        if NorbixError.saysItFailed(data: data) {
+            throw NorbixError.fromHTTPResponse(status: 200, data: data)
+        }
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
