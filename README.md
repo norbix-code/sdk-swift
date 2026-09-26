@@ -221,8 +221,7 @@ let client = try NorbixApiClient(projectId: "proj_123", apiKey: "sk_live_xxx")
 do {
     let response = try await client.database.find([
         "collectionName": "orders",
-        "take": 20,
-        "skip": 0,
+        "pagingArgs": "{pageSize:20}",
     ])
     if let payload = response as? [String: Any] {
         print("orders response:", payload)
@@ -346,6 +345,25 @@ gateway sends them (camelCase) — including `description`:
 
 ```swift
 struct Role: Decodable { let name: String; let description: String? }
+```
+
+Database records have no fixed shape, so the typed database calls also take
+`JSONValue`. `find` reads the records from `list.items` and `findOne` from
+`result`; an answer in any other shape throws `NORBIX_DECODE_ERROR` instead of
+giving an empty page.
+
+```swift
+let page: Page<JSONValue> = try await client.database.find(
+    collection: "orders",
+    query: ["pagingArgs": "{pageSize:20}"],
+    as: JSONValue.self
+)
+let title = page.items.first?["title"]?.stringValue
+if page.hasMore == true {
+    // next page: ["pagingArgs": "{pageSize:20,startingAfter:\"\(page.startingAfter!)\"}"]
+}
+
+let order: JSONValue = try await client.database.findOne(collection: "orders", id: "abc123", as: JSONValue.self)
 ```
 
 The files in `references/` are the gateway's upstream DTO output. They are not

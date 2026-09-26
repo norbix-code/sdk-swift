@@ -8,14 +8,18 @@ import NorbixCore
 // flavor you prefer per call site.
 
 public extension DatabaseModule {
-    /// Type-safe paginated `find` over a collection. Decodes the response into
-    /// `Page<T>`.
+    /// Type-safe paginated `find` over a collection. Decodes the records
+    /// (`list.items` in the answer) into `Page<T>`. Use `JSONValue` as `T`
+    /// when the records have no fixed shape.
+    ///
+    /// Paging is by cursor: pass `pagingArgs` in the gateway's inline format,
+    /// and the next page's cursor comes back in `page.startingAfter`.
     ///
     /// ```swift
     /// struct Order: Codable, Sendable { let id: String; let total: Decimal }
     /// let page: Page<Order> = try await client.database.find(
     ///     collection: "orders",
-    ///     query: ["take": 20, "skip": 0],
+    ///     query: ["pagingArgs": "{pageSize:20}"],
     ///     as: Order.self
     /// )
     /// for order in page.items { print(order.id, order.total) }
@@ -40,7 +44,8 @@ public extension DatabaseModule {
         )
     }
 
-    /// Type-safe `findOne` by id.
+    /// Type-safe `findOne` by id. Decodes the record (`result` in the answer)
+    /// into `T`; use `JSONValue` when the record has no fixed shape.
     ///
     /// ```swift
     /// let order: Order = try await client.database.findOne(
@@ -54,14 +59,19 @@ public extension DatabaseModule {
         bearerToken: String? = nil,
         as type: T.Type
     ) async throws -> T {
-        try await transport.send(
+        let answer: FindOneAnswer<T> = try await transport.send(
             path: "/{version}/database/collections/{collectionName}/{id}",
             method: "GET",
             request: ["collectionName": collection, "id": id],
             scope: .project,
             timeout: timeout,
             bearerToken: bearerToken,
-            as: T.self
+            as: FindOneAnswer<T>.self
         )
+        return answer.result
     }
+}
+
+private struct FindOneAnswer<T: Decodable>: Decodable {
+    let result: T
 }

@@ -113,10 +113,12 @@ final class TypedDecodeTests: XCTestCase {
         }
     }
 
+    // GET /{version}/database/collections/{collectionName}/{id} answers
+    // FindOneResponse: the record is under "result".
     func testFindOneReturnsTypedItem() async throws {
         let mock = MockHTTPExecutor()
         mock.responseBody = Data(#"""
-        {"id":"o1","total":99.99}
+        {"result":{"id":"o1","total":99.99},"responseStatus":{"isSuccess":true,"errors":[]}}
         """#.utf8)
         let client = try NorbixApiClient(
             projectId: "p1", apiKey: "k", executor: mock
@@ -133,7 +135,7 @@ final class TypedDecodeTests: XCTestCase {
 
     func testDecodeErrorIsTypedNorbixError() async throws {
         let mock = MockHTTPExecutor()
-        mock.responseBody = Data(#"{"id":42,"total":"not-a-number"}"#.utf8)
+        mock.responseBody = Data(#"{"result":{"id":42,"total":"not-a-number"}}"#.utf8)
         let client = try NorbixApiClient(
             projectId: "p1", apiKey: "k", executor: mock
         )
@@ -147,5 +149,51 @@ final class TypedDecodeTests: XCTestCase {
             XCTAssertEqual(error.code, "NORBIX_DECODE_ERROR")
             XCTAssertNotNil(error.rawBody)
         }
+    }
+
+    func testFindOneWithoutResultThrows() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"id":"o1","total":1}"#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        do {
+            let _: Order = try await client.database.findOne(collection: "orders", id: "o1", as: Order.self)
+            XCTFail("expected NORBIX_DECODE_ERROR")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.code, "NORBIX_DECODE_ERROR")
+        }
+    }
+
+    // Records have no fixed shape: JSONValue decodes them as they arrived.
+    func testFindDecodesRecordsAsJSONValue() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(Self.gatewayFindAnswer.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        let page: Page<JSONValue> = try await client.database.find(collection: "products", as: JSONValue.self)
+
+        XCTAssertEqual(page.items.count, 2)
+        XCTAssertEqual(page.items[0]["_id"]?.stringValue, "6710a1f0c2b7e41a2b3c4d5e")
+        XCTAssertEqual(page.items[0]["price"]?.doubleValue, 10.5)
+        XCTAssertEqual(page.items[1]["price"]?.intValue, 20)
+        XCTAssertNil(page.items[0]["missing"])
+    }
+
+    func testFindOneDecodesARecordAsJSONValue() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"""
+        {"result":{"_id":"r1","title":"Hello","tags":["a","b"],"stock":{"count":3,"open":true},"note":null}}
+        """#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        let record: JSONValue = try await client.database.findOne(collection: "posts", id: "r1", as: JSONValue.self)
+
+        XCTAssertEqual(record["title"]?.stringValue, "Hello")
+        XCTAssertEqual(record["tags"]?[1]?.stringValue, "b")
+        XCTAssertEqual(record["stock"]?["count"]?.intValue, 3)
+        XCTAssertEqual(record["stock"]?["open"]?.boolValue, true)
+        XCTAssertEqual(record["note"]?.isNull, true)
+        let dict = try XCTUnwrap(record.anyValue as? [String: Any])
+        XCTAssertEqual(dict["title"] as? String, "Hello")
     }
 }
