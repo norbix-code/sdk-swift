@@ -138,6 +138,7 @@ public final class NorbixApiClient: Sendable {
                 "provider": credentials.provider
             ],
             scope: .unauthenticated,
+            headers: [Transport.loginProjectIdHeader: transport.config.projectId],
             as: AuthResponse.self
         )
         transport.config.auth = .bearerToken(auth.bearerToken)

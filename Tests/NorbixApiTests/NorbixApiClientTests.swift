@@ -27,6 +27,19 @@ final class NorbixApiClientTests: XCTestCase {
         XCTAssertTrue(client.isAuthenticated)
     }
 
+    // The Api login is a project-user login: the gateway picks the project
+    // from norbix-project-id on /auth.
+    func testLoginSendsTheLoginProjectHeader() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"bearerToken":"t"}"#.utf8)
+        let client = try NorbixApiClient(projectId: "prj_1", executor: mock)
+
+        _ = try await client.login(LoginCredentials(userName: "alice", password: "secret"))
+
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-project-id"), "prj_1")
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "nb-project-id"), "prj_1")
+    }
+
     func testDefaultBaseUrlIsProductionApi() async throws {
         let mock = MockHTTPExecutor()
         let client = try NorbixApiClient(

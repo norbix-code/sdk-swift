@@ -49,6 +49,13 @@ public struct LoginCredentials: Sendable {
 /// internally.) The `@unchecked Sendable` conformance is correct because
 /// access to `_config` is fully synchronized.
 public final class Transport: @unchecked Sendable {
+    /// Header the gateway reads the project id from on every request.
+    public static let projectIdHeader = "nb-project-id"
+    /// Header the gateway reads the account id from (calls without a session).
+    public static let accountIdHeader = "nb-account-id"
+    /// Header the gateway reads on `/auth` to log in a project user.
+    public static let loginProjectIdHeader = "norbix-project-id"
+
     private let lock = NSLock()
     private var _config: NorbixConfig
     private let executor: HTTPExecuting
@@ -145,13 +152,14 @@ public final class Transport: @unchecked Sendable {
         bearerToken: String? = nil,
         env: String? = nil,
         region: String? = nil,
+        headers: [String: String] = [:],
         as type: T.Type,
         decoder: JSONDecoder = .norbixDefault
     ) async throws -> T {
         let data = try await performRequest(
             path: path, method: method, request: request,
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
-            region: region
+            region: region, headers: headers
         )
         // Same rule as the untyped variant: a 200 the gateway marked as failed
         // is a failure, not a value to decode (10b-files, issue #67).
@@ -198,7 +206,8 @@ public final class Transport: @unchecked Sendable {
         timeout: TimeInterval?,
         bearerToken: String?,
         env: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        headers: [String: String] = [:]
     ) async throws -> Data {
         // Take one consistent snapshot of the config for this request — avoids
         // the request seeing a half-mutated state if another thread calls
@@ -243,11 +252,18 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue("Bearer \(resolvedToken)", forHTTPHeaderField: "Authorization")
         }
 
+        // The gateway's request filter reads these two names for every call
+        // (EventMetadataHeaderNames in the gateway). Do not send the
+        // norbix-project-id / norbix-account-id spellings here: on /auth
+        // they switch the login to a project user or a collaborator.
         if !snapshot.projectId.isEmpty {
-            httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "X-CM-ProjectId")
+            httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: Transport.projectIdHeader)
         }
-        if let accountId = snapshot.accountId {
-            httpRequest.setValue(accountId, forHTTPHeaderField: "X-CM-AccountId")
+        if let accountId = snapshot.accountId, !accountId.isEmpty {
+            httpRequest.setValue(accountId, forHTTPHeaderField: Transport.accountIdHeader)
+        }
+        for (k, v) in headers {
+            httpRequest.setValue(v, forHTTPHeaderField: k)
         }
 
         // Environment selector: per-call override wins over the client default.

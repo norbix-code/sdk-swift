@@ -260,7 +260,7 @@ final class FilesModuleTests: XCTestCase {
         XCTAssertNil(mock.lastRequest?.url?.query)
         // Project scope, like the other Api Files calls.
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer k")
-        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "X-CM-ProjectId"), "p1")
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "nb-project-id"), "p1")
         // The integration id is consumed by the route, so nothing is left for a body.
         XCTAssertNil(mock.lastRequest?.httpBody)
 
