@@ -28,7 +28,8 @@ In Xcode:
 2. Use URL: `https://github.com/norbix-code/sdk-swift`
 3. Pick a version rule (recommended: Up to Next Major)
 4. Add **`NorbixApi`** and/or **`NorbixHub`** to your target — only the planes
-   you need.
+   you need — and **`NorbixCore`** when your code names the shared types
+   (`LoginCredentials`, `NorbixError`, `HTTPExecuting`, `Page`, `JSONValue`).
 
 Or in `Package.swift`:
 
@@ -42,6 +43,7 @@ Or in `Package.swift`:
     dependencies: [
         .product(name: "NorbixApi", package: "sdk-swift"),
         // .product(name: "NorbixHub", package: "sdk-swift"),
+        .product(name: "NorbixCore", package: "sdk-swift"),
     ]
 )
 ```

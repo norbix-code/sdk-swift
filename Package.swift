@@ -11,16 +11,16 @@ let package = Package(
         .visionOS(.v1)
     ],
     products: [
-        // Two library products — one per gateway. Consumers import only the
-        // surface they need so an iOS app that uses the Api gateway doesn't
-        // pay binary-size cost for the Hub gateway. NorbixCore is an
-        // internal target both depend on (not exposed as a library product);
-        // shared types (errors, config) are re-exported from both Api and
-        // Hub via public typealiases. This matches the Stripe iOS pattern.
+        // One library product per gateway, so an app that uses only the Api
+        // gateway does not pay binary-size cost for the Hub gateway.
         // Project-scoped data plane (https://api.norbix.ai by default).
         .library(name: "NorbixApi", targets: ["NorbixApi"]),
         // Project / account configuration plane (https://hub.norbix.ai by default).
-        .library(name: "NorbixHub", targets: ["NorbixHub"])
+        .library(name: "NorbixHub", targets: ["NorbixHub"]),
+        // Shared types both clients use (LoginCredentials, NorbixError,
+        // HTTPExecuting, Page, JSONValue, ...). Add it next to NorbixApi /
+        // NorbixHub to `import NorbixCore` in an app.
+        .library(name: "NorbixCore", targets: ["NorbixCore"])
     ],
     targets: [
         .target(
