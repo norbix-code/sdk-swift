@@ -107,12 +107,9 @@ public final class NorbixHubClient: Sendable {
     ) throws {
         let processEnv = ProcessInfo.processInfo.environment
 
-        guard let resolvedProjectId = projectId ?? processEnv["NORBIX_PROJECT_ID"], !resolvedProjectId.isEmpty else {
-            throw NorbixError(
-                message: "projectId is required (pass it directly or set NORBIX_PROJECT_ID).",
-                code: "NORBIX_CONFIG_INVALID"
-            )
-        }
+        // projectId is optional for the Hub: an account owner logs in and
+        // lists projects before choosing one (then `setScope(projectId:)`).
+        let resolvedProjectId = projectId ?? processEnv["NORBIX_PROJECT_ID"] ?? ""
 
         let auth: NorbixAuth
         if let token = bearerToken ?? processEnv["NORBIX_BEARER_TOKEN"], !token.isEmpty {

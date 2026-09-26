@@ -34,7 +34,8 @@ public enum NorbixAuth: Sendable {
 }
 
 /// Tells the transport whether a call is project-scoped, account-scoped, or
-/// public/unauthenticated. Account-scoped calls require `accountId` to be set.
+/// public/unauthenticated. Project-scoped calls require `projectId`; account-scoped
+/// calls do not need `accountId` (the gateway reads the account from the session).
 public enum NorbixScope: Sendable {
     case project
     case account
@@ -102,12 +103,9 @@ public struct NorbixConfig: Sendable {
         verbose: Bool = false,
         retryPolicy: RetryPolicy = .standard
     ) throws {
-        guard !projectId.isEmpty else {
-            throw NorbixError(
-                message: "projectId is required",
-                code: "NORBIX_CONFIG_INVALID"
-            )
-        }
+        // An empty projectId is allowed: a Hub client can log in and call
+        // account-scoped endpoints before a project is chosen. Project-scoped
+        // calls still fail fast in the transport (NORBIX_PROJECT_SCOPE_REQUIRED).
         guard !baseUrl.isEmpty else {
             throw NorbixError(
                 message: "baseUrl is required",

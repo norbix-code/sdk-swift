@@ -205,10 +205,10 @@ public final class Transport: @unchecked Sendable {
         // setApiKey/setBearerToken concurrently.
         let snapshot = self.config
 
-        if scope == .account && snapshot.accountId == nil {
+        if scope == .project && snapshot.projectId.isEmpty {
             throw NorbixError(
-                message: "This endpoint is account-scoped. Configure accountId on the client.",
-                code: "NORBIX_ACCOUNT_SCOPE_REQUIRED"
+                message: "This endpoint is project-scoped. Choose a project first (setScope(projectId:)).",
+                code: "NORBIX_PROJECT_SCOPE_REQUIRED"
             )
         }
 
@@ -243,7 +243,9 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue("Bearer \(resolvedToken)", forHTTPHeaderField: "Authorization")
         }
 
-        httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "X-CM-ProjectId")
+        if !snapshot.projectId.isEmpty {
+            httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "X-CM-ProjectId")
+        }
         if let accountId = snapshot.accountId {
             httpRequest.setValue(accountId, forHTTPHeaderField: "X-CM-AccountId")
         }
