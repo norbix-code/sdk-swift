@@ -28,6 +28,91 @@ final class TypedDecodeTests: XCTestCase {
         XCTAssertEqual(page.total, 2)
     }
 
+    // Answer shape of GET /{version}/database/collections/{collectionName}:
+    // FindResponse.list is the gateway's PaginatedResponse (items + cursors).
+    static let gatewayFindAnswer = #"""
+    {"list":{"items":[{"_id":"6710a1f0c2b7e41a2b3c4d5e","title":"First","price":10.5},{"_id":"6710a1f0c2b7e41a2b3c4d5f","title":"Second","price":20}],"hasMore":true,"hasPrevious":false,"startingAfter":"6710a1f0c2b7e41a2b3c4d5f"},"responseStatus":{"isSuccess":true,"errors":[]}}
+    """#
+
+    private struct Product: Codable, Sendable, Equatable {
+        let id: String
+        let title: String
+        let price: Double
+        enum CodingKeys: String, CodingKey { case id = "_id", title, price }
+    }
+
+    func testFindReadsListItemsFromTheGatewayAnswer() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(Self.gatewayFindAnswer.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        let page: Page<Product> = try await client.database.find(collection: "products", as: Product.self)
+
+        XCTAssertEqual(page.items, [
+            Product(id: "6710a1f0c2b7e41a2b3c4d5e", title: "First", price: 10.5),
+            Product(id: "6710a1f0c2b7e41a2b3c4d5f", title: "Second", price: 20)
+        ])
+        XCTAssertEqual(page.hasMore, true)
+        XCTAssertEqual(page.hasPrevious, false)
+        XCTAssertEqual(page.startingAfter, "6710a1f0c2b7e41a2b3c4d5f")
+        XCTAssertNil(page.total)
+    }
+
+    func testFindReadsAnEmptyList() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"list":{"items":[],"hasMore":false},"responseStatus":{"isSuccess":true}}"#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        let page: Page<Product> = try await client.database.find(collection: "products", as: Product.self)
+
+        XCTAssertTrue(page.items.isEmpty)
+        XCTAssertEqual(page.hasMore, false)
+    }
+
+    // GET /{version}/membership/auth answers GetUsersResponse { list: PaginatedResponse<AuthDto> }.
+    func testGetUsersReadsListItems() async throws {
+        struct User: Codable, Sendable { let id: String; let email: String }
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"list":{"items":[{"id":"usr_1","email":"a@b.c"}],"hasMore":false}}"#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        let page: Page<User> = try await client.membership.getUsers(as: User.self)
+
+        XCTAssertEqual(page.items.map(\.email), ["a@b.c"])
+    }
+
+    func testPageStillReadsABareArray() throws {
+        let page = try JSONDecoder.norbixDefault.decode(Page<Order>.self, from: Data(#"[{"id":"o1","total":1}]"#.utf8))
+        XCTAssertEqual(page.items, [Order(id: "o1", total: 1)])
+    }
+
+    func testUnknownAnswerShapeThrowsInsteadOfAnEmptyPage() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"result":[{"id":"o1","total":1}],"responseStatus":{"isSuccess":true}}"#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        do {
+            let _: Page<Order> = try await client.database.find(collection: "orders", as: Order.self)
+            XCTFail("expected NORBIX_DECODE_ERROR")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.code, "NORBIX_DECODE_ERROR")
+            XCTAssertNotNil(error.rawBody)
+        }
+    }
+
+    func testItemsThatDoNotDecodeThrowInsteadOfAnEmptyPage() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"list":{"items":[{"id":42}],"hasMore":false}}"#.utf8)
+        let client = try NorbixApiClient(projectId: "p1", apiKey: "k", executor: mock)
+
+        do {
+            let _: Page<Order> = try await client.database.find(collection: "orders", as: Order.self)
+            XCTFail("expected NORBIX_DECODE_ERROR")
+        } catch let error as NorbixError {
+            XCTAssertEqual(error.code, "NORBIX_DECODE_ERROR")
+        }
+    }
+
     func testFindOneReturnsTypedItem() async throws {
         let mock = MockHTTPExecutor()
         mock.responseBody = Data(#"""

@@ -24,17 +24,44 @@ public struct AuthResponse: Codable, Sendable, Equatable {
 }
 
 /// Generic paginated list response returned by collection endpoints.
+///
+/// Known answer shapes, tried in this order:
+/// 1. `{"list": {"items": [...], "hasMore": ..., "startingAfter": ...}}` —
+///    database `find`, membership user lists (the gateway's paginated answer)
+/// 2. `{"items": [...], "total": ...}`
+/// 3. a bare JSON array
+///
+/// Any other shape throws, so a changed answer is an error and never a
+/// silently empty page.
 public struct Page<Item: Codable & Sendable>: Codable, Sendable {
     public let items: [Item]
     public let total: Int?
     public let take: Int?
     public let skip: Int?
+    /// Cursor paging, as the gateway sends it inside `list`.
+    public let hasMore: Bool?
+    public let hasPrevious: Bool?
+    public let startingAfter: String?
+    public let endingBefore: String?
 
-    public init(items: [Item], total: Int? = nil, take: Int? = nil, skip: Int? = nil) {
+    public init(
+        items: [Item],
+        total: Int? = nil,
+        take: Int? = nil,
+        skip: Int? = nil,
+        hasMore: Bool? = nil,
+        hasPrevious: Bool? = nil,
+        startingAfter: String? = nil,
+        endingBefore: String? = nil
+    ) {
         self.items = items
         self.total = total
         self.take = take
         self.skip = skip
+        self.hasMore = hasMore
+        self.hasPrevious = hasPrevious
+        self.startingAfter = startingAfter
+        self.endingBefore = endingBefore
     }
 
     enum CodingKeys: String, CodingKey {
@@ -42,23 +69,63 @@ public struct Page<Item: Codable & Sendable>: Codable, Sendable {
         case total
         case take
         case skip
+        case hasMore
+        case hasPrevious
+        case startingAfter
+        case endingBefore
+    }
+
+    private enum AnswerKeys: String, CodingKey {
+        case list
+        case items
+        case total
+        case totalCount
+        case take
+        case skip
+        case hasMore
+        case hasPrevious
+        case startingAfter
+        case endingBefore
     }
 
     public init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        // Some Norbix endpoints return `items`, others return `result`/`data`.
-        // Try the most common keys in order, otherwise try to decode the whole
-        // payload as `[Item]` and treat it as a single page.
-        if let items = try? c.decode([Item].self, forKey: .items) {
-            self.items = items
-        } else if let single = try? decoder.singleValueContainer().decode([Item].self) {
-            self.items = single
-        } else {
-            self.items = []
+        guard let root = try? decoder.container(keyedBy: AnswerKeys.self) else {
+            do {
+                self.init(items: try decoder.singleValueContainer().decode([Item].self))
+            } catch {
+                throw DecodingError.dataCorrupted(.init(
+                    codingPath: decoder.codingPath,
+                    debugDescription: "Page: expected an object or an array of items.",
+                    underlyingError: error
+                ))
+            }
+            return
         }
-        self.total = try c.decodeIfPresent(Int.self, forKey: .total)
-        self.take = try c.decodeIfPresent(Int.self, forKey: .take)
-        self.skip = try c.decodeIfPresent(Int.self, forKey: .skip)
+
+        let page: KeyedDecodingContainer<AnswerKeys>
+        if root.contains(.list), try !root.decodeNil(forKey: .list) {
+            page = try root.nestedContainer(keyedBy: AnswerKeys.self, forKey: .list)
+        } else {
+            page = root
+        }
+        guard page.contains(.items) else {
+            throw DecodingError.dataCorrupted(.init(
+                codingPath: decoder.codingPath,
+                debugDescription: "Page: none of the known shapes matched (list.items, items, array). Keys: \(root.allKeys.map(\.stringValue))."
+            ))
+        }
+
+        self.init(
+            items: try page.decode([Item].self, forKey: .items),
+            total: try page.decodeIfPresent(Int.self, forKey: .total)
+                ?? page.decodeIfPresent(Int.self, forKey: .totalCount),
+            take: try page.decodeIfPresent(Int.self, forKey: .take),
+            skip: try page.decodeIfPresent(Int.self, forKey: .skip),
+            hasMore: try page.decodeIfPresent(Bool.self, forKey: .hasMore),
+            hasPrevious: try page.decodeIfPresent(Bool.self, forKey: .hasPrevious),
+            startingAfter: try page.decodeIfPresent(String.self, forKey: .startingAfter),
+            endingBefore: try page.decodeIfPresent(String.self, forKey: .endingBefore)
+        )
     }
 }
 
