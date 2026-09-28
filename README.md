@@ -268,6 +268,21 @@ print(account)
 - If none set, the SDK throws `NORBIX_NOT_AUTHENTICATED` on the first
   authenticated call
 
+### Preview a notification with its signed link (no sign-in)
+
+The push, email and SMS preview routes open with the signed link (`hash`)
+alone — no API key or bearer token needed. When the client does have a
+token it is still sent (scope `.optional`).
+
+```swift
+let hub = try NorbixHubClient(projectId: "proj_123") // no apiKey, no bearerToken
+let preview = try await hub.notifications.previewEmailNotification(["hash": signedLink])
+// also: previewPushNotification(...), previewSmsNotification(...)
+```
+
+A signed-in member can pass `projectId` + `notificationId` instead of `hash`.
+A bad or expired link throws a `NorbixError` with status 401.
+
 ## Environment configuration
 
 ```bash

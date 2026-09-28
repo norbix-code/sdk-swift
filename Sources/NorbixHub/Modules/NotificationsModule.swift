@@ -481,12 +481,46 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Opens a email notification preview. Pass `hash` (the signed preview
+    /// link) to open it without sign-in, or `projectId` + `notificationId` as
+    /// a signed-in member with read permission. Auth is sent only when the
+    /// client has a token (`.optional` scope).
     public func previewEmailNotification(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/email/preview",
             method: "GET",
             request: request,
-            scope: .project,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Opens a push notification preview. Pass `hash` (the signed preview
+    /// link) to open it without sign-in, or `projectId` + `notificationId` as
+    /// a signed-in member with read permission. Auth is sent only when the
+    /// client has a token (`.optional` scope).
+    public func previewPushNotification(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/push/preview",
+            method: "GET",
+            request: request,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Opens a SMS notification preview. Pass `hash` (the signed preview
+    /// link) to open it without sign-in, or `projectId` + `notificationId` as
+    /// a signed-in member with read permission. Auth is sent only when the
+    /// client has a token (`.optional` scope).
+    public func previewSmsNotification(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/preview",
+            method: "GET",
+            request: request,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
