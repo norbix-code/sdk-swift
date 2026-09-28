@@ -3,7 +3,8 @@ name: Release
 # Swift packages have no registry: SwiftPM resolves versions from git tags.
 # A release is therefore the `vX.Y.Z` tag plus its GitHub Release, both created
 # by semantic-release from conventional commits since the last tag:
-# `feat:` → minor, `fix:` → patch, `feat!:` / `BREAKING CHANGE:` → major.
+# `feat:` → minor, `fix:` → patch. Breaking changes → minor too until the
+# public launch (major frozen; see README "Versioning").
 # `chore:`, `ci:`, `test:` don't release.
 #
 # `main` is protected (changes only through pull requests), so the release does
