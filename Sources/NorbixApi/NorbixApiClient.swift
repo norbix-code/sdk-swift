@@ -34,7 +34,6 @@ public final class NorbixApiClient: Sendable {
     public let accessToken: AccessTokenModule
     public let apiKeys: ApiKeysModule
     public let auth: AuthModule
-    public let chat: ChatModule
     public let database: DatabaseModule
     public let echo: EchoModule
     public let files: FilesModule
@@ -60,7 +59,6 @@ public final class NorbixApiClient: Sendable {
         self.accessToken = AccessTokenModule(transport: transport)
         self.apiKeys = ApiKeysModule(transport: transport)
         self.auth = AuthModule(transport: transport)
-        self.chat = ChatModule(transport: transport)
         self.database = DatabaseModule(transport: transport)
         self.echo = EchoModule(transport: transport)
         self.files = FilesModule(transport: transport)

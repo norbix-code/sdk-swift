@@ -38,4 +38,3 @@
 | `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `account` |
 | `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `account` |
 | `getLicenses` | `GET` | `/{version}/account/licenses` | `account` |
-| `askChat` | `POST` | `/{version}/account/chat/complete` | `account` |

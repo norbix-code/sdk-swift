@@ -3,7 +3,7 @@
 | Module | Endpoints |
 | --- | ---: |
 | [`access_token`](./access_token.md) | 1 |
-| [`account`](./account.md) | 37 |
+| [`account`](./account.md) | 36 |
 | [`ai`](./ai.md) | 14 |
 | [`apikeys`](./apikeys.md) | 2 |
 | [`auth`](./auth.md) | 1 |
