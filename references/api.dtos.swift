@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-09-21 16:45:23
+Date: 2026-09-28 20:32:42
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -92,294 +92,6 @@ public class GetPublicProjectLegal : RequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if projectId != nil { try container.encode(projectId, forKey: .projectId) }
         if kind != nil { try container.encode(kind, forKey: .kind) }
-    }
-}
-
-public class AccountCreated : Codable
-{
-    public var email:EmailAddress?
-    public var displayName:DisplayName?
-    public var accountId:AccountId?
-    public var createdOn:UtcDateTime?
-
-    required public init(){}
-}
-
-public class AccountVerified : Codable
-{
-    required public init(){}
-}
-
-public class AccountSetAsActive : Codable
-{
-    required public init(){}
-}
-
-public class AccountValidationTokenIssued : Codable
-{
-    public var expiration:ExpirationToken?
-
-    required public init(){}
-}
-
-public class AccountBlocked : Codable
-{
-    required public init(){}
-}
-
-public class AccountProfileUpdated : Codable
-{
-    public var displayName:DisplayName?
-    public var billingEmail:EmailAddress?
-    public var operationsEmail:EmailAddress?
-    public var securityEmail:EmailAddress?
-
-    required public init(){}
-}
-
-public class AccountSetAsInactive : Codable
-{
-    required public init(){}
-}
-
-public class AccountUnregistered : Codable
-{
-    required public init(){}
-}
-
-public class LicenseCreated : Codable
-{
-    public var license:CodeMashLicense?
-
-    required public init(){}
-}
-
-public class CustomerCreated : Codable
-{
-    public var paymentCustomerRef:PaymentCustomerRef?
-
-    required public init(){}
-}
-
-public class SubscriptionChanged : Codable
-{
-    public var subscription:CodeMashManagedServiceSubscription?
-
-    required public init(){}
-}
-
-public class SubscriptionCanceled : Codable
-{
-    public var paymentCustomerRef:PaymentCustomerRef?
-    public var subscriptionId:String?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationGroupSaved : Codable
-{
-    public var group:GroupDefinition?
-    public var channel:CommunicationChannel?
-    public var originChannel:CommunicationChannel?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationTagFromGroupDeleted : Codable
-{
-    public var groupTag:Tag?
-    public var removedTag:Tag?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationGroupDeleted : Codable
-{
-    public var groupTag:Tag?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationTagSaved : Codable
-{
-    public var tag:TagDefinition?
-    public var groupTag:Tag?
-    public var channel:CommunicationChannel?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationTagDeleted : Codable
-{
-    public var tag:Tag?
-
-    required public init(){}
-}
-
-public class ProjectCreated : Codable
-{
-    public var id:ProjectId?
-    public var name:ProjectName?
-    public var databaseIntegrationId:IntegrationId?
-    public var primaryRegion:ProjectRegion?
-    public var additionalRegions:[ProjectRegion]?
-    public var Description:String?
-    public var isProvisioning:Bool?
-
-    required public init(){}
-}
-
-public class ProjectDeleted : Codable
-{
-    required public init(){}
-}
-
-public class ProjectActivated : Codable
-{
-    required public init(){}
-}
-
-public class ProjectDisabled : Codable
-{
-    required public init(){}
-}
-
-public class ProjectNameChanged : Codable
-{
-    public var projectName:ProjectName?
-
-    required public init(){}
-}
-
-public class ProjectDescriptionChanged : Codable
-{
-    public var Description:String?
-
-    required public init(){}
-}
-
-public class ProjectMarketingUrlChanged : Codable
-{
-    public var url:DomainUrl?
-
-    required public init(){}
-}
-
-public class ProjectAllowedOriginsChanged : Codable
-{
-    public var origins:[DomainUrl]?
-
-    required public init(){}
-}
-
-public class ProjectDefaultLanguageChanged : Codable
-{
-    public var language:Language?
-
-    required public init(){}
-}
-
-public class ProjectLanguagesChanged : Codable
-{
-    public var languages:[Language] = []
-
-    required public init(){}
-}
-
-public class ProjectLogoChanged : Codable
-{
-    public var logo:ProjectLogo?
-
-    required public init(){}
-}
-
-public class ProjectIconChanged : Codable
-{
-    public var icon:ProjectIcon?
-
-    required public init(){}
-}
-
-public class ProjectMainColorChanged : Codable
-{
-    public var color:BrandColor?
-
-    required public init(){}
-}
-
-public class ProjectAccentColorChanged : Codable
-{
-    public var color:BrandColor?
-
-    required public init(){}
-}
-
-public class ProjectRegionsChanged : Codable
-{
-    public var primaryRegion:ProjectRegion?
-    public var additionalRegions:[ProjectRegion]?
-
-    required public init(){}
-}
-
-public class ProjectTimeZoneChanged : Codable
-{
-    public var timeZone:TimeZone?
-
-    required public init(){}
-}
-
-public class ProjectPaymentZonesChanged : Codable
-{
-    public var paymentZones:[TimeZone]?
-
-    required public init(){}
-}
-
-public class ProjectCommunicationSet : Codable
-{
-    public var projectCommunication:ProjectCommunication?
-
-    required public init(){}
-}
-
-public class AccountUserPushDeviceCreated : Codable
-{
-    public var authId:AuthId?
-    public var pushDevice:PushDevice?
-
-    required public init(){}
-}
-
-/**
-* AI
-*/
-// @Route("/{version}/chat/complete", "POST")
-// @Api(Description="AI")
-// @DataContract
-public class AskChatRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = AskChatResponse
-
-    // @DataMember
-    public var prompt:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case prompt
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        prompt = try container.decodeIfPresent(String.self, forKey: .prompt)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if prompt != nil { try container.encode(prompt, forKey: .prompt) }
     }
 }
 
@@ -3720,128 +3432,6 @@ public class TestFilesIntegrationRequest : CodeMashRequestBase, IReturn
     }
 }
 
-public class PushIntegrationSaved : Codable
-{
-    public var integration:PushIntegration?
-
-    required public init(){}
-}
-
-public class PushIntegrationRenamed : Codable
-{
-    public var id:IntegrationId?
-    public var name:DisplayName?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushIntegrationSetAsDefault : Codable
-{
-    public var env:Env?
-    public var id:IntegrationId?
-
-    required public init(){}
-}
-
-public class PushIntegrationDeleted : Codable
-{
-    public var id:IntegrationId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushIntegrationEnabled : Codable
-{
-    public var id:IntegrationId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushIntegrationDisabled : Codable
-{
-    public var id:IntegrationId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushServiceEstablished : Codable
-{
-    public var defaultTemplates:[PushTemplate]?
-
-    required public init(){}
-}
-
-public class PushServiceEnabled : Codable
-{
-    required public init(){}
-}
-
-public class PushServiceDisabled : Codable
-{
-    required public init(){}
-}
-
-public class PushTemplateCreated : Codable
-{
-    public var templateId:TemplateId?
-    public var displayName:DisplayName?
-    public var translations:[MessageTranslation<PushMessageContent>] = []
-    public var channel:CommunicationChannel?
-    public var Description:String?
-    public var tags:[Tag]?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushTemplateUpdated : Codable
-{
-    public var templateId:TemplateId?
-    public var displayName:DisplayName?
-    public var translations:[MessageTranslation<PushMessageContent>] = []
-    public var channel:CommunicationChannel?
-    public var Description:String?
-    public var tags:[Tag]?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushTemplateDeleted : Codable
-{
-    public var templateId:TemplateId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushTemplateArchived : Codable
-{
-    public var templateId:TemplateId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushTemplateUnArchived : Codable
-{
-    public var templateId:TemplateId?
-    public var env:Env?
-
-    required public init(){}
-}
-
-public class PushTemplateMirrored : Codable
-{
-    public var template:PushTemplate?
-
-    required public init(){}
-}
-
 /**
 * Sign In
 */
@@ -3927,6 +3517,7 @@ public class EchoResponse : Codable
     public var graceDaysLeft:Int?
     public var installationDomain:String?
     public var licensingDocsUrl:String?
+    public var agent:EchoAgentDto?
 
     required public init(){}
 }
@@ -3949,29 +3540,6 @@ public class PublicLegalDocumentDto : Codable
     public var available:Bool?
 
     required public init(){}
-}
-
-public class AskChatResponse : ResponseBase
-{
-    public var result:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case result
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        result = try container.decodeIfPresent(String.self, forKey: .result)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if result != nil { try container.encode(result, forKey: .result) }
-    }
 }
 
 // @DataContract
@@ -4777,329 +4345,6 @@ public protocol IHasCorrelationIdRequest
 
 }
 
-public class EmailAddress : Codable
-{
-    public var address:String?
-
-    required public init(){}
-}
-
-public class DisplayName : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-public class AccountId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class UtcDateTime : Codable
-{
-    required public init(){}
-}
-
-public class ExpirationToken : Codable
-{
-    public var items:Int?
-    public var unit:TimeUnit?
-    public var value:Int?
-
-    required public init(){}
-}
-
-public class CodeMashLicense : CodeMashManagedServiceSubscription
-{
-    public var domain:DomainUrl?
-    public var accountId:AccountId?
-    public var isEnterprise:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case domain
-        case accountId
-        case isEnterprise
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        domain = try container.decodeIfPresent(DomainUrl.self, forKey: .domain)
-        accountId = try container.decodeIfPresent(AccountId.self, forKey: .accountId)
-        isEnterprise = try container.decodeIfPresent(Bool.self, forKey: .isEnterprise)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if domain != nil { try container.encode(domain, forKey: .domain) }
-        if accountId != nil { try container.encode(accountId, forKey: .accountId) }
-        if isEnterprise != nil { try container.encode(isEnterprise, forKey: .isEnterprise) }
-    }
-}
-
-public class PaymentCustomerRef : ResourceRef
-{
-    public var source:ResourceSource?
-    public var externalId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case kind
-        case source
-        case externalId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        kind = try container.decodeIfPresent(ResourceRefKind.self, forKey: .kind)
-        source = try container.decodeIfPresent(ResourceSource.self, forKey: .source)
-        externalId = try container.decodeIfPresent(String.self, forKey: .externalId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if kind != nil { try container.encode(kind, forKey: .kind) }
-        if source != nil { try container.encode(source, forKey: .source) }
-        if externalId != nil { try container.encode(externalId, forKey: .externalId) }
-    }
-}
-
-public class CodeMashManagedServiceSubscription : Codable
-{
-    public var subscriptionId:CodeMashSubscriptionId?
-    public var paymentCustomerRef:PaymentCustomerRef?
-    public var refSubscriptionId:String?
-    public var issuedOn:UtcDateTime?
-    public var willExpireOn:UtcDateTime?
-    public var projectCap:Quantity?
-    public var isTrial:Bool?
-
-    required public init(){}
-}
-
-public class GroupDefinition : BaseTagDefinition
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public enum CommunicationChannel : String, Codable
-{
-    case Transactional
-    case Marketing
-    case System
-}
-
-public class Tag : Codable
-{
-    required public init(){}
-}
-
-public class TagDefinition : BaseTagDefinition
-{
-    public var defaultDelivery:[DeliveryChannel:Bool] = [:]
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case defaultDelivery
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        defaultDelivery = try container.decodeIfPresent([DeliveryChannel:Bool].self, forKey: .defaultDelivery) ?? [:]
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if defaultDelivery.count > 0 { try container.encode(defaultDelivery, forKey: .defaultDelivery) }
-    }
-}
-
-public class ProjectId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-// @DataContract
-public class ProjectName : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var uniqueName:String?
-
-    required public init(){}
-}
-
-public class IntegrationId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-// @DataContract
-public class ProjectRegion : Codable
-{
-    // @DataMember
-    public var region:NorbixRegion?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var continent:Continent?
-
-    required public init(){}
-}
-
-public class DomainUrl : Codable
-{
-    public var value:Uri?
-
-    required public init(){}
-}
-
-public class Language : Codable
-{
-    public var code:String?
-    public var name:String?
-
-    required public init(){}
-}
-
-public class ProjectLogo : Codable
-{
-    public var fileResource:FileResourceRef?
-    public var publicUrl:String?
-
-    required public init(){}
-}
-
-public class ProjectIcon : Codable
-{
-    public var fileResource:FileResourceRef?
-    public var publicUrl:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class BrandColor : Codable
-{
-    // @DataMember
-    public var value:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TimeZone : Codable
-{
-    // @DataMember
-    public var zoneId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectCommunication : Codable
-{
-    // @DataMember
-    public var channels:[ProjectCommunicationChannel] = []
-
-    // @DataMember
-    public var groups:[GroupDefinition] = []
-
-    // @DataMember
-    public var tags:[TagDefinition] = []
-
-    required public init(){}
-}
-
-public class AuthId : IHasDomainEntityId, Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushDevice : Codable
-{
-    // @DataMember
-    public var id:DeviceId?
-
-    // @DataMember
-    public var brand:String?
-
-    // @DataMember
-    public var manufacturer:String?
-
-    // @DataMember
-    public var modelName:String?
-
-    // @DataMember
-    public var deviceName:String?
-
-    // @DataMember
-    public var deviceType:DeviceType?
-
-    // @DataMember
-    public var osName:String?
-
-    // @DataMember
-    public var osVersion:String?
-
-    // @DataMember
-    public var platformApiLevel:Int?
-
-    // @DataMember
-    public var token:PushDeviceDeliveryToken?
-
-    required public init(){}
-}
-
 // @DataContract(Namespace="http://codemash.io/types/")
 public class CodeMashRequestBase : RequestBase, IHasProjectId, IHasEnv
 {
@@ -5279,7 +4524,6 @@ public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHa
     // @ApiMember(DataType="string", Description="Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.", Name="norbix-env", ParameterType="header")
     public var env:String?
 
-    public var resolvedEnv:Env?
     /**
     * Cursor token — fetch the page AFTER this item.
     */
@@ -5301,22 +4545,14 @@ public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHa
     // @ApiMember(DataType="integer", Description="Amount of records to return.", Format="int32", Name="pageSize", ParameterType="query")
     public var pageSize:Int?
 
-    /**
-    * Paging
-    */
-    // @ApiMember(DataType="object", Description="Paging", Name="paging", ParameterType="body")
-    public var paging:PagingArgs?
-
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case projectId
         case env
-        case resolvedEnv
         case startingAfter
         case endingBefore
         case pageSize
-        case paging
     }
 
     required public init(from decoder: Decoder) throws {
@@ -5324,11 +4560,9 @@ public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHa
         let container = try decoder.container(keyedBy: CodingKeys.self)
         projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
         env = try container.decodeIfPresent(String.self, forKey: .env)
-        resolvedEnv = try container.decodeIfPresent(Env.self, forKey: .resolvedEnv)
         startingAfter = try container.decodeIfPresent(String.self, forKey: .startingAfter)
         endingBefore = try container.decodeIfPresent(String.self, forKey: .endingBefore)
         pageSize = try container.decodeIfPresent(Int.self, forKey: .pageSize)
-        paging = try container.decodeIfPresent(PagingArgs.self, forKey: .paging)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -5336,20 +4570,10 @@ public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHa
         var container = encoder.container(keyedBy: CodingKeys.self)
         if projectId != nil { try container.encode(projectId, forKey: .projectId) }
         if env != nil { try container.encode(env, forKey: .env) }
-        if resolvedEnv != nil { try container.encode(resolvedEnv, forKey: .resolvedEnv) }
         if startingAfter != nil { try container.encode(startingAfter, forKey: .startingAfter) }
         if endingBefore != nil { try container.encode(endingBefore, forKey: .endingBefore) }
         if pageSize != nil { try container.encode(pageSize, forKey: .pageSize) }
-        if paging != nil { try container.encode(paging, forKey: .paging) }
     }
-}
-
-public class Env : Codable
-{
-    public var value:String?
-    public var isProd:Bool?
-
-    required public init(){}
 }
 
 public protocol IPasskeyCeremonyRequest
@@ -5363,56 +4587,6 @@ public class PagingArgs : Codable
     public var startingAfter:String?
     public var endingBefore:String?
 
-    required public init(){}
-}
-
-public class PushIntegration : Integration
-{
-    public var provider:PushProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(PushProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class PushTemplate : Template<PushMessageContent>
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class TemplateId : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MessageTranslation<TContent : Codable> : Codable
-{
     required public init(){}
 }
 
@@ -5466,6 +4640,17 @@ public class EchoRegionDto : Codable
     public var displayName:String?
     public var apiUrl:String?
     public var hubUrl:String?
+
+    required public init(){}
+}
+
+public class EchoAgentDto : Codable
+{
+    public var mcpUrl:String?
+    public var oAuthMetadataUrl:String?
+    public var installationType:String?
+    public var onboardingDocsUrl:String?
+    public var toolsUrl:String?
 
     required public init(){}
 }
@@ -5778,197 +4963,6 @@ public class IntegrationTestResultItemDto : Codable
     required public init(){}
 }
 
-public class AggregateId : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-public protocol IHasDomainEntityId
-{
-    var viewId:String? { get set }
-
-}
-
-public enum TimeUnit : String, Codable
-{
-    case Ticks
-    case Milliseconds
-    case Seconds
-    case Minutes
-    case Hours
-}
-
-public class CodeMashSubscriptionId : AggregateId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class Quantity : Codable
-{
-    public var value:Int?
-
-    required public init(){}
-}
-
-public enum ResourceRefKind : String, Codable
-{
-    case Contact
-    case Document
-    case File
-    case PaymentCustomer
-    case Order
-    case Payment
-    case Product
-    case Integration
-}
-
-public enum ResourceSource : String, Codable
-{
-    case Norbix
-    case Stripe
-    case Shopify
-    case PayPal
-    case Adyen
-    case Mollie
-    case Paddle
-    case LemonSqueezy
-    case AppleInApp
-    case GoogleInApp
-    case AuthorizeNet
-    case Braintree
-    case CheckOutCom
-    case WooCommerce
-    case Magento
-    case Worldpay
-}
-
-public class ResourceRef : Codable
-{
-    public var projectId:ProjectId?
-    public var integrationId:IntegrationId?
-    public var kind:ResourceRefKind?
-
-    required public init(){}
-}
-
-public class TagTranslation : MessageTranslation<TagDescription>
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class BaseTagDefinition : Codable
-{
-    public var tag:Tag?
-    public var translations:[TagTranslation] = []
-
-    required public init(){}
-}
-
-public enum DeliveryChannel : String, Codable
-{
-    case Email
-    case Push
-    case Sms
-    case WebPush
-    case InApp
-    case ChatBot
-    case ChatPlatform
-}
-
-public class NorbixRegion : Codable
-{
-    public var code:String?
-
-    required public init(){}
-}
-
-public enum Continent : String, Codable
-{
-    case Africa
-    case Antarctica
-    case Asia
-    case Europe
-    case NorthAmerica
-    case Oceania
-    case SouthAmerica
-}
-
-// @DataContract
-public class FileResourceRef : Codable
-{
-    // @DataMember(Order=1)
-    public var resource:FileResource?
-
-    // @DataMember(Order=2)
-    public var integrationId:IntegrationId?
-
-    // @DataMember(Order=3)
-    public var provider:FileProvider?
-
-    // @DataMember(Order=4)
-    public var path:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectCommunicationChannel : Codable
-{
-    // @DataMember
-    public var channel:CommunicationChannel?
-
-    // @DataMember
-    public var groups:[GroupTags] = []
-
-    required public init(){}
-}
-
-public class DeviceId : Codable
-{
-    public var id:String?
-
-    required public init(){}
-}
-
-public enum DeviceType : String, Codable
-{
-    case Unknown
-    case Phone
-    case Tablet
-    case Desktop
-    case Tv
-}
-
-// @DataContract
-public class PushDeviceDeliveryToken : Codable
-{
-    // @DataMember
-    public var pushDeviceToken:PushDeviceToken?
-
-    // @DataMember
-    public var deliveryFamily:PushDeviceDeliveryFamily?
-
-    required public init(){}
-}
-
 public enum Gender : String, Codable
 {
     case Male
@@ -5992,105 +4986,6 @@ public class CursorArgs : ICursorArgs, Codable
     public var order:Int?
 
     required public init(){}
-}
-
-// @DataContract
-public enum PushProvider : String, Codable
-{
-    case AppleApns
-    case SafariWeb
-    case SafariPush
-    case AndroidFirebase
-    case ChromeWeb
-    case FirefoxWeb
-    case EdgeWeb
-    case ChromePush
-    case CodeMashIosApp
-    case CodeMashAndroidApp
-    case CodeMashSafariPlugin
-    case CodeMashSafariWeb
-    case CodeMashChromePlugin
-    case CodeMashChromeWeb
-    case Expo
-    case Fake
-}
-
-public class Integration : IIntegrationIdentification, IHasDomainEntityId, Codable
-{
-    public var integrationId:IntegrationId?
-    public var env:Env?
-    public var capability:String?
-    public var isSystemOwned:Bool?
-    public var integrationName:DisplayName?
-    public var isEnabled:Bool?
-    public var isConfigured:Bool?
-    public var lastIntegrationTestAtUtc:Date?
-    public var lastIntegrationTestSucceeded:Bool?
-    public var lastIntegrationTestErrorMessages:IReadOnlyList<String>?
-    public var humanDeliveryConfirmedAtUtc:Date?
-    public var isApprovedThatItWorks:Bool?
-
-    required public init(){}
-}
-
-public protocol IIntegrationIdentification
-{
-    var integrationId:IntegrationId? { get set }
-    var capability:String? { get set }
-    var isSystemOwned:Bool? { get set }
-
-}
-
-// @DataContract
-public class Template<TMessageContent : Codable> : IBindableContract, Codable
-{
-    // @DataMember
-    public var templateId:TemplateId?
-
-    // @DataMember
-    public var templateName:DisplayName?
-
-    // @DataMember
-    public var translations:[MessageTranslation<TMessageContent>] = []
-
-    // @DataMember
-    public var communicationChannel:CommunicationChannel?
-
-    // @DataMember
-    public var isActive:Bool?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var tags:[Tag]?
-
-    // @DataMember
-    public var fileIntegrationId:IntegrationId?
-
-    // @DataMember
-    public var env:Env?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushMessageContent : Codable
-{
-    // @DataMember(Order=1)
-    public var title:PushTitle?
-
-    // @DataMember(Order=1)
-    public var subTitle:PushTitle?
-
-    // @DataMember(Order=2)
-    public var body:PushBody?
-
-    required public init(){}
-}
-
-public protocol IBindableContract
-{
 }
 
 public class PublicPasswordPolicyDto : Codable
@@ -6150,6 +5045,10 @@ public enum AuthStatus : Int, Codable
     case Suspended = 32
     case InActive = 64
     case Blocked = 128
+}
+
+public protocol IBindableContract
+{
 }
 
 public class TermMultiParentDto : Codable
@@ -6274,87 +5173,11 @@ public enum FileProvider : String, Codable
     case GoogleDrive
 }
 
-public class TagDescription : Codable
-{
-    public var displayName:DisplayName?
-    public var Description:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class FileResource : Codable
-{
-    // @DataMember
-    public var id:FileResourceId?
-
-    // @DataMember
-    public var originalFileName:String?
-
-    // @DataMember
-    public var `extension`:String?
-
-    // @DataMember
-    public var sizeBytes:Int?
-
-    // @DataMember
-    public var checksum:FileChecksum?
-
-    // @DataMember
-    public var storedFileName:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class GroupTags : Codable
-{
-    // @DataMember
-    public var group:Tag?
-
-    // @DataMember
-    public var tags:[Tag] = []
-
-    required public init(){}
-}
-
-public class PushDeviceToken : Codable
-{
-    public var token:String?
-
-    required public init(){}
-}
-
-public enum PushDeviceDeliveryFamily : String, Codable
-{
-    case Ios
-    case Android
-    case Chrome
-    case Safari
-    case Expo
-}
-
 public protocol ICursorArgs
 {
     var field:String? { get set }
     var order:Int? { get set }
 
-}
-
-// @DataContract
-public class PushTitle : Codable
-{
-    // @DataMember
-    public var value:TemplateCode?
-
-    required public init(){}
-}
-
-public class PushBody : Codable
-{
-    public var value:TemplateCode?
-
-    required public init(){}
 }
 
 public class AccessInformationDto : Codable
@@ -6403,27 +5226,6 @@ public class FileChecksumDto : Codable
     // @DataMember(Order=2)
     public var hash:String?
 
-    required public init(){}
-}
-
-public class FileResourceId : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-public class FileChecksum : Codable
-{
-    public var algorithm:String?
-    public var hash:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TemplateCode : Codable
-{
     required public init(){}
 }
 
