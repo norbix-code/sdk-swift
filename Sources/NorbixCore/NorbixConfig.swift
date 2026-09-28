@@ -39,6 +39,9 @@ public enum NorbixScope: Sendable {
     case project
     case account
     case unauthenticated
+    /// Auth is sent when the client has a token, never required — used by the
+    /// signed notification preview links.
+    case optional
 }
 
 /// Strongly-typed configuration shared by `NorbixApiClient` and `NorbixHubClient`.

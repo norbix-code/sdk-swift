@@ -232,7 +232,13 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue(v, forHTTPHeaderField: k)
         }
 
-        if scope != .unauthenticated {
+        if scope == .optional {
+            // Auth is sent when the client has a token, never required — the
+            // signed notification preview links open with the hash alone.
+            if let token = bearerToken ?? Transport.token(from: snapshot.auth) {
+                httpRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            }
+        } else if scope != .unauthenticated {
             let token = bearerToken ?? Transport.token(from: snapshot.auth)
             guard let resolvedToken = token else {
                 throw NorbixError(

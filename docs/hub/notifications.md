@@ -45,7 +45,9 @@
 | `getEmailCampaignBatchNotification` | `GET` | `/{version}/notifications/email/campaigns/{id}/batches/{batchId}/{notificationId}` | `project` |
 | `getEmailCampaignBatchNotifications` | `GET` | `/{version}/notifications/email/campaigns/{id}/batches/{batchId}` | `project` |
 | `getEmailCampaignStatistics` | `GET` | `/{version}/notifications/email/campaigns/{id}/stats` | `project` |
-| `previewEmailNotification` | `GET` | `/{version}/notifications/email/preview` | `project` |
+| `previewEmailNotification` | `GET` | `/{version}/notifications/email/preview` | `optional` |
+| `previewPushNotification` | `GET` | `/{version}/notifications/push/preview` | `optional` |
+| `previewSmsNotification` | `GET` | `/{version}/notifications/sms/preview` | `optional` |
 | `getEmailCampaignMessage` | `GET` | `/{version}/notifications/emails/campaigns/{campaignId}/messages/{id}` | `project` |
 | `getEmailCampaignMessages` | `GET` | `/{version}/notifications/emails/campaigns/{campaignId}/messages` | `project` |
 | `disablePush` | `GET` | `/{version}/notifications/push/disable` | `project` |
