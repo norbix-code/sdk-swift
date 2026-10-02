@@ -13,6 +13,7 @@ import NorbixCore
 /// ```
 public protocol NorbixApiClientType: Sendable {
     var accessToken: AccessTokenModule { get }
+    var ai: AiModule { get }
     var apiKeys: ApiKeysModule { get }
     var auth: AuthModule { get }
     var database: DatabaseModule { get }
