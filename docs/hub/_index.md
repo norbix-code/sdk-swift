@@ -14,7 +14,7 @@
 | [`internal`](./internal.md) | 1 |
 | [`logs`](./logs.md) | 9 |
 | [`membership`](./membership.md) | 25 |
-| [`notifications`](./notifications.md) | 68 |
+| [`notifications`](./notifications.md) | 104 |
 | [`payments`](./payments.md) | 16 |
 | [`scheduler`](./scheduler.md) | 8 |
 | [`webhooks`](./webhooks.md) | 8 |

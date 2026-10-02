@@ -790,4 +790,383 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    // MARK: - SMS (previewSmsNotification is above, with the other signed-link previews)
+    public func getSmsCampaigns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func createSmsCampaign(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaignMessages(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{campaignId}/messages",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// One message (notification) of a campaign. Pass `campaignId` and `notificationId`; the latter comes from `getSmsCampaignMessages`.
+    public func getSmsCampaignMessage(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{campaignId}/messages/{notificationId}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func deleteSmsCampaign(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaign(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaignBatches(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}/batches",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaignBatchNotifications(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}/batches/{batchId}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaignBatchNotification(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}/batches/{batchId}/{notificationId}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsCampaignStatistics(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{id}/stats",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Stops a scheduled or running campaign: no further messages are sent. Cannot be undone — create a new campaign instead. Pass `Id` (the campaign id).
+    public func stopSmsCampaign(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{Id}/stop",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func disableSms(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/disable",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// What disabling the SMS module would affect (running campaigns, integrations). Call it before `disableSms` so the user can be warned.
+    public func getSmsDisableDependencies(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/disable-dependencies",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func enableSms(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/enable",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsSettings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/settings",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsIntegrations(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func saveSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func confirmSmsIntegrationHumanDelivery(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/confirm-human-delivery",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func testSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/test",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func deleteSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/{Id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func setSmsIntegrationAsDefault(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/{Id}/default",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func disableSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/{Id}/disable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func enableSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/{Id}/enable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/integrations/{id}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsTemplates(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func createSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func updateSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Runs the Razor SMS template `code` with the given `tokens` (`[{name, value}]`) and answers the bound text, or the list of tokens still unresolved. `isForPreview: true` relaxes some validation.
+    public func renderSms(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/render",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func deleteSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{Id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func archiveSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{Id}/archive",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func cloneSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{Id}/clone",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func unArchiveSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{Id}/unarchive",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{id}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    public func getSmsMessageContentTokens(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/templates/{id}/tokens",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }
