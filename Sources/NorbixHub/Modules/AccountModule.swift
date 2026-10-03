@@ -550,4 +550,74 @@ public final class AccountModule: Sendable {
             bearerToken: bearerToken
         )
     }
+
+    /// `POST /{version}/account/ai/service-users`
+    ///
+    /// Create an AI service user (a scoped key for MCP and AI tools): keys `name`, `scope`. The answer holds the key once — store it.
+    public func createAiServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `GET /{version}/account/ai/service-users`
+    ///
+    /// List the account's AI service users and their keys (no secrets).
+    public func listAiServiceUsers(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `POST /{version}/account/ai/service-users/{Id}/keys`
+    ///
+    /// Issue a new key for service user `Id`; optional `revokeKeyId` revokes an old key in the same call.
+    public func rotateAiServiceUserKey(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}/keys",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `DELETE /{version}/account/ai/service-users/{Id}/keys/{KeyId}`
+    ///
+    /// Revoke key `KeyId` of service user `Id`.
+    public func revokeAiServiceUserKey(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}/keys/{KeyId}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `DELETE /{version}/account/ai/service-users/{Id}`
+    ///
+    /// Delete service user `Id` and all its keys.
+    public func deleteAiServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
 }

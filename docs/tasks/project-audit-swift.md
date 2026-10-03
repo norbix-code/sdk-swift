@@ -9,7 +9,7 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
 1. [done] docs(sdk-swift:project): task file with goal and plan
 2. [done] feat(sdk-swift:account): admin URL, legal documents, expose legal, admin portal structure and service user on `hub.account`, with route tests
 3. [todo] feat(sdk-swift:public): new `api.publicProjects` module for the public project config and legal pages (API host), sent with no credentials, with route tests
-4. [todo] feat(sdk-swift:account): AI service users (create, list, delete, rotate key, revoke key) on `hub.account`, with route tests
+4. [done] feat(sdk-swift:account): AI service users (create, list, delete, rotate key, revoke key) on `hub.account`, with route tests
 5. [todo] feat(sdk-swift:mcp): developer MCP endpoint (send, open stream, end session) on `hub.account`, returning the session id from the answer header, with tests
 6. [todo] docs(sdk-swift:docs): docs/hub/account.md, new docs/api/public_projects.md, both index pages, README
 7. [todo] chore(sdk-swift:checks): `swift build` and `swift test` green; push and open the pull request
@@ -20,6 +20,8 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/docs/tasks/project-audit-swift.md | this task file | 1 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixHub/Modules/AccountModule.swift | 5 methods: updateProjectAdminUrl, updateProjectLegalDocuments, updateProjectExposeLegal, getAdminPortalStructure, assignAdminPortalServiceUser | 2 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountProjectSettingsRoutesTests.swift | new: verb + path + auth + project header per method (5) | 2 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixHub/Modules/AccountModule.swift | 5 methods: createAiServiceUser, listAiServiceUsers, rotateAiServiceUserKey, revokeAiServiceUserKey, deleteAiServiceUser | 4 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountAiServiceUsersRoutesTests.swift | new: verb + path + auth + project header per method (5) | 4 |
 
 ## Findings
 
