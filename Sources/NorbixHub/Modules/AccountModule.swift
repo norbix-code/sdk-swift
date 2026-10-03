@@ -480,4 +480,74 @@ public final class AccountModule: Sendable {
             bearerToken: bearerToken
         )
     }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/admin-url`
+    ///
+    /// Set or clear the project's admin portal URL: `["projectId": id, "url": "https://admin.example.com"]` (`NSNull()` clears it).
+    public func updateProjectAdminUrl(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/admin-url",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/legal`
+    ///
+    /// Save the project's terms and privacy texts (Markdown): keys `termsMarkdown`, `privacyMarkdown`.
+    public func updateProjectLegalDocuments(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/legal",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/legal/expose`
+    ///
+    /// Show or hide the legal documents on the public project routes: key `exposed` (Bool).
+    public func updateProjectExposeLegal(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/legal/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `GET /{version}/account/projects/{projectId}/admin-portal/structure`
+    ///
+    /// The admin portal's structure for the project.
+    public func getAdminPortalStructure(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/admin-portal/structure",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PUT /{version}/account/projects/{projectId}/settings/admin-portal/service-user`
+    ///
+    /// Choose the AI service user the admin portal acts as: key `serviceUserId`.
+    public func assignAdminPortalServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/admin-portal/service-user",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
 }
