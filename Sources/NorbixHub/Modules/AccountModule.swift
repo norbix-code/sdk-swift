@@ -620,4 +620,86 @@ public final class AccountModule: Sendable {
             bearerToken: bearerToken
         )
     }
+
+    // MARK: - Developer MCP endpoint
+
+    /// `POST /{version}/account/mcp`
+    ///
+    /// Developer MCP endpoint (Streamable HTTP, MCP revision 2025-11-25): send
+    /// one JSON-RPC 2.0 `message` (`initialize`, `tools/list`, `tools/call`, ...).
+    /// The `initialize` answer carries the session id in
+    /// `McpResponse.sessionId`; pass it as `sessionId` on every later call.
+    /// The answer is JSON (`McpResponse.json`) or, for a `tools/call`, an SSE
+    /// stream (`McpResponse.text`). `toolsets` filters `tools/list`, e.g.
+    /// `ai:campaigns,ai:project-context`. An AI service user key (`nbsu_...`)
+    /// as the client's key narrows the tools to that user's scope.
+    public func sendMcpMessage(
+        _ message: [String: Any],
+        sessionId: String? = nil,
+        protocolVersion: String? = nil,
+        toolsets: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "POST",
+            body: try JSONSerialization.data(withJSONObject: message),
+            query: toolsets.map { ["toolsets": $0] } ?? [:],
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: protocolVersion, lastEventId: nil),
+            scope: .project,
+            accept: "application/json, text/event-stream",
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    /// `GET /{version}/account/mcp`
+    ///
+    /// Open the server-to-client SSE stream of the session `sessionId`;
+    /// `lastEventId` resumes a dropped stream. This SDK has no SSE client: the
+    /// call returns only when the server closes the stream, with the raw SSE
+    /// text in `McpResponse.text`.
+    public func openMcpStream(
+        sessionId: String,
+        lastEventId: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "GET",
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: nil, lastEventId: lastEventId),
+            scope: .project,
+            accept: "text/event-stream",
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    /// `DELETE /{version}/account/mcp`
+    ///
+    /// End the MCP session `sessionId`.
+    public func endMcpSession(
+        sessionId: String,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "DELETE",
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: nil, lastEventId: nil),
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    private static func mcpHeaders(sessionId: String?, protocolVersion: String?, lastEventId: String?) -> [String: String] {
+        var out: [String: String] = [:]
+        if let sessionId { out["Mcp-Session-Id"] = sessionId }
+        if let protocolVersion { out["MCP-Protocol-Version"] = protocolVersion }
+        if let lastEventId { out["Last-Event-ID"] = lastEventId }
+        return out
+    }
 }

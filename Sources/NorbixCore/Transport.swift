@@ -188,6 +188,40 @@ public final class Transport: @unchecked Sendable {
         )
     }
 
+    /// Raw variant — returns the whole answer: status, headers and the
+    /// untouched body.
+    ///
+    /// Same credentials, environment and region headers as `send`, and the
+    /// same `NorbixError` for any status of 400 or more, but nothing is
+    /// parsed. Use it when a header of the answer matters — the
+    /// `Mcp-Session-Id` the MCP endpoint issues on `initialize` — or when the
+    /// body may be an SSE stream instead of JSON. `body` is sent as is
+    /// (`application/json`); `query` fills path tokens and the query string;
+    /// `headers` are set last and win.
+    public func sendRaw(
+        path: String,
+        method: String,
+        body: Data? = nil,
+        query: [String: Any] = [:],
+        headers: [String: String] = [:],
+        scope: NorbixScope = .project,
+        accept: String = "application/json",
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> NorbixRawResponse {
+        let (data, response) = try await performRequestFull(
+            path: path, method: method, request: query,
+            scope: scope, timeout: timeout, bearerToken: bearerToken,
+            accept: accept, extraHeaders: headers,
+            rawBody: body ?? (method.uppercased() == "GET" || method.uppercased() == "DELETE" ? nil : Data())
+        )
+        var out: [String: String] = [:]
+        for (k, v) in response.allHeaderFields {
+            if let key = k as? String { out[key] = "\(v)" }
+        }
+        return NorbixRawResponse(statusCode: response.statusCode, headers: out, body: data)
+    }
+
     /// Shared request pipeline — builds the URLRequest, runs it, and returns
     /// the raw response body on success or throws `NorbixError` on failure.
     private func performRequest(
@@ -200,6 +234,29 @@ public final class Transport: @unchecked Sendable {
         env: String? = nil,
         region: String? = nil
     ) async throws -> Data {
+        try await performRequestFull(
+            path: path, method: method, request: request,
+            scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
+            region: region
+        ).0
+    }
+
+    /// The pipeline itself. [extraHeaders] are set last and win; [rawBody],
+    /// when given, is sent as is instead of a JSON body built from [request]
+    /// (then [request] only fills the path and, for any verb, the query).
+    private func performRequestFull(
+        path: String,
+        method: String,
+        request: [String: Any],
+        scope: NorbixScope,
+        timeout: TimeInterval?,
+        bearerToken: String?,
+        env: String? = nil,
+        region: String? = nil,
+        accept: String = "application/json",
+        extraHeaders: [String: String] = [:],
+        rawBody: Data? = nil
+    ) async throws -> (Data, HTTPURLResponse) {
         // Take one consistent snapshot of the config for this request — avoids
         // the request seeing a half-mutated state if another thread calls
         // setApiKey/setBearerToken concurrently.
@@ -215,7 +272,9 @@ public final class Transport: @unchecked Sendable {
         let built = try buildUrlAndBody(
             baseUrl: snapshot.baseUrl,
             path: path,
-            method: method,
+            // A raw body never comes from [request], so its leftovers go to
+            // the query, as for a GET.
+            method: rawBody == nil ? method : "GET",
             version: snapshot.version,
             request: request
         )
@@ -227,7 +286,7 @@ public final class Transport: @unchecked Sendable {
         var httpRequest = URLRequest(url: url)
         httpRequest.httpMethod = method
         httpRequest.timeoutInterval = timeout ?? snapshot.timeout
-        httpRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        httpRequest.setValue(accept, forHTTPHeaderField: "Accept")
         for (k, v) in snapshot.defaultHeaders {
             httpRequest.setValue(v, forHTTPHeaderField: k)
         }
@@ -275,6 +334,13 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
             httpRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
         }
+        if let rawBody {
+            httpRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            httpRequest.httpBody = rawBody
+        }
+        for (k, v) in extraHeaders {
+            httpRequest.setValue(v, forHTTPHeaderField: k)
+        }
 
         // Auto-attach Idempotency-Key for write methods so a retry can't
         // double-write. Caller may override by passing one in defaultHeaders.
@@ -302,7 +368,7 @@ public final class Transport: @unchecked Sendable {
         policy: RetryPolicy,
         verbose: Bool,
         verboseBody: [String: Any]?
-    ) async throws -> Data {
+    ) async throws -> (Data, HTTPURLResponse) {
         var attempt = 0
         while true {
             if verbose {
@@ -365,7 +431,7 @@ public final class Transport: @unchecked Sendable {
                         ]
                     ))
                 }
-                return data
+                return (data, response)
             } catch let error as NorbixError {
                 throw error
             } catch {
@@ -485,5 +551,23 @@ public final class Transport: @unchecked Sendable {
             return (k, v)
         }
         return (nil, nil)
+    }
+}
+
+/// A whole HTTP answer, as `Transport.sendRaw` returns it.
+public struct NorbixRawResponse: Sendable {
+    public let statusCode: Int
+    public let headers: [String: String]
+    public let body: Data
+
+    public init(statusCode: Int, headers: [String: String], body: Data) {
+        self.statusCode = statusCode
+        self.headers = headers
+        self.body = body
+    }
+
+    /// A header of the answer, matched without regard to case.
+    public func header(_ name: String) -> String? {
+        headers.first { $0.key.caseInsensitiveCompare(name) == .orderedSame }?.value
     }
 }
