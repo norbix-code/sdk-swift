@@ -480,4 +480,254 @@ public final class AccountModule: Sendable {
             bearerToken: bearerToken
         )
     }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/admin-url`
+    ///
+    /// Set or clear the project's admin portal URL: `["projectId": id, "url": "https://admin.example.com"]` (`NSNull()` clears it).
+    public func updateProjectAdminUrl(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/admin-url",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/legal`
+    ///
+    /// Save the project's terms and privacy texts (Markdown): keys `termsMarkdown`, `privacyMarkdown`.
+    public func updateProjectLegalDocuments(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/legal",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/legal/expose`
+    ///
+    /// Show or hide the legal documents on the public project routes: key `exposed` (Bool).
+    public func updateProjectExposeLegal(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/legal/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/brand/expose`
+    ///
+    /// Show or hide the project brand (logo, colours) in the Admin Portal: key `exposed` (Bool).
+    public func updateProjectExposeBrand(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/brand/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/auth/expose`
+    ///
+    /// Show or hide the sign-in settings (auth flows) in the Admin Portal: key `exposed` (Bool).
+    public func updateProjectExposeAuth(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/auth/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `GET /{version}/account/projects/{projectId}/admin-portal/structure`
+    ///
+    /// The admin portal's structure for the project.
+    public func getAdminPortalStructure(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/admin-portal/structure",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PUT /{version}/account/projects/{projectId}/settings/admin-portal/service-user`
+    ///
+    /// Choose the AI service user the admin portal acts as: key `serviceUserId`.
+    public func assignAdminPortalServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/admin-portal/service-user",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `POST /{version}/account/ai/service-users`
+    ///
+    /// Create an AI service user (a scoped key for MCP and AI tools): keys `name`, `scope`. The answer holds the key once — store it.
+    public func createAiServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `GET /{version}/account/ai/service-users`
+    ///
+    /// List the account's AI service users and their keys (no secrets).
+    public func listAiServiceUsers(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `POST /{version}/account/ai/service-users/{Id}/keys`
+    ///
+    /// Issue a new key for service user `Id`; optional `revokeKeyId` revokes an old key in the same call.
+    public func rotateAiServiceUserKey(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}/keys",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `DELETE /{version}/account/ai/service-users/{Id}/keys/{KeyId}`
+    ///
+    /// Revoke key `KeyId` of service user `Id`.
+    public func revokeAiServiceUserKey(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}/keys/{KeyId}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `DELETE /{version}/account/ai/service-users/{Id}`
+    ///
+    /// Delete service user `Id` and all its keys.
+    public func deleteAiServiceUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/ai/service-users/{Id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Developer MCP endpoint
+
+    /// `POST /{version}/account/mcp`
+    ///
+    /// Developer MCP endpoint (Streamable HTTP, MCP revision 2025-11-25): send
+    /// one JSON-RPC 2.0 `message` (`initialize`, `tools/list`, `tools/call`, ...).
+    /// The `initialize` answer carries the session id in
+    /// `McpResponse.sessionId`; pass it as `sessionId` on every later call.
+    /// The answer is JSON (`McpResponse.json`) or, for a `tools/call`, an SSE
+    /// stream (`McpResponse.text`). `toolsets` filters `tools/list`, e.g.
+    /// `ai:campaigns,ai:project-context`. An AI service user key (`nbsu_...`)
+    /// as the client's key narrows the tools to that user's scope.
+    public func sendMcpMessage(
+        _ message: [String: Any],
+        sessionId: String? = nil,
+        protocolVersion: String? = nil,
+        toolsets: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "POST",
+            body: try JSONSerialization.data(withJSONObject: message),
+            query: toolsets.map { ["toolsets": $0] } ?? [:],
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: protocolVersion, lastEventId: nil),
+            scope: .project,
+            accept: "application/json, text/event-stream",
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    /// `GET /{version}/account/mcp`
+    ///
+    /// Open the server-to-client SSE stream of the session `sessionId`;
+    /// `lastEventId` resumes a dropped stream. This SDK has no SSE client: the
+    /// call returns only when the server closes the stream, with the raw SSE
+    /// text in `McpResponse.text`.
+    public func openMcpStream(
+        sessionId: String,
+        lastEventId: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "GET",
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: nil, lastEventId: lastEventId),
+            scope: .project,
+            accept: "text/event-stream",
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    /// `DELETE /{version}/account/mcp`
+    ///
+    /// End the MCP session `sessionId`.
+    public func endMcpSession(
+        sessionId: String,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> McpResponse {
+        McpResponse(try await transport.sendRaw(
+            path: "/{version}/account/mcp",
+            method: "DELETE",
+            headers: Self.mcpHeaders(sessionId: sessionId, protocolVersion: nil, lastEventId: nil),
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        ))
+    }
+
+    private static func mcpHeaders(sessionId: String?, protocolVersion: String?, lastEventId: String?) -> [String: String] {
+        var out: [String: String] = [:]
+        if let sessionId { out["Mcp-Session-Id"] = sessionId }
+        if let protocolVersion { out["MCP-Protocol-Version"] = protocolVersion }
+        if let lastEventId { out["Last-Event-ID"] = lastEventId }
+        return out
+    }
 }

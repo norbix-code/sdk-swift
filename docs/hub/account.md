@@ -45,3 +45,42 @@
 | `deleteProjectAiAssistant` | `DELETE` | `/{version}/account/projects/{projectId}/ai/assistants/{assistantId}` | `project` |
 | `getProjectAiUsage` | `GET` | `/{version}/account/projects/{projectId}/ai/usage` | `project` |
 | `setAdminPortalEnabled` | `PUT` | `/{version}/account/projects/{projectId}/admin-portal/enabled` | `project` |
+| `updateProjectAdminUrl` | `PATCH` | `/{version}/account/projects/{projectId}/settings/admin-url` | `project` |
+| `updateProjectLegalDocuments` | `PATCH` | `/{version}/account/projects/{projectId}/settings/legal` | `project` |
+| `updateProjectExposeLegal` | `PATCH` | `/{version}/account/projects/{projectId}/settings/legal/expose` | `project` |
+| `updateProjectExposeBrand` | `PATCH` | `/{version}/account/projects/{projectId}/settings/brand/expose` | `project` |
+| `updateProjectExposeAuth` | `PATCH` | `/{version}/account/projects/{projectId}/settings/auth/expose` | `project` |
+| `getAdminPortalStructure` | `GET` | `/{version}/account/projects/{projectId}/admin-portal/structure` | `project` |
+| `assignAdminPortalServiceUser` | `PUT` | `/{version}/account/projects/{projectId}/settings/admin-portal/service-user` | `project` |
+| `createAiServiceUser` | `POST` | `/{version}/account/ai/service-users` | `project` |
+| `listAiServiceUsers` | `GET` | `/{version}/account/ai/service-users` | `project` |
+| `rotateAiServiceUserKey` | `POST` | `/{version}/account/ai/service-users/{Id}/keys` | `project` |
+| `revokeAiServiceUserKey` | `DELETE` | `/{version}/account/ai/service-users/{Id}/keys/{KeyId}` | `project` |
+| `deleteAiServiceUser` | `DELETE` | `/{version}/account/ai/service-users/{Id}` | `project` |
+| `sendMcpMessage` | `POST` | `/{version}/account/mcp` | `project` |
+| `openMcpStream` | `GET` | `/{version}/account/mcp` | `project` |
+| `endMcpSession` | `DELETE` | `/{version}/account/mcp` | `project` |
+
+## Developer MCP endpoint
+
+`sendMcpMessage`, `openMcpStream` and `endMcpSession` return an `McpResponse`
+(`statusCode`, `headers`, `body`, `sessionId`, `contentType`, `isEventStream`,
+`text`, `json`), not a parsed value: the gateway hands out the session id only
+in the `Mcp-Session-Id` answer header of `initialize`, and a `tools/call` may
+answer with an SSE stream. This SDK has no SSE client — `openMcpStream` returns
+only when the server closes the stream.
+
+```swift
+let initialize = try await hub.account.sendMcpMessage([
+    "jsonrpc": "2.0", "id": 1, "method": "initialize",
+    "params": ["protocolVersion": "2025-11-25", "capabilities": [String: Any](),
+               "clientInfo": ["name": "my-app", "version": "1.0"]],
+])
+let sessionId = initialize.sessionId!
+let tools = try await hub.account.sendMcpMessage(["jsonrpc": "2.0", "id": 2, "method": "tools/list"], sessionId: sessionId)
+print(tools.json ?? tools.text)
+_ = try await hub.account.endMcpSession(sessionId: sessionId)
+```
+
+A service user key (`nbsu_...`, from `createAiServiceUser` / `rotateAiServiceUserKey`)
+used as the client's key narrows the MCP tools to that user's scope.

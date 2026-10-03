@@ -39,6 +39,7 @@ public final class NorbixApiClient: Sendable {
     public let echo: EchoModule
     public let files: FilesModule
     public let membership: MembershipModule
+    public let publicProjects: PublicProjectsModule
 
     /// Build a client from an existing `NorbixConfig`.
     public init(
@@ -65,6 +66,7 @@ public final class NorbixApiClient: Sendable {
         self.echo = EchoModule(transport: transport)
         self.files = FilesModule(transport: transport)
         self.membership = MembershipModule(transport: transport)
+        self.publicProjects = PublicProjectsModule(transport: transport)
     }
 
     /// Convenience initializer that mirrors the most common shape.

@@ -10,3 +10,4 @@
 | [`echo`](./echo.md) | 1 |
 | [`files`](./files.md) | 8 |
 | [`membership`](./membership.md) | 18 |
+| [`public_projects`](./public_projects.md) | 2 |
