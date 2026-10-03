@@ -8,7 +8,8 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
 ## Plan
 1. [done] docs(sdk-swift:project): task file with goal and plan
 2. [done] feat(sdk-swift:account): admin URL, legal documents, expose legal, admin portal structure and service user on `hub.account`, with route tests
-3. [todo] feat(sdk-swift:public): new `api.publicProjects` module for the public project config and legal pages (API host), sent with no credentials, with route tests
+3. [done] feat(sdk-swift:public): new `api.publicProjects` module for the public project config and legal pages (API host), sent with no credentials, with route tests
+   decision(sdk-swift:api): `publicProjects` is added to the public `NorbixApiClientType` protocol, as the AI pull request did for `ai`; an app's own fake that conforms to it must add the property — written as a `Breaking:` line in the pull request (minor version, major frozen)
 4. [done] feat(sdk-swift:account): AI service users (create, list, delete, rotate key, revoke key) on `hub.account`, with route tests
 5. [todo] feat(sdk-swift:mcp): developer MCP endpoint (send, open stream, end session) on `hub.account`, returning the session id from the answer header, with tests
 6. [todo] docs(sdk-swift:docs): docs/hub/account.md, new docs/api/public_projects.md, both index pages, README
@@ -22,8 +23,23 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountProjectSettingsRoutesTests.swift | new: verb + path + auth + project header per method (5) | 2 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixHub/Modules/AccountModule.swift | 5 methods: createAiServiceUser, listAiServiceUsers, rotateAiServiceUserKey, revokeAiServiceUserKey, deleteAiServiceUser | 4 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountAiServiceUsersRoutesTests.swift | new: verb + path + auth + project header per method (5) | 4 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixApi/Modules/PublicProjectsModule.swift | new module: getPublicProjectConfig, getPublicProjectLegal (scope .unauthenticated) | 3 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixApi/NorbixApiClient.swift | exposes `api.publicProjects` | 3 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixApi/NorbixApiClientType.swift | protocol gains `publicProjects` (same as the AI pull request added `ai`) | 3 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixApiTests/PublicProjectsModuleTests.swift | new: path, verb, no Authorization header (2) | 3 |
 
 ## Findings
+docs(sdk-swift:files): the public file link route is written `{publicId}/{name}`, the gateway writes `{PublicId}/{Name*}`, so the coverage scanner (exact text match) counts it as missing; the URL on the wire is right — left open
+    where: /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixApi/Modules/FilesModule.swift:613 (branch audit/project)
+```swift
+// Sources/NorbixApi/Modules/FilesModule.swift:612-616 (main)
+        try await transport.downloadData(
+            path: "/{version}/files/public/{publicId}/{name}",   // <-- here: gateway route is /{version}/files/public/{PublicId}/{Name*}
+            method: "GET",
+            request: ["publicId": publicId, "name": name],
+            scope: .unauthenticated,
+```
+
 
 ## Rejected / moved out
 - decision(sdk-swift:ai): AI plans, knowledge search and AI credits endpoints are not added — rejected — reason: decided internal by the campaign — new ticket/file: none

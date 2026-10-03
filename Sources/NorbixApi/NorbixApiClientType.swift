@@ -20,6 +20,7 @@ public protocol NorbixApiClientType: Sendable {
     var echo: EchoModule { get }
     var files: FilesModule { get }
     var membership: MembershipModule { get }
+    var publicProjects: PublicProjectsModule { get }
 
     var isAuthenticated: Bool { get }
 
