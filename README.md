@@ -16,6 +16,11 @@ separate libraries** that mirror the two Norbix planes:
 A small shared `NorbixCore` module holds the transport, config, and error types
 both clients use.
 
+| Client | Modules |
+| --- | --- |
+| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `membership`, `publicProjects` |
+| `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `platform`, `regions`, `scheduler`, `webhooks` |
+
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
 Swift tooling: **Swift Package Manager**, **XCTest**, GitHub Actions CI, and
 semantic-release based tagging.
@@ -77,7 +82,7 @@ let hub = try NorbixHubClient(
     apiKey: "sk_live_xxx",
     accountId: "acc_456"
 )
-let account = try await hub.account.getAccount()
+let account = try await hub.account.getAccountProfile()
 let integrations = try await hub.files.getFilesIntegrations()
 ```
 
@@ -256,7 +261,7 @@ let hub = try NorbixHubClient(
     accountId: "acc_456" // required for account-scoped hub endpoints
 )
 
-let account = try await hub.account.getAccount()
+let account = try await hub.account.getAccountProfile()
 print(account)
 ```
 
@@ -410,4 +415,25 @@ Project owners configure the assistant on the Hub: `hub.account`
 `deleteEmbeddingIntegration`, `testEmbeddingIntegration`,
 `setLlmIntegrationAsDefault`). Tables: `docs/api/ai.md`, `docs/hub/ai.md`,
 `docs/hub/account.md`.
+
+## Project settings, public config, MCP endpoint and AI service users
+
+- `hub.account`: `updateProjectAdminUrl`, `updateProjectLegalDocuments`,
+  `updateProjectExposeLegal`, `getAdminPortalStructure`,
+  `assignAdminPortalServiceUser`.
+- `api.publicProjects`: `getPublicProjectConfig`, `getPublicProjectLegal` — no
+  sign-in; sent with no `Authorization` header.
+- `hub.account`, AI service users: `createAiServiceUser`, `listAiServiceUsers`,
+  `rotateAiServiceUserKey`, `revokeAiServiceUserKey`, `deleteAiServiceUser`.
+- `hub.account`, developer MCP endpoint: `sendMcpMessage`, `openMcpStream`,
+  `endMcpSession`. They return an `McpResponse` that carries the session id
+  from the `Mcp-Session-Id` answer header.
+
+```swift
+_ = try await hub.account.updateProjectLegalDocuments(["projectId": projectId, "termsMarkdown": "# Terms"])
+_ = try await hub.account.updateProjectExposeLegal(["projectId": projectId, "exposed": true])
+let terms = try await api.publicProjects.getPublicProjectLegal(projectId: projectId, kind: "terms")
+```
+
+Tables and the MCP example: `docs/hub/account.md`, `docs/api/public_projects.md`.
 
