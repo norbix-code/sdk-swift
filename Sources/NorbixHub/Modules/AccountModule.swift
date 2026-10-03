@@ -523,6 +523,34 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// `PATCH /{version}/account/projects/{projectId}/settings/brand/expose`
+    ///
+    /// Show or hide the project brand (logo, colours) in the Admin Portal: key `exposed` (Bool).
+    public func updateProjectExposeBrand(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/brand/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `PATCH /{version}/account/projects/{projectId}/settings/auth/expose`
+    ///
+    /// Show or hide the sign-in settings (auth flows) in the Admin Portal: key `exposed` (Bool).
+    public func updateProjectExposeAuth(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/projects/{projectId}/settings/auth/expose",
+            method: "PATCH",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     /// `GET /{version}/account/projects/{projectId}/admin-portal/structure`
     ///
     /// The admin portal's structure for the project.

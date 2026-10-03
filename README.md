@@ -419,7 +419,8 @@ Project owners configure the assistant on the Hub: `hub.account`
 ## Project settings, public config, MCP endpoint and AI service users
 
 - `hub.account`: `updateProjectAdminUrl`, `updateProjectLegalDocuments`,
-  `updateProjectExposeLegal`, `getAdminPortalStructure`,
+  `updateProjectExposeLegal`, `updateProjectExposeBrand`,
+  `updateProjectExposeAuth`, `getAdminPortalStructure`,
   `assignAdminPortalServiceUser`.
 - `api.publicProjects`: `getPublicProjectConfig`, `getPublicProjectLegal` — no
   sign-in; sent with no `Authorization` header.
@@ -432,6 +433,8 @@ Project owners configure the assistant on the Hub: `hub.account`
 ```swift
 _ = try await hub.account.updateProjectLegalDocuments(["projectId": projectId, "termsMarkdown": "# Terms"])
 _ = try await hub.account.updateProjectExposeLegal(["projectId": projectId, "exposed": true])
+_ = try await hub.account.updateProjectExposeBrand(["projectId": projectId, "exposed": true])
+_ = try await hub.account.updateProjectExposeAuth(["projectId": projectId, "exposed": true])
 let terms = try await api.publicProjects.getPublicProjectLegal(projectId: projectId, kind: "terms")
 ```
 

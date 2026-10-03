@@ -48,6 +48,8 @@
 | `updateProjectAdminUrl` | `PATCH` | `/{version}/account/projects/{projectId}/settings/admin-url` | `project` |
 | `updateProjectLegalDocuments` | `PATCH` | `/{version}/account/projects/{projectId}/settings/legal` | `project` |
 | `updateProjectExposeLegal` | `PATCH` | `/{version}/account/projects/{projectId}/settings/legal/expose` | `project` |
+| `updateProjectExposeBrand` | `PATCH` | `/{version}/account/projects/{projectId}/settings/brand/expose` | `project` |
+| `updateProjectExposeAuth` | `PATCH` | `/{version}/account/projects/{projectId}/settings/auth/expose` | `project` |
 | `getAdminPortalStructure` | `GET` | `/{version}/account/projects/{projectId}/admin-portal/structure` | `project` |
 | `assignAdminPortalServiceUser` | `PUT` | `/{version}/account/projects/{projectId}/settings/admin-portal/service-user` | `project` |
 | `createAiServiceUser` | `POST` | `/{version}/account/ai/service-users` | `project` |

@@ -12,12 +12,14 @@ final class HubAccountProjectSettingsRoutesTests: XCTestCase {
             ("updateProjectAdminUrl", "PATCH", "/v2/account/projects/projectId1/settings/admin-url", { c in _ = try await c.account.updateProjectAdminUrl(["projectId": "projectId1", "probe": "value"]) }),
             ("updateProjectLegalDocuments", "PATCH", "/v2/account/projects/projectId1/settings/legal", { c in _ = try await c.account.updateProjectLegalDocuments(["projectId": "projectId1", "probe": "value"]) }),
             ("updateProjectExposeLegal", "PATCH", "/v2/account/projects/projectId1/settings/legal/expose", { c in _ = try await c.account.updateProjectExposeLegal(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectExposeBrand", "PATCH", "/v2/account/projects/projectId1/settings/brand/expose", { c in _ = try await c.account.updateProjectExposeBrand(["projectId": "projectId1", "exposed": true]) }),
+            ("updateProjectExposeAuth", "PATCH", "/v2/account/projects/projectId1/settings/auth/expose", { c in _ = try await c.account.updateProjectExposeAuth(["projectId": "projectId1", "exposed": true]) }),
             ("getAdminPortalStructure", "GET", "/v2/account/projects/projectId1/admin-portal/structure", { c in _ = try await c.account.getAdminPortalStructure(["projectId": "projectId1", "probe": "value"]) }),
             ("assignAdminPortalServiceUser", "PUT", "/v2/account/projects/projectId1/settings/admin-portal/service-user", { c in _ = try await c.account.assignAdminPortalServiceUser(["projectId": "projectId1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {
-        XCTAssertEqual(cases.count, 5)
+        XCTAssertEqual(cases.count, 7)
         for c in cases {
             let mock = MockHTTPExecutor()
             mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)

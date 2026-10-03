@@ -15,6 +15,7 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
    decision(sdk-swift:mcp): one gateway route with three verbs becomes three methods returning `McpResponse`; plain `send` cannot carry it, because the gateway gives the session id only in the `Mcp-Session-Id` answer header and refuses every later call without it (gateway `McpHttpTransport.cs:157-165`); the TypeScript SDK has only the POST, named `mcp`, returning the body
 6. [done] docs(sdk-swift:docs): docs/hub/account.md, new docs/api/public_projects.md, both index pages, README
 7. [done] chore(sdk-swift:checks): `swift build` complete, `swift test` 147 tests, 0 failures (14 new; no lint tool in CI or on this Mac); push and open the pull request
+8. [done] feat(sdk-swift:account): expose brand and expose auth switches (`updateProjectExposeBrand`, `updateProjectExposeAuth`) on `hub.account`, twins of `updateProjectExposeLegal`, with route tests and docs rows — item B3c, gateway routes from item B1; `swift build` complete, `swift test` 147 tests, 0 failures (the route table test now checks 7 routes)
 
 ## Changes
 | file (absolute, branch audit/project) | what changed | step |
@@ -37,6 +38,11 @@ Not in scope: AI plans, knowledge and credits (decided internal); a streaming (S
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/docs/hub/_index.md | account count 36 → 56 (was already stale at 43 rows) | 6 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/docs/api/_index.md | public_projects row | 6 |
 | /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/README.md | module table per client; new section with the 15 new methods; `getAccount()` → `getAccountProfile()` in two examples | 6 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Sources/NorbixHub/Modules/AccountModule.swift | 2 methods: updateProjectExposeBrand, updateProjectExposeAuth | 8 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountProjectSettingsRoutesTests.swift | 2 route cases (verb, path, auth, project header); case count 5 → 7 | 8 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/docs/hub/account.md | 2 table rows | 8 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/README.md | method list + example lines | 8 |
+| /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/docs/tasks/project-audit-swift.md | step 8 | 8 |
 
 ## Findings
 docs(sdk-swift:readme): two README examples called `hub.account.getAccount()`, which does not exist (the method is `getAccountProfile`), so the copied code did not compile — done (fixed here, step 6)
@@ -75,6 +81,20 @@ docs(sdk-swift:files): the public file link route is written `{publicId}/{name}`
             scope: .unauthenticated,
 ```
 
+chore(sdk-swift:references): `references/hub.dtos.swift` has no `UpdateProjectExposeBrand` / `UpdateProjectExposeAuth` DTOs — generated before gateway item B1 added the routes; the methods were written from the gateway source — left open (regenerate the references after B1 merges)
+    where: /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/references/hub.dtos.swift (branch audit/project)
+```swift
+// references/hub.dtos.swift:1969 (audit/project) — only the legal twin exists
+// @Route("/{version}/account/projects/{projectId}/settings/legal/expose", "PATCH")
+public class UpdateProjectExposeLegal : CodeMashRequestBase, IReturn
+// <-- here: no settings/brand/expose or settings/auth/expose class
+```
+
+test(sdk-swift:hub): the route test checks verb, path and headers but not the JSON body, so a lost `exposed` key would still pass — left open (same for every case in HubAccountProjectSettingsRoutesTests)
+    where: /Users/djovaisas/Projects/norbix/worktrees/sdks/norbix-swift/audit/project/Tests/NorbixHubTests/AccountProjectSettingsRoutesTests.swift (branch audit/project)
+```swift
+            XCTAssertEqual(mock.lastRequest?.url?.path, c.path, c.name)   // <-- here: no check on mock.lastRequest?.httpBody
+```
 
 ## Rejected / moved out
 - decision(sdk-swift:ai): AI plans, knowledge search and AI credits endpoints are not added — rejected — reason: decided internal by the campaign — new ticket/file: none
