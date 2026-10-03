@@ -32,6 +32,7 @@ public final class NorbixApiClient: Sendable {
 
     // Modules — flat, no nested .api namespace.
     public let accessToken: AccessTokenModule
+    public let ai: AiModule
     public let apiKeys: ApiKeysModule
     public let auth: AuthModule
     public let database: DatabaseModule
@@ -57,6 +58,7 @@ public final class NorbixApiClient: Sendable {
         let transport = Transport(config: config, executor: executor, logger: logger)
         self.transport = transport
         self.accessToken = AccessTokenModule(transport: transport)
+        self.ai = AiModule(transport: transport)
         self.apiKeys = ApiKeysModule(transport: transport)
         self.auth = AuthModule(transport: transport)
         self.database = DatabaseModule(transport: transport)

@@ -384,3 +384,30 @@ Push to `main`, `next`, or `beta`:
 - create git tag + GitHub release
 
 Swift Package Manager consumers get new versions from git tags/releases.
+
+## End-user AI chat and project AI settings
+
+`client.ai` (NorbixApi) is the end-user AI chat for a signed-in project user:
+availability, sessions, entries, feedback, attachments, memory and
+`startEndUserChatTurn`, which answers at once with a `turnId`. The answer
+streams over the gateway's SSE endpoint on the user's own channel
+`ai-chat:{projectId}:{authId}` (events `ai.chat.turn.*`, `ai.chat.session.*`);
+a subscription to another user's channel is refused with 403 and
+`responseStatus.errorCode = "AiChatChannelRefused"` before the stream starts —
+do not retry it. This SDK has no SSE client. Path tokens are read from the
+request dictionary.
+
+```swift
+let turn = try await api.ai.startEndUserChatTurn(["sessionId": sessionId, "message": "What can you do?"])
+let entries = try await api.ai.getEndUserChatEntries(["SessionId": sessionId])
+```
+
+Project owners configure the assistant on the Hub: `hub.account`
+(`getProjectAiSettings`, `updateProjectAiSettings`, `createProjectAiAssistant`,
+`updateProjectAiAssistant`, `deleteProjectAiAssistant`, `getProjectAiUsage`,
+`setAdminPortalEnabled`) and `hub.ai` (`getEmbeddingIntegrations`,
+`saveEmbeddingIntegration`, `getEmbeddingIntegration`,
+`deleteEmbeddingIntegration`, `testEmbeddingIntegration`,
+`setLlmIntegrationAsDefault`). Tables: `docs/api/ai.md`, `docs/hub/ai.md`,
+`docs/hub/account.md`.
+

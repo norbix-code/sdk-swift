@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-09-28 20:32:44
+Date: 2026-10-02 15:58:21
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -1292,6 +1292,40 @@ public class GetProjectTokens : CodeMashRequestBase, IReturn
 }
 
 /**
+* Turns the project's managed Admin Portal on or off
+*/
+// @Route("/{version}/account/projects/{projectId}/admin-portal/enabled", "PUT")
+// @Api(Description="Turns the project's managed Admin Portal on or off")
+public class SetAdminPortalEnabledRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * true turns the managed Admin Portal on; false turns it off.
+    */
+    // @ApiMember(Description="true turns the managed Admin Portal on; false turns it off.", IsRequired=true)
+    public var enabled:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case enabled
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if enabled != nil { try container.encode(enabled, forKey: .enabled) }
+    }
+}
+
+/**
 * Assigns the project's Admin Portal service user
 */
 // @Route("/{version}/account/projects/{projectId}/settings/admin-portal/service-user", "PUT")
@@ -1376,6 +1410,200 @@ public class UpdateProjectAdminUrl : CodeMashRequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if url != nil { try container.encode(url, forKey: .url) }
+    }
+}
+
+/**
+* Reads the project's AI chat settings for end users: on/off, default LLM and assistants
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/settings", "GET")
+// @Api(Description="Reads the project's AI chat settings for end users: on/off, default LLM and assistants")
+public class GetProjectAiSettings : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetProjectAiSettingsResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
+* Saves the project's AI chat settings: on/off and the default LLM
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/settings", "PUT")
+// @Api(Description="Saves the project's AI chat settings: on/off and the default LLM")
+public class UpdateProjectAiSettings : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * True to show end-user AI chat in the Admin Portal, false to hide it.
+    */
+    // @ApiMember(Description="True to show end-user AI chat in the Admin Portal, false to hide it.")
+    public var enabled:Bool?
+
+    /**
+    * Default LLM integration id (int_…) for assistants without their own. Empty clears it.
+    */
+    // @ApiMember(Description="Default LLM integration id (int_…) for assistants without their own. Empty clears it.")
+    public var defaultLlmIntegrationId:String?
+
+    /**
+    * Model of the default LLM. Empty = the integration's default model.
+    */
+    // @ApiMember(Description="Model of the default LLM. Empty = the integration's default model.")
+    public var defaultModel:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case enabled
+        case defaultLlmIntegrationId
+        case defaultModel
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
+        defaultLlmIntegrationId = try container.decodeIfPresent(String.self, forKey: .defaultLlmIntegrationId)
+        defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if enabled != nil { try container.encode(enabled, forKey: .enabled) }
+        if defaultLlmIntegrationId != nil { try container.encode(defaultLlmIntegrationId, forKey: .defaultLlmIntegrationId) }
+        if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
+    }
+}
+
+/**
+* Adds an end-user AI assistant to the project
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/assistants", "POST")
+// @Api(Description="Adds an end-user AI assistant to the project")
+public class CreateProjectAiAssistant : ProjectAiAssistantRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
+* Updates an end-user AI assistant of the project (full replace)
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/assistants/{assistantId}", "PUT")
+// @Api(Description="Updates an end-user AI assistant of the project (full replace)")
+public class UpdateProjectAiAssistant : ProjectAiAssistantRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * Id of the assistant (ast_…).
+    */
+    // @ApiMember(Description="Id of the assistant (ast_…).", IsRequired=true)
+    public var assistantId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case assistantId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
+    }
+}
+
+/**
+* Removes an end-user AI assistant from the project
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/assistants/{assistantId}", "DELETE")
+// @Api(Description="Removes an end-user AI assistant from the project")
+public class DeleteProjectAiAssistant : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * Id of the assistant (ast_…).
+    */
+    // @ApiMember(Description="Id of the assistant (ast_…).", IsRequired=true)
+    public var assistantId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case assistantId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
+    }
+}
+
+/**
+* Reads the project's AI usage this month: totals, per assistant, top users and per model
+*/
+// @Route("/{version}/account/projects/{projectId}/ai/usage", "GET")
+// @Api(Description="Reads the project's AI usage this month: totals, per assistant, top users and per model")
+public class GetProjectAiUsage : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetProjectAiUsageResponse
+
+    /**
+    * How many users to list, biggest first. 1–100, default 10.
+    */
+    // @ApiMember(Description="How many users to list, biggest first. 1–100, default 10.")
+    public var top:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case top
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        top = try container.decodeIfPresent(Int.self, forKey: .top)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if top != nil { try container.encode(top, forKey: .top) }
     }
 }
 
@@ -7685,6 +7913,51 @@ public class ProcessCollectionImport : Codable
     required public init(){}
 }
 
+public class TermInserted : Codable
+{
+    public var projectId:ProjectId?
+    public var databaseIntegrationId:IntegrationId?
+    public var taxonomyId:TaxonomyId?
+    public var id:String?
+    public var document:String?
+
+    required public init(){}
+}
+
+public class TermUpdated : Codable
+{
+    public var projectId:ProjectId?
+    public var databaseIntegrationId:IntegrationId?
+    public var taxonomyId:TaxonomyId?
+    public var id:String?
+    public var from:String?
+    public var to:String?
+
+    required public init(){}
+}
+
+public class TermDeleted : Codable
+{
+    public var projectId:ProjectId?
+    public var databaseIntegrationId:IntegrationId?
+    public var taxonomyId:TaxonomyId?
+    public var id:String?
+    public var document:String?
+
+    required public init(){}
+}
+
+public class TermsDeleted : Codable
+{
+    public var projectId:ProjectId?
+    public var databaseIntegrationId:IntegrationId?
+    public var taxonomyId:TaxonomyId?
+    public var deletedCount:Int?
+    public var filter:String?
+
+    required public init(){}
+}
+
 // @Route("/{version}/files/disable", "GET")
 public class DisableFiles : CodeMashRequestBase, IReturn
 {
@@ -13435,10 +13708,10 @@ public class TestPushIntegration : CodeMashRequestBase, IReturn
     public var testToken:String?
 
     /**
-    * Optional delivery family for the test token (e.g. Ios, Android, Chrome, Safari, Expo). Requires TestToken when set.
+    * Optional delivery family for the test token (ios, android, chrome or safari). Requires TestToken when set.
     */
     // @DataMember
-    // @ApiMember(Description="Optional delivery family for the test token (e.g. Ios, Android, Chrome, Safari, Expo). Requires TestToken when set.")
+    // @ApiMember(Description="Optional delivery family for the test token (ios, android, chrome or safari). Requires TestToken when set.")
     public var deliveryFamily:String?
 
     required public init(){ super.init() }
@@ -13603,9 +13876,9 @@ public class GetPushDevices : CodeMashListPaginationRequestBase, IReturn
     public var deviceKey:String?
 
     /**
-    * Optional: only devices of this platform — ios, android, chrome, safari or expo.
+    * Optional: only devices of this platform — ios, android, chrome or safari.
     */
-    // @ApiMember(Description="Optional: only devices of this platform — ios, android, chrome, safari or expo.")
+    // @ApiMember(Description="Optional: only devices of this platform — ios, android, chrome or safari.")
     public var platform:String?
 
     /**
@@ -13638,6 +13911,52 @@ public class GetPushDevices : CodeMashListPaginationRequestBase, IReturn
         if userId != nil { try container.encode(userId, forKey: .userId) }
         if deviceKey != nil { try container.encode(deviceKey, forKey: .deviceKey) }
         if platform != nil { try container.encode(platform, forKey: .platform) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
+/**
+* Count the devices a push campaign audience would reach
+*/
+// @Route("/{version}/notifications/push/campaigns/audience-count", "POST")
+// @Api(Description="Count the devices a push campaign audience would reach")
+// @DataContract
+public class GetPushCampaignAudienceCountRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetPushCampaignAudienceCountResponse
+
+    /**
+    * The audience, in the same shape as CreatePushCampaignRequest.campaign. Template and send options are ignored.
+    */
+    // @DataMember
+    // @ApiMember(Description="The audience, in the same shape as CreatePushCampaignRequest.campaign. Template and send options are ignored.")
+    public var campaign:PushCampaignRequest?
+
+    /**
+    * Optional. When omitted, the default database integration for the request's environment is used.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional. When omitted, the default database integration for the request's environment is used.")
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case campaign
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        campaign = try container.decodeIfPresent(PushCampaignRequest.self, forKey: .campaign)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if campaign != nil { try container.encode(campaign, forKey: .campaign) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
     }
 }
@@ -15866,15 +16185,183 @@ public class ChatTurnRequest : RequestBase, IReturn
 }
 
 /**
-* MCP server endpoint — JSON-RPC 2.0 over HTTP POST exposing the AI tool catalog.
+* Plans (preview) or builds (apply) a whole project from one spec.
+*/
+// @Route("/{version}/account/ai/scaffold", "POST")
+// @Api(Description="Plans (preview) or builds (apply) a whole project from one spec.")
+public class ScaffoldProjectRequest : RequestBase, IReturn
+{
+    public typealias Return = ScaffoldProjectResponse
+
+    /**
+    * The project spec (a JSON object) — see the tool description.
+    */
+    // @ApiMember(Description="The project spec (a JSON object) — see the tool description.", IsRequired=true)
+    public var spec:String?
+
+    /**
+    * 'preview' (writes nothing) or 'apply' (builds the project).
+    */
+    // @ApiMember(Description="'preview' (writes nothing) or 'apply' (builds the project).", IsRequired=true)
+    public var mode:String?
+
+    public var env:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case spec
+        case mode
+        case env
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        spec = try container.decodeIfPresent(String.self, forKey: .spec)
+        mode = try container.decodeIfPresent(String.self, forKey: .mode)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if spec != nil { try container.encode(spec, forKey: .spec) }
+        if mode != nil { try container.encode(mode, forKey: .mode) }
+        if env != nil { try container.encode(env, forKey: .env) }
+    }
+}
+
+/**
+* Validates a collection schema without saving it.
+*/
+// @Route("/{version}/account/ai/schemas/validate", "POST")
+// @Api(Description="Validates a collection schema without saving it.")
+public class ValidateSchemaRequest : RequestBase, IReturn
+{
+    public typealias Return = ValidateSchemaResponse
+
+    /**
+    * The schema as JSON — see the tool description.
+    */
+    // @ApiMember(Description="The schema as JSON — see the tool description.", IsRequired=true)
+    public var schemaJson:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case schemaJson
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaJson = try container.decodeIfPresent(String.self, forKey: .schemaJson)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if schemaJson != nil { try container.encode(schemaJson, forKey: .schemaJson) }
+    }
+}
+
+/**
+* Renders an email, push or SMS template with sample data.
+*/
+// @Route("/{version}/account/ai/templates/render-preview", "POST")
+// @Api(Description="Renders an email, push or SMS template with sample data.")
+public class RenderTemplatePreviewRequest : RequestBase, IReturn, IHasEnv
+{
+    public typealias Return = RenderTemplatePreviewResponse
+
+    /**
+    * The project of templateId. Not needed to render a body.
+    */
+    // @ApiMember(Description="The project of templateId. Not needed to render a body.")
+    public var projectId:String?
+
+    public var env:String?
+    /**
+    * email | push | sms
+    */
+    // @ApiMember(Description="email | push | sms", IsRequired=true)
+    public var channel:String?
+
+    /**
+    * An existing template id (tmpl_…). Needs projectId. Leave empty to render body instead.
+    */
+    // @ApiMember(Description="An existing template id (tmpl_…). Needs projectId. Leave empty to render body instead.")
+    public var templateId:String?
+
+    /**
+    * Razor template text to render when there is no templateId.
+    */
+    // @ApiMember(Description="Razor template text to render when there is no templateId.")
+    public var body:String?
+
+    /**
+    * Email subject / push title / SMS subject to render with body. Optional.
+    */
+    // @ApiMember(Description="Email subject / push title / SMS subject to render with body. Optional.")
+    public var subject:String?
+
+    /**
+    * Sample data as a JSON object, read by the template as @Model.
+    */
+    // @ApiMember(Description="Sample data as a JSON object, read by the template as @Model.")
+    public var sampleData:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case projectId
+        case env
+        case channel
+        case templateId
+        case body
+        case subject
+        case sampleData
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+        channel = try container.decodeIfPresent(String.self, forKey: .channel)
+        templateId = try container.decodeIfPresent(String.self, forKey: .templateId)
+        body = try container.decodeIfPresent(String.self, forKey: .body)
+        subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        sampleData = try container.decodeIfPresent(String.self, forKey: .sampleData)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+        if env != nil { try container.encode(env, forKey: .env) }
+        if channel != nil { try container.encode(channel, forKey: .channel) }
+        if templateId != nil { try container.encode(templateId, forKey: .templateId) }
+        if body != nil { try container.encode(body, forKey: .body) }
+        if subject != nil { try container.encode(subject, forKey: .subject) }
+        if sampleData != nil { try container.encode(sampleData, forKey: .sampleData) }
+    }
+}
+
+/**
+* MCP server endpoint (Streamable HTTP): JSON-RPC 2.0 over POST, server stream over GET, session end over DELETE.
 */
 // @Route("/{version}/account/mcp", "POST")
-// @Api(Description="MCP server endpoint — JSON-RPC 2.0 over HTTP POST exposing the AI tool catalog.")
+// @Route("/{version}/account/mcp", "GET")
+// @Route("/{version}/account/mcp", "DELETE")
+// @Api(Description="MCP server endpoint (Streamable HTTP): JSON-RPC 2.0 over POST, server stream over GET, session end over DELETE.")
 public class McpRequest : IReturn, Codable
 {
     public typealias Return = String
 
     public var version:String?
+    public var toolsets:String?
     public var requestStream:Data?
 
     required public init(){}
@@ -16050,6 +16537,241 @@ public class MarkNeedsYouDoneRequest : CodeMashRequestBase, IReturn
     }
 }
 
+/**
+* OAuth protected-resource metadata (RFC 9728) for the Hub MCP endpoint.
+*/
+// @Route("/.well-known/oauth-protected-resource", "GET")
+// @Route("/.well-known/oauth-protected-resource/{Path*}", "GET")
+// @Api(Description="OAuth protected-resource metadata (RFC 9728) for the Hub MCP endpoint.")
+public class OAuthProtectedResourceMetadataRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var path:String?
+
+    required public init(){}
+}
+
+/**
+* OAuth authorization-server metadata (RFC 8414).
+*/
+// @Route("/.well-known/oauth-authorization-server", "GET")
+// @Route("/.well-known/oauth-authorization-server/{Path*}", "GET")
+// @Api(Description="OAuth authorization-server metadata (RFC 8414).")
+public class OAuthAuthorizationServerMetadataRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var path:String?
+
+    required public init(){}
+}
+
+/**
+* Registers an MCP client for OAuth (RFC 7591). Public clients only: PKCE, no secret.
+*/
+// @Route("/{version}/oauth/register", "POST")
+// @Api(Description="Registers an MCP client for OAuth (RFC 7591). Public clients only: PKCE, no secret.")
+public class OAuthRegisterRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var version:String?
+    public var requestStream:Data?
+
+    required public init(){}
+}
+
+/**
+* OAuth authorization endpoint: sign-in hint or the consent page (HTML).
+*/
+// @Route("/{version}/oauth/authorize", "GET")
+// @Api(Description="OAuth authorization endpoint: sign-in hint or the consent page (HTML).")
+public class OAuthAuthorizeRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var version:String?
+
+    required public init(){}
+}
+
+/**
+* OAuth authorization endpoint: the person's decision from the consent page.
+*/
+// @Route("/{version}/oauth/authorize", "POST")
+// @Api(Description="OAuth authorization endpoint: the person's decision from the consent page.")
+public class OAuthAuthorizeDecisionRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var version:String?
+
+    required public init(){}
+}
+
+/**
+* OAuth token endpoint: authorization code (PKCE S256) or refresh token → access token.
+*/
+// @Route("/{version}/oauth/token", "POST")
+// @Api(Description="OAuth token endpoint: authorization code (PKCE S256) or refresh token → access token.")
+public class OAuthTokenRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var version:String?
+
+    required public init(){}
+}
+
+/**
+* OAuth token revocation (RFC 7009): revokes the grant behind a refresh or access token.
+*/
+// @Route("/{version}/oauth/revoke", "POST")
+// @Api(Description="OAuth token revocation (RFC 7009): revokes the grant behind a refresh or access token.")
+public class OAuthRevokeRequest : IReturn, Codable
+{
+    public typealias Return = String
+
+    public var version:String?
+
+    required public init(){}
+}
+
+// @Route("/{version}/ai/integrations/embeddings/{Id}", "DELETE")
+public class DeleteEmbeddingIntegrationRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * Id of the embedding integration to delete.
+    */
+    // @ApiMember(Description="Id of the embedding integration to delete.")
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+// @Route("/{version}/ai/integrations/embeddings/{Id}", "GET")
+public class GetEmbeddingIntegration : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetEmbeddingIntegrationResponse
+
+    /**
+    * Id of the embedding integration to fetch.
+    */
+    // @ApiMember(Description="Id of the embedding integration to fetch.")
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+// @Route("/{version}/ai/integrations/embeddings", "GET")
+public class GetEmbeddingIntegrations : CodeMashListPaginationRequestBase, IReturn
+{
+    public typealias Return = GetEmbeddingIntegrationsResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+// @Route("/{version}/ai/integrations/embeddings", "POST")
+// @DataContract
+public class SaveEmbeddingIntegration : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    // @DataMember(Name="integration")
+    public var integration:EmbeddingIntegrationRequest?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integration
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integration = try container.decodeIfPresent(EmbeddingIntegrationRequest.self, forKey: .integration)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integration != nil { try container.encode(integration, forKey: .integration) }
+    }
+}
+
+// @Route("/{version}/ai/integrations/embeddings/{Id}/test", "POST")
+public class TestEmbeddingIntegration : CodeMashRequestBase, IReturn
+{
+    public typealias Return = TestEmbeddingIntegrationResponse
+
+    /**
+    * Id of the embedding integration to test.
+    */
+    // @ApiMember(Description="Id of the embedding integration to test.")
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
 // @Route("/{version}/ai/integrations/llms/{Id}", "DELETE")
 public class DeleteLlmIntegrationRequest : CodeMashRequestBase, IReturn
 {
@@ -16211,6 +16933,36 @@ public class SaveLlmIntegration : CodeMashRequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if integration != nil { try container.encode(integration, forKey: .integration) }
+    }
+}
+
+// @Route("/{version}/ai/integrations/llms/{Id}/default", "PUT")
+public class SetLlmIntegrationAsDefaultRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * Id of the LLM integration to make the default.
+    */
+    // @ApiMember(Description="Id of the LLM integration to make the default.")
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
     }
 }
 
@@ -18541,6 +19293,7 @@ public class PublicProjectConfigDto : Codable
     public var adminPortalEnabled:Bool?
     public var branding:PublicBrandDto?
     public var auth:PublicAuthDto?
+    public var aiChat:PublicAiChatDto?
 
     required public init(){}
 }
@@ -18889,6 +19642,52 @@ public class AdminPortalStructureDto : Codable
     public var modules:[AdminPortalModuleDto] = []
 
     required public init(){}
+}
+
+public class GetProjectAiSettingsResponse : ResponseBase
+{
+    public var result:ProjectAiSettingsDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(ProjectAiSettingsDto.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
+    }
+}
+
+public class GetProjectAiUsageResponse : ResponseBase
+{
+    public var result:ProjectAiUsageDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(ProjectAiUsageDto.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
+    }
 }
 
 // @DataContract
@@ -22325,6 +23124,29 @@ public class GetPushDevicesResponse : ResponseBase
     }
 }
 
+public class GetPushCampaignAudienceCountResponse : ResponseBase
+{
+    public var result:PushAudienceCountDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(PushAudienceCountDto.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
+    }
+}
+
 public class GetPushCampaignResponse : ResponseBase
 {
     public var item:PushCampaignDto?
@@ -23145,6 +23967,107 @@ public class ChatTurnResponse : ResponseBase
     }
 }
 
+public class ScaffoldProjectResponse : ResponseBase
+{
+    public var mode:String?
+    public var env:String?
+    public var valid:Bool?
+    public var plan:[ScaffoldStep]?
+    public var defaults:[String]?
+    public var issues:[ScaffoldIssue]?
+    public var report:ScaffoldApplyReport?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case mode
+        case env
+        case valid
+        case plan
+        case defaults
+        case issues
+        case report
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        mode = try container.decodeIfPresent(String.self, forKey: .mode)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+        valid = try container.decodeIfPresent(Bool.self, forKey: .valid)
+        plan = try container.decodeIfPresent([ScaffoldStep].self, forKey: .plan) ?? []
+        defaults = try container.decodeIfPresent([String].self, forKey: .defaults) ?? []
+        issues = try container.decodeIfPresent([ScaffoldIssue].self, forKey: .issues) ?? []
+        report = try container.decodeIfPresent(ScaffoldApplyReport.self, forKey: .report)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if mode != nil { try container.encode(mode, forKey: .mode) }
+        if env != nil { try container.encode(env, forKey: .env) }
+        if valid != nil { try container.encode(valid, forKey: .valid) }
+        if plan != nil { try container.encode(plan, forKey: .plan) }
+        if defaults != nil { try container.encode(defaults, forKey: .defaults) }
+        if issues != nil { try container.encode(issues, forKey: .issues) }
+        if report != nil { try container.encode(report, forKey: .report) }
+    }
+}
+
+public class ValidateSchemaResponse : ResponseBase
+{
+    public var valid:Bool?
+    public var issues:[ScaffoldIssue]?
+    public var collections:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case valid
+        case issues
+        case collections
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        valid = try container.decodeIfPresent(Bool.self, forKey: .valid)
+        issues = try container.decodeIfPresent([ScaffoldIssue].self, forKey: .issues) ?? []
+        collections = try container.decodeIfPresent([String].self, forKey: .collections) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if valid != nil { try container.encode(valid, forKey: .valid) }
+        if issues != nil { try container.encode(issues, forKey: .issues) }
+        if collections != nil { try container.encode(collections, forKey: .collections) }
+    }
+}
+
+public class RenderTemplatePreviewResponse : ResponseBase
+{
+    public var preview:TemplatePreview?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case preview
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        preview = try container.decodeIfPresent(TemplatePreview.self, forKey: .preview)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if preview != nil { try container.encode(preview, forKey: .preview) }
+    }
+}
+
 public class GetProjectBriefResponse : ResponseBase
 {
     public var projectId:String?
@@ -23262,6 +24185,89 @@ public class ExportWorkItemResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if workItemId != nil { try container.encode(workItemId, forKey: .workItemId) }
         if markdown != nil { try container.encode(markdown, forKey: .markdown) }
+    }
+}
+
+public class GetEmbeddingIntegrationResponse : ResponseBase
+{
+    public var item:EmbeddingIntegrationDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case item
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        item = try container.decodeIfPresent(EmbeddingIntegrationDto.self, forKey: .item)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if item != nil { try container.encode(item, forKey: .item) }
+    }
+}
+
+public class GetEmbeddingIntegrationsResponse : ResponseBase
+{
+    public var list:PaginatedResponse<EmbeddingIntegrationListProjection>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case list
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        list = try container.decodeIfPresent(PaginatedResponse<EmbeddingIntegrationListProjection>.self, forKey: .list)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+// @DataContract
+public class TestEmbeddingIntegrationResponse : ResponseBase
+{
+    // @DataMember
+    public var dimension:Int?
+
+    // @DataMember
+    public var latencyMs:Int?
+
+    // @DataMember
+    public var totalTokens:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case dimension
+        case latencyMs
+        case totalTokens
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
+        latencyMs = try container.decodeIfPresent(Int.self, forKey: .latencyMs)
+        totalTokens = try container.decodeIfPresent(Int.self, forKey: .totalTokens)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
+        if latencyMs != nil { try container.encode(latencyMs, forKey: .latencyMs) }
+        if totalTokens != nil { try container.encode(totalTokens, forKey: .totalTokens) }
     }
 }
 
@@ -27357,11 +28363,15 @@ public class PushToAllUsersDeliverySettingsDto : PushCampaignDeliverySettingsDto
     // @DataMember
     public var userTags:[String]?
 
+    // @DataMember
+    public var platforms:[PushDeviceDeliveryFamily]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case rolesNames
         case userTags
+        case platforms
     }
 
     required public init(from decoder: Decoder) throws {
@@ -27369,6 +28379,7 @@ public class PushToAllUsersDeliverySettingsDto : PushCampaignDeliverySettingsDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         rolesNames = try container.decodeIfPresent([String].self, forKey: .rolesNames) ?? []
         userTags = try container.decodeIfPresent([String].self, forKey: .userTags) ?? []
+        platforms = try container.decodeIfPresent([PushDeviceDeliveryFamily].self, forKey: .platforms) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -27376,6 +28387,7 @@ public class PushToAllUsersDeliverySettingsDto : PushCampaignDeliverySettingsDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if rolesNames != nil { try container.encode(rolesNames, forKey: .rolesNames) }
         if userTags != nil { try container.encode(userTags, forKey: .userTags) }
+        if platforms != nil { try container.encode(platforms, forKey: .platforms) }
     }
 }
 
@@ -27410,22 +28422,28 @@ public class PushToAccountUsersDeliverySettingsDto : PushCampaignDeliverySetting
     // @DataMember
     public var recipients:[String] = []
 
+    // @DataMember
+    public var platforms:[PushDeviceDeliveryFamily]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case recipients
+        case platforms
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         recipients = try container.decodeIfPresent([String].self, forKey: .recipients) ?? []
+        platforms = try container.decodeIfPresent([PushDeviceDeliveryFamily].self, forKey: .platforms) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if recipients.count > 0 { try container.encode(recipients, forKey: .recipients) }
+        if platforms != nil { try container.encode(platforms, forKey: .platforms) }
     }
 }
 
@@ -30610,6 +31628,114 @@ public class DatabaseIntegrationRequest : Codable
     required public init(){}
 }
 
+public class ProjectAiAssistantRequestBase : CodeMashRequestBase
+{
+    /**
+    * Name shown to end users. Required, at most 100 characters, unique in the project.
+    */
+    // @ApiMember(Description="Name shown to end users. Required, at most 100 characters, unique in the project.")
+    public var name:String?
+
+    /**
+    * First message end users see. Public. At most 2 000 characters.
+    */
+    // @ApiMember(Description="First message end users see. Public. At most 2 000 characters.")
+    public var welcomeMessage:String?
+
+    /**
+    * Instructions for the model. Never shown to end users. At most 20 000 characters.
+    */
+    // @ApiMember(Description="Instructions for the model. Never shown to end users. At most 20 000 characters.")
+    public var systemPrompt:String?
+
+    /**
+    * Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences). Any other name is refused.
+    */
+    // @ApiMember(Description="Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences). Any other name is refused.")
+    public var toolsets:[String]?
+
+    /**
+    * The assistant's own LLM integration id (int_…). Empty = the project's default LLM.
+    */
+    // @ApiMember(Description="The assistant's own LLM integration id (int_…). Empty = the project's default LLM.")
+    public var llmIntegrationId:String?
+
+    /**
+    * Model name. Empty = the integration's default model.
+    */
+    // @ApiMember(Description="Model name. Empty = the integration's default model.")
+    public var model:String?
+
+    /**
+    * True to let the assistant remember facts about the end user across chats.
+    */
+    // @ApiMember(Description="True to let the assistant remember facts about the end user across chats.")
+    public var memoryEnabled:Bool?
+
+    /**
+    * RAG source ids. Not available yet — must be empty.
+    */
+    // @ApiMember(Description="RAG source ids. Not available yet — must be empty.")
+    public var ragSourceIds:[String]?
+
+    /**
+    * AI plan (quota) id. Optional.
+    */
+    // @ApiMember(Description="AI plan (quota) id. Optional.")
+    public var planId:String?
+
+    /**
+    * True to make this the project's default assistant; the previous default stops being default.
+    */
+    // @ApiMember(Description="True to make this the project's default assistant; the previous default stops being default.")
+    public var isDefault:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case name
+        case welcomeMessage
+        case systemPrompt
+        case toolsets
+        case llmIntegrationId
+        case model
+        case memoryEnabled
+        case ragSourceIds
+        case planId
+        case isDefault
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        welcomeMessage = try container.decodeIfPresent(String.self, forKey: .welcomeMessage)
+        systemPrompt = try container.decodeIfPresent(String.self, forKey: .systemPrompt)
+        toolsets = try container.decodeIfPresent([String].self, forKey: .toolsets) ?? []
+        llmIntegrationId = try container.decodeIfPresent(String.self, forKey: .llmIntegrationId)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        memoryEnabled = try container.decodeIfPresent(Bool.self, forKey: .memoryEnabled)
+        ragSourceIds = try container.decodeIfPresent([String].self, forKey: .ragSourceIds) ?? []
+        planId = try container.decodeIfPresent(String.self, forKey: .planId)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if name != nil { try container.encode(name, forKey: .name) }
+        if welcomeMessage != nil { try container.encode(welcomeMessage, forKey: .welcomeMessage) }
+        if systemPrompt != nil { try container.encode(systemPrompt, forKey: .systemPrompt) }
+        if toolsets != nil { try container.encode(toolsets, forKey: .toolsets) }
+        if llmIntegrationId != nil { try container.encode(llmIntegrationId, forKey: .llmIntegrationId) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if memoryEnabled != nil { try container.encode(memoryEnabled, forKey: .memoryEnabled) }
+        if ragSourceIds != nil { try container.encode(ragSourceIds, forKey: .ragSourceIds) }
+        if planId != nil { try container.encode(planId, forKey: .planId) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+    }
+}
+
 // @DataContract
 public class FileResourceRefDto : Codable
 {
@@ -30972,6 +32098,45 @@ public class ImportColumnMappingDto : Codable
     public var dontImportOnError:Bool?
 
     required public init(){}
+}
+
+public class ProjectId : AggregateId, IHasDomainEntityId
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public class IntegrationId : AggregateId, IHasDomainEntityId
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public class TaxonomyId : AggregateId, IHasDomainEntityId
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
 }
 
 public class FilesIntegrationRequest : Codable
@@ -31461,6 +32626,20 @@ public class ChatScreenContextDto : Codable
     required public init(){}
 }
 
+public class EmbeddingIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:EmbeddingProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var endpoint:String?
+    public var model:String?
+    public var dimension:Int?
+    public var apiKey:String?
+
+    required public init(){}
+}
+
 public class LlmIntegrationRequest : Codable
 {
     public var integrationId:String?
@@ -31469,6 +32648,8 @@ public class LlmIntegrationRequest : Codable
     public var isEnabled:Bool?
     public var endpoint:String?
     public var defaultModel:String?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionRequest]?
 
     required public init(){}
 }
@@ -31619,6 +32800,14 @@ public class PublicAuthDto : Codable
     public var passkey:Bool?
     public var methods:[String]?
     public var passwordPolicy:PublicPasswordPolicyDto?
+
+    required public init(){}
+}
+
+public class PublicAiChatDto : Codable
+{
+    public var enabled:Bool?
+    public var assistants:[PublicAiAssistantDto] = []
 
     required public init(){}
 }
@@ -31836,6 +33025,9 @@ public class ProjectDto : IHasViewId, IBindableContract, Codable
     public var exposeLegalToAdminPortal:Bool?
 
     // @DataMember
+    public var aiChat:ProjectAiSettingsDto?
+
+    // @DataMember
     public var legalTermsMarkdown:String?
 
     // @DataMember
@@ -31957,6 +33149,45 @@ public class ProjectRegionDto : Codable
     public var id:String?
     public var continent:Continent?
     public var name:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiSettingsDto : Codable
+{
+    // @DataMember
+    public var enabled:Bool?
+
+    // @DataMember
+    public var defaultLlmIntegrationId:String?
+
+    // @DataMember
+    public var defaultModel:String?
+
+    // @DataMember
+    public var assistants:[AiAssistantDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiUsageDto : Codable
+{
+    // @DataMember
+    public var period:String?
+
+    // @DataMember
+    public var totals:AiUsageGroupDto?
+
+    // @DataMember
+    public var assistants:[AiUsageGroupDto] = []
+
+    // @DataMember
+    public var topUsers:[AiUsageGroupDto] = []
+
+    // @DataMember
+    public var models:[AiUsageGroupDto] = []
 
     required public init(){}
 }
@@ -33960,6 +35191,24 @@ public class PushDeviceListProjection : Codable
 }
 
 // @DataContract
+public class PushAudienceCountDto : Codable
+{
+    // @DataMember
+    public var devices:Int?
+
+    // @DataMember
+    public var recipients:Int?
+
+    // @DataMember
+    public var skippedUserIds:Int?
+
+    // @DataMember
+    public var isCapped:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
 public class PushCampaignDto : CampaignDto
 {
     // @DataMember
@@ -34270,6 +35519,7 @@ public class AgentOnboardingSnippet : Codable
 {
     public var client:String?
     public var config:String?
+    public var auth:String?
 
     required public init(){}
 }
@@ -34339,6 +35589,49 @@ public class AiChatEntryWireDto : Codable
     required public init(){}
 }
 
+public class ScaffoldStep : Codable
+{
+    public var order:Int?
+    public var kind:String?
+    public var title:String?
+    public var tool:String?
+    public var arguments:JsonObject?
+    public var checkTool:String?
+    public var templateRef:String?
+
+    required public init(){}
+}
+
+public class ScaffoldIssue : Codable
+{
+    public var `where`:String?
+    public var code:String?
+    public var message:String?
+
+    required public init(){}
+}
+
+public class ScaffoldApplyReport : Codable
+{
+    public var completed:Bool?
+    public var projectId:String?
+    public var projectUrl:String?
+    public var summary:String?
+    public var steps:[ScaffoldStepReportWithLink] = []
+
+    required public init(){}
+}
+
+public class TemplatePreview : Codable
+{
+    public var channel:String?
+    public var ok:Bool?
+    public var parts:IReadOnlyList<TemplatePreviewPartResult>?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
 public class ProjectBriefSnapshotWireDto : Codable
 {
     public var projectId:String?
@@ -34399,6 +35692,80 @@ public class WorkItemWireDto : Codable
     required public init(){}
 }
 
+public class EmbeddingIntegrationDto : IntegrationDto
+{
+    public var provider:EmbeddingProvider?
+    public var model:String?
+    public var dimension:Int?
+    public var baseUrl:String?
+    public var isConfigured:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case model
+        case dimension
+        case baseUrl
+        case isConfigured
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .provider)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
+        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
+        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+    }
+}
+
+public class EmbeddingIntegrationListProjection : IntegrationListProjection
+{
+    public var embeddingProvider:EmbeddingProvider?
+    public var model:String?
+    public var dimension:Int?
+    public var isConfigured:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case embeddingProvider
+        case model
+        case dimension
+        case isConfigured
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        embeddingProvider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .embeddingProvider)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if embeddingProvider != nil { try container.encode(embeddingProvider, forKey: .embeddingProvider) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+    }
+}
+
 public class LlmIntegrationDto : IntegrationDto
 {
     public var provider:LlmProvider?
@@ -34406,6 +35773,8 @@ public class LlmIntegrationDto : IntegrationDto
     public var defaultModel:String?
     public var isConfigured:Bool?
     public var isSystemOwned:Bool?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionDto] = []
 
     required public init(){ super.init() }
 
@@ -34415,6 +35784,8 @@ public class LlmIntegrationDto : IntegrationDto
         case defaultModel
         case isConfigured
         case isSystemOwned
+        case isDefault
+        case models
     }
 
     required public init(from decoder: Decoder) throws {
@@ -34425,6 +35796,8 @@ public class LlmIntegrationDto : IntegrationDto
         defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
         isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
         isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -34435,6 +35808,8 @@ public class LlmIntegrationDto : IntegrationDto
         if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
         if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
         if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+        if models.count > 0 { try container.encode(models, forKey: .models) }
     }
 }
 
@@ -34443,6 +35818,8 @@ public class LlmIntegrationListProjection : IntegrationListProjection
     public var llmProvider:LlmProvider?
     public var baseUrl:String?
     public var defaultModel:String?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionDto] = []
 
     required public init(){ super.init() }
 
@@ -34450,6 +35827,8 @@ public class LlmIntegrationListProjection : IntegrationListProjection
         case llmProvider
         case baseUrl
         case defaultModel
+        case isDefault
+        case models
     }
 
     required public init(from decoder: Decoder) throws {
@@ -34458,6 +35837,8 @@ public class LlmIntegrationListProjection : IntegrationListProjection
         llmProvider = try container.decodeIfPresent(LlmProvider.self, forKey: .llmProvider)
         baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
         defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -34466,6 +35847,8 @@ public class LlmIntegrationListProjection : IntegrationListProjection
         if llmProvider != nil { try container.encode(llmProvider, forKey: .llmProvider) }
         if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
         if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+        if models.count > 0 { try container.encode(models, forKey: .models) }
     }
 }
 
@@ -35241,6 +36624,14 @@ public enum LlmProvider : String, Codable
     case NorbixHosted
 }
 
+public class LlmModelOptionRequest : Codable
+{
+    public var id:String?
+    public var displayName:String?
+
+    required public init(){}
+}
+
 public protocol ILlmApiKeyRequest
 {
     var apiKey:String? { get set }
@@ -35432,6 +36823,15 @@ public enum RespectTimeZoneSettings : Int, Codable
     case RespectToRegistrationProjectZone = 4
 }
 
+public enum PushDeviceDeliveryFamily : String, Codable
+{
+    case Ios
+    case Android
+    case Chrome
+    case Safari
+    case Expo
+}
+
 public enum PushCampaignRecipientsSourceTypes : String, Codable
 {
     case AllUsers
@@ -35449,6 +36849,16 @@ public class PushDeviceDeliveryTokenDto : Codable
 
     // @DataMember
     public var deliveryFamily:PushDeviceDeliveryFamily?
+
+    required public init(){}
+}
+
+public class LlmModelOptionDto : Codable
+{
+    public var id:String?
+    public var displayName:String?
+    public var inputCreditRate:Double?
+    public var outputCreditRate:Double?
 
     required public init(){}
 }
@@ -35747,6 +37157,19 @@ public class SchemaListSortDto : Codable
     required public init(){}
 }
 
+public class AggregateId : Codable
+{
+    public var value:String?
+
+    required public init(){}
+}
+
+public protocol IHasDomainEntityId
+{
+    var viewId:String? { get set }
+
+}
+
 // @DataContract
 public enum EmailValidationProvider : Int, Codable
 {
@@ -35842,6 +37265,12 @@ public enum DeviceType : String, Codable
     case Tv
 }
 
+public enum EmbeddingProvider : String, Codable
+{
+    case Voyage
+    case OpenAI
+}
+
 public enum ResourceKindDto : String, Codable
 {
     case Contact
@@ -35872,6 +37301,15 @@ public class PublicPasswordPolicyDto : Codable
     public var minLower:Int?
     public var minSpecial:Int?
     public var allowedSpecial:String?
+
+    required public init(){}
+}
+
+public class PublicAiAssistantDto : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var welcome:String?
 
     required public init(){}
 }
@@ -36053,6 +37491,9 @@ public class AiDto : Codable
     public var isEnabled:Bool?
 
     // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    // @DataMember
     public var defaultIntegrationViewId:String?
 
     required public init(){}
@@ -36187,6 +37628,78 @@ public enum Continent : String, Codable
     case NorthAmerica
     case Oceania
     case SouthAmerica
+}
+
+// @DataContract
+public class AiAssistantDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var welcomeMessage:String?
+
+    // @DataMember
+    public var systemPrompt:String?
+
+    // @DataMember
+    public var toolsets:[String] = []
+
+    // @DataMember
+    public var llmIntegrationId:String?
+
+    // @DataMember
+    public var model:String?
+
+    // @DataMember
+    public var memoryEnabled:Bool?
+
+    // @DataMember
+    public var ragSourceIds:[String] = []
+
+    // @DataMember
+    public var planId:String?
+
+    // @DataMember
+    public var isDefault:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiUsageGroupDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var llmInputTokens:Int?
+
+    // @DataMember
+    public var llmOutputTokens:Int?
+
+    // @DataMember
+    public var embeddingTokens:Int?
+
+    // @DataMember
+    public var rerankCalls:Int?
+
+    // @DataMember
+    public var totalTokens:Int?
+
+    // @DataMember
+    public var chargeableTokens:Int?
+
+    // @DataMember
+    public var chargeableRerankCalls:Int?
+
+    // @DataMember
+    public var credits:Int?
+
+    required public init(){}
 }
 
 public enum AuthType : String, Codable
@@ -36817,6 +38330,29 @@ public class AiToolManifestParameter : Codable
     required public init(){}
 }
 
+public class ScaffoldStepReportWithLink : Codable
+{
+    public var order:Int?
+    public var title:String?
+    public var tool:String?
+    public var status:String?
+    public var id:String?
+    public var dashboardUrl:String?
+    public var note:String?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+public class TemplatePreviewPartResult : Codable
+{
+    public var name:String?
+    public var rendered:String?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
 public class ProjectBriefRequirementWireDto : Codable
 {
     public var id:String?
@@ -37329,15 +38865,6 @@ public class RoleName : Codable
     public var isSystemRole:Bool?
 
     required public init(){}
-}
-
-public enum PushDeviceDeliveryFamily : String, Codable
-{
-    case Ios
-    case Android
-    case Chrome
-    case Safari
-    case Expo
 }
 
 public enum MarketplaceFieldType : String, Codable

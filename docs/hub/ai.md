@@ -16,3 +16,9 @@
 | `getMcpIntegrations` | `GET` | `/{version}/ai/integrations/mcp/integrations` | `project` |
 | `saveMcpIntegration` | `POST` | `/{version}/ai/integrations/mcp/` | `project` |
 | `testMcpIntegration` | `POST` | `/{version}/ai/integrations/mcp/test` | `project` |
+| `getEmbeddingIntegrations` | `GET` | `/{version}/ai/integrations/embeddings` | `project` |
+| `saveEmbeddingIntegration` | `POST` | `/{version}/ai/integrations/embeddings` | `project` |
+| `getEmbeddingIntegration` | `GET` | `/{version}/ai/integrations/embeddings/{Id}` | `project` |
+| `deleteEmbeddingIntegration` | `DELETE` | `/{version}/ai/integrations/embeddings/{Id}` | `project` |
+| `testEmbeddingIntegration` | `POST` | `/{version}/ai/integrations/embeddings/{Id}/test` | `project` |
+| `setLlmIntegrationAsDefault` | `PUT` | `/{version}/ai/integrations/llms/{Id}/default` | `project` |
