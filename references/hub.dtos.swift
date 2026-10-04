@@ -17447,7 +17447,7 @@ public class SaveWebhookDestinationRequest : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/scheduler/disable", "GET")
+// @Route("/{version}/scheduler/disable", "PUT")
 public class DisableScheduler : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -17463,7 +17463,7 @@ public class DisableScheduler : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/scheduler/enable", "GET")
+// @Route("/{version}/scheduler/enable", "PUT")
 public class EnableScheduler : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -32683,6 +32683,36 @@ public class SchedulerTaskRequest : Codable
     public var type:SchedulerTaskType?
 
     required public init(){}
+}
+
+public class EmailCampaignSchedulerTaskRequest : SchedulerTaskRequest
+{
+    public var campaign:EmailCampaignRequest?
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case campaign
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchedulerTaskType.self, forKey: .type)
+        campaign = try container.decodeIfPresent(EmailCampaignRequest.self, forKey: .campaign)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if campaign != nil { try container.encode(campaign, forKey: .campaign) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
 }
 
 public class ResourceRefDto : Codable
