@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-05 16:12:05
+Date: 2026-10-05 20:52:59
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -5474,10 +5474,10 @@ public class SaveDatabaseTaxonomyRequest : CodeMashRequestBase, IReturn
     public typealias Return = IdResponse
 
     /**
-    * Empty to create a new taxonomy; set to an existing taxonomy id (from get_database_taxonomies) to update it.
+    * Empty to create a new taxonomy; set to an existing taxonomy id (from get_database_taxonomies) to update it. An update replaces the whole taxonomy: send every field you want to keep (parentId, dependencies, description, schemas).
     */
     // @DataMember
-    // @ApiMember(Description="Empty to create a new taxonomy; set to an existing taxonomy id (from get_database_taxonomies) to update it.")
+    // @ApiMember(Description="Empty to create a new taxonomy; set to an existing taxonomy id (from get_database_taxonomies) to update it. An update replaces the whole taxonomy: send every field you want to keep (parentId, dependencies, description, schemas).")
     public var viewId:String?
 
     /**
@@ -6405,19 +6405,11 @@ public class RenameDatabaseSchemaRequest : CodeMashRequestBase, IReturn
     // @ApiMember(Description="New human-entered title (e.g. \"Company Employees\"); the slug is derived server-side.", IsRequired=true)
     public var title:String?
 
-    /**
-    * When true (default), rejects the rename if another schema already owns the derived slug. Leave true unless explicitly asked to bypass the uniqueness check.
-    */
-    // @DataMember
-    // @ApiMember(Description="When true (default), rejects the rename if another schema already owns the derived slug. Leave true unless explicitly asked to bypass the uniqueness check.")
-    public var renameUniqueName:Bool?
-
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case id
         case title
-        case renameUniqueName
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6425,7 +6417,6 @@ public class RenameDatabaseSchemaRequest : CodeMashRequestBase, IReturn
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(String.self, forKey: .id)
         title = try container.decodeIfPresent(String.self, forKey: .title)
-        renameUniqueName = try container.decodeIfPresent(Bool.self, forKey: .renameUniqueName)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6433,7 +6424,6 @@ public class RenameDatabaseSchemaRequest : CodeMashRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if id != nil { try container.encode(id, forKey: .id) }
         if title != nil { try container.encode(title, forKey: .title) }
-        if renameUniqueName != nil { try container.encode(renameUniqueName, forKey: .renameUniqueName) }
     }
 }
 
@@ -6534,10 +6524,10 @@ public class UpdateDatabaseSchemaDraftRequest : CodeMashRequestBase, IReturn
     public var dataSchema:String?
 
     /**
-    * Raw JSON string matching the Norbix UI/visual meta-schema (https://norbix.ai/schemas/ui/v1.json) for the draft's record form.
+    * OPTIONAL raw JSON string matching the Norbix UI/visual meta-schema (https://norbix.ai/schemas/ui/v1.json) for the draft's record form. If omitted or invalid, the backend auto-generates a flat-list form from the data schema.
     */
     // @DataMember
-    // @ApiMember(Description="Raw JSON string matching the Norbix UI/visual meta-schema (https://norbix.ai/schemas/ui/v1.json) for the draft's record form.")
+    // @ApiMember(Description="OPTIONAL raw JSON string matching the Norbix UI/visual meta-schema (https://norbix.ai/schemas/ui/v1.json) for the draft's record form. If omitted or invalid, the backend auto-generates a flat-list form from the data schema.")
     public var visualSchema:String?
 
     required public init(){ super.init() }
@@ -6875,10 +6865,16 @@ public class DeleteManyRecords : CodeMashRequestBase, IReturn
 
     public var databaseIntegrationId:String?
     /**
-    * The match filter as a MongoDB extended-JSON document. Required.
+    * The match filter as a MongoDB extended-JSON document. Required. An empty object ({}) matches every record and is refused unless AllRecords is true.
     */
-    // @ApiMember(Description="The match filter as a MongoDB extended-JSON document. Required.", IsRequired=true)
+    // @ApiMember(Description="The match filter as a MongoDB extended-JSON document. Required. An empty object ({}) matches every record and is refused unless AllRecords is true.", IsRequired=true)
     public var filter:String?
+
+    /**
+    * Set to true to delete EVERY record of the collection with an empty filter ({}). Without it an empty filter is refused (CM-ERRORS-DATABASE-037).
+    */
+    // @ApiMember(Description="Set to true to delete EVERY record of the collection with an empty filter ({}). Without it an empty filter is refused (CM-ERRORS-DATABASE-037).")
+    public var allRecords:Bool?
 
     required public init(){ super.init() }
 
@@ -6886,6 +6882,7 @@ public class DeleteManyRecords : CodeMashRequestBase, IReturn
         case collectionName
         case databaseIntegrationId
         case filter
+        case allRecords
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6894,6 +6891,7 @@ public class DeleteManyRecords : CodeMashRequestBase, IReturn
         collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
+        allRecords = try container.decodeIfPresent(Bool.self, forKey: .allRecords)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6902,6 +6900,7 @@ public class DeleteManyRecords : CodeMashRequestBase, IReturn
         if collectionName != nil { try container.encode(collectionName, forKey: .collectionName) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if filter != nil { try container.encode(filter, forKey: .filter) }
+        if allRecords != nil { try container.encode(allRecords, forKey: .allRecords) }
     }
 }
 
@@ -7447,10 +7446,16 @@ public class UpdateManyRecords : CodeMashRequestBase, IReturn
 
     public var databaseIntegrationId:String?
     /**
-    * The match filter as a MongoDB extended-JSON document. Empty object means match all.
+    * The match filter as a MongoDB extended-JSON document. An empty object ({}) matches every record and is refused unless AllRecords is true.
     */
-    // @ApiMember(Description="The match filter as a MongoDB extended-JSON document. Empty object means match all.", IsRequired=true)
+    // @ApiMember(Description="The match filter as a MongoDB extended-JSON document. An empty object ({}) matches every record and is refused unless AllRecords is true.", IsRequired=true)
     public var filter:String?
+
+    /**
+    * Set to true to update EVERY record of the collection with an empty filter ({}). Without it an empty filter is refused (CM-ERRORS-DATABASE-037).
+    */
+    // @ApiMember(Description="Set to true to update EVERY record of the collection with an empty filter ({}). Without it an empty filter is refused (CM-ERRORS-DATABASE-037).")
+    public var allRecords:Bool?
 
     /**
     * The partial update document (applied with $set), as MongoDB extended-JSON.
@@ -7464,6 +7469,7 @@ public class UpdateManyRecords : CodeMashRequestBase, IReturn
         case collectionName
         case databaseIntegrationId
         case filter
+        case allRecords
         case update
     }
 
@@ -7473,6 +7479,7 @@ public class UpdateManyRecords : CodeMashRequestBase, IReturn
         collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
+        allRecords = try container.decodeIfPresent(Bool.self, forKey: .allRecords)
         update = try container.decodeIfPresent(String.self, forKey: .update)
     }
 
@@ -7482,6 +7489,7 @@ public class UpdateManyRecords : CodeMashRequestBase, IReturn
         if collectionName != nil { try container.encode(collectionName, forKey: .collectionName) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if filter != nil { try container.encode(filter, forKey: .filter) }
+        if allRecords != nil { try container.encode(allRecords, forKey: .allRecords) }
         if update != nil { try container.encode(update, forKey: .update) }
     }
 }
@@ -8398,62 +8406,6 @@ public class TestDatabaseAggregateRequest : CodeMashRequestBase, IReturn
         if pipeline != nil { try container.encode(pipeline, forKey: .pipeline) }
         if tokens != nil { try container.encode(tokens, forKey: .tokens) }
     }
-}
-
-public class ProcessCollectionImport : Codable
-{
-    public var importId:String?
-    public var projectId:String?
-    public var accountId:String?
-    public var databaseIntegrationId:String?
-    public var env:String?
-
-    required public init(){}
-}
-
-public class TermInserted : Codable
-{
-    public var projectId:ProjectId?
-    public var databaseIntegrationId:IntegrationId?
-    public var taxonomyId:TaxonomyId?
-    public var id:String?
-    public var document:String?
-
-    required public init(){}
-}
-
-public class TermUpdated : Codable
-{
-    public var projectId:ProjectId?
-    public var databaseIntegrationId:IntegrationId?
-    public var taxonomyId:TaxonomyId?
-    public var id:String?
-    public var from:String?
-    public var to:String?
-
-    required public init(){}
-}
-
-public class TermDeleted : Codable
-{
-    public var projectId:ProjectId?
-    public var databaseIntegrationId:IntegrationId?
-    public var taxonomyId:TaxonomyId?
-    public var id:String?
-    public var document:String?
-
-    required public init(){}
-}
-
-public class TermsDeleted : Codable
-{
-    public var projectId:ProjectId?
-    public var databaseIntegrationId:IntegrationId?
-    public var taxonomyId:TaxonomyId?
-    public var deletedCount:Int?
-    public var filter:String?
-
-    required public init(){}
 }
 
 // @Route("/{version}/files/disable", "PUT")
@@ -10613,9 +10565,9 @@ public class GetEmailCampaignBatches : CodeMashListPaginationRequestBase, IRetur
     public typealias Return = GetEmailCampaignBatchesResponse
 
     /**
-    * The email campaign id to list batches for. Get it from get_all_email_campaigns.
+    * The email campaign id to list batches for. Get it from get_email_campaigns.
     */
-    // @ApiMember(Description="The email campaign id to list batches for. Get it from get_all_email_campaigns.", IsRequired=true)
+    // @ApiMember(Description="The email campaign id to list batches for. Get it from get_email_campaigns.", IsRequired=true)
     public var id:String?
 
     /**
@@ -10674,9 +10626,9 @@ public class GetEmailCampaignBatchNotification : CodeMashListPaginationRequestBa
     public typealias Return = GetEmailCampaignBatchNotificationResponse
 
     /**
-    * The email campaign id. Get it from get_all_email_campaigns.
+    * The email campaign id. Get it from get_email_campaigns.
     */
-    // @ApiMember(Description="The email campaign id. Get it from get_all_email_campaigns.", IsRequired=true)
+    // @ApiMember(Description="The email campaign id. Get it from get_email_campaigns.", IsRequired=true)
     public var id:String?
 
     /**
@@ -10735,9 +10687,9 @@ public class GetEmailCampaignBatchNotifications : CodeMashListPaginationRequestB
     public typealias Return = GetEmailCampaignBatchNotificationsResponse
 
     /**
-    * The email campaign id. Get it from get_all_email_campaigns.
+    * The email campaign id. Get it from get_email_campaigns.
     */
-    // @ApiMember(Description="The email campaign id. Get it from get_all_email_campaigns.", IsRequired=true)
+    // @ApiMember(Description="The email campaign id. Get it from get_email_campaigns.", IsRequired=true)
     public var id:String?
 
     /**
@@ -10787,9 +10739,9 @@ public class GetEmailCampaignStatistics : CodeMashRequestBase, IReturn
     public typealias Return = GetEmailCampaignStatisticsResponse
 
     /**
-    * The email campaign id to get statistics for. Get it from get_all_email_campaigns.
+    * The email campaign id to get statistics for. Get it from get_email_campaigns.
     */
-    // @ApiMember(Description="The email campaign id to get statistics for. Get it from get_all_email_campaigns.", IsRequired=true)
+    // @ApiMember(Description="The email campaign id to get statistics for. Get it from get_email_campaigns.", IsRequired=true)
     public var id:String?
 
     /**
@@ -10928,9 +10880,9 @@ public class GetEmailCampaignMessagesRequest : CodeMashListPaginationRequestBase
     public typealias Return = GetEmailCampaignMessagesResponse
 
     /**
-    * The email campaign id. Get it from get_all_email_campaigns.
+    * The email campaign id. Get it from get_email_campaigns.
     */
-    // @ApiMember(Description="The email campaign id. Get it from get_all_email_campaigns.", IsRequired=true)
+    // @ApiMember(Description="The email campaign id. Get it from get_email_campaigns.", IsRequired=true)
     public var campaignId:String?
 
     /**
@@ -17692,24 +17644,6 @@ public class TestMcpIntegration : CodeMashRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if integrationId != nil { try container.encode(integrationId, forKey: .integrationId) }
     }
-}
-
-public class IngestSourceMessage : Codable
-{
-    public var projectId:String?
-    public var env:String?
-    public var ownerAuthId:String?
-    public var sourceKind:String?
-    public var sourceId:String?
-    public var title:String?
-    public var contentType:String?
-    public var content:String?
-    public var embeddingIntegrationId:String?
-    public var removed:Bool?
-    public var metadata:[String:String]?
-    public var ownerRequired:Bool?
-
-    required public init(){}
 }
 
 /**
@@ -31675,6 +31609,9 @@ public class SchedulerTaskDto : Codable
     public var stopOnError:Bool?
 
     // @DataMember
+    public var env:String?
+
+    // @DataMember
     public var createdAtUnix:Int?
 
     // @DataMember
@@ -31789,6 +31726,9 @@ public class MongoDbAggregateDto : IHasViewId, Codable
 
     // @DataMember
     public var pipeline:String?
+
+    // @DataMember
+    public var joinedCollections:[String]?
 
     required public init(){}
 }
@@ -33059,45 +32999,6 @@ public class ImportColumnMappingDto : Codable
     required public init(){}
 }
 
-public class ProjectId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class IntegrationId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public class TaxonomyId : AggregateId, IHasDomainEntityId
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
 public class FilesIntegrationRequest : Codable
 {
     public var integrationId:String?
@@ -33892,6 +33793,9 @@ public class PromotionResultDto : Codable
 
     // @DataMember
     public var integrationsSeeded:[PromotionItemDto] = []
+
+    // @DataMember
+    public var integrationsToProvision:[PromotionItemDto] = []
 
     // @DataMember
     public var integrationsSkipped:[PromotionItemDto] = []
@@ -34762,12 +34666,16 @@ public class SchemaTriggerDto : TriggerDto
     // @DataMember
     public var configurationCode:String?
 
+    // @DataMember
+    public var env:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case schemaId
         case when
         case configurationCode
+        case env
     }
 
     required public init(from decoder: Decoder) throws {
@@ -34776,6 +34684,7 @@ public class SchemaTriggerDto : TriggerDto
         schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
         when = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .when)
         configurationCode = try container.decodeIfPresent(String.self, forKey: .configurationCode)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -34784,6 +34693,7 @@ public class SchemaTriggerDto : TriggerDto
         if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
         if when != nil { try container.encode(when, forKey: .when) }
         if configurationCode != nil { try container.encode(configurationCode, forKey: .configurationCode) }
+        if env != nil { try container.encode(env, forKey: .env) }
     }
 }
 
@@ -34793,22 +34703,28 @@ public class SchemaTriggerProjectionList : TriggerProjectionList
     // @DataMember
     public var type:SchemaTriggerType?
 
+    // @DataMember
+    public var env:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case type
+        case env
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         type = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .type)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if type != nil { try container.encode(type, forKey: .type) }
+        if env != nil { try container.encode(env, forKey: .env) }
     }
 }
 
@@ -34865,7 +34781,7 @@ public class TaxonomyListProjection : IHasViewId, Codable
     public var parentName:String?
 
     // @DataMember
-    public var dependencyNames:[String]?
+    public var dependencyRefs:[TaxonomyRef]?
 
     required public init(){}
 }
@@ -35167,23 +35083,27 @@ public class SeedCollectionRecordsResultDto : Codable
 public class DatabaseIntegrationDto : IntegrationDto
 {
     public var provider:DatabaseProvider?
+    public var isSystemOwned:Bool?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case provider
+        case isSystemOwned
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
+        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if provider != nil { try container.encode(provider, forKey: .provider) }
+        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
     }
 }
 
@@ -35192,22 +35112,28 @@ public class DatabaseIntegrationListProjection : IntegrationListProjection
     // @DataMember
     public var provider:DatabaseProvider?
 
+    // @DataMember
+    public var env:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case provider
+        case env
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if provider != nil { try container.encode(provider, forKey: .provider) }
+        if env != nil { try container.encode(env, forKey: .env) }
     }
 }
 
@@ -37860,6 +37786,9 @@ public class TemplateDto : IHasViewId, IHasDatabaseId, Codable
     // @DataMember
     public var tags:[String]?
 
+    // @DataMember
+    public var env:String?
+
     required public init(){}
 }
 
@@ -38363,19 +38292,6 @@ public class SchemaListSortDto : Codable
     public var order:Int?
 
     required public init(){}
-}
-
-public class AggregateId : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-public protocol IHasDomainEntityId
-{
-    var viewId:String? { get set }
-
 }
 
 // @DataContract
@@ -39249,6 +39165,17 @@ public class VisualSchemaDto : Codable
     required public init(){}
 }
 
+public class TaxonomyRef : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    required public init(){}
+}
+
 public class TermMultiParentDto : Codable
 {
     // @DataMember
@@ -39365,6 +39292,9 @@ public class TemplateListProjection : IHasViewId, IHasDatabaseId, Codable
 
     // @DataMember
     public var tags:[String]?
+
+    // @DataMember
+    public var env:String?
 
     required public init(){}
 }
