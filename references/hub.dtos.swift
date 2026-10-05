@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-05 08:09:06
+Date: 2026-10-05 16:12:05
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -220,6 +220,8 @@ public class InternalsTypeGen : Codable
     public var typegen_193_WebhookDestinationDto:WebhookDestinationDto?
     public var typegen_194_SchedulerTaskDto:SchedulerTaskDto?
     public var typegen_249_EmailCampaignSchedulerTaskRequest:EmailCampaignSchedulerTaskRequest?
+    public var typegen_250_SmsCampaignSchedulerTaskRequest:SmsCampaignSchedulerTaskRequest?
+    public var typegen_251_PushCampaignSchedulerTaskRequest:PushCampaignSchedulerTaskRequest?
     public var typegen_195_MongoDbAggregateDto:MongoDbAggregateDto?
     public var typegen_196_MarketplaceIntegrationDto:MarketplaceIntegrationDto?
     public var typegen_197_MarketplaceFunctionDto:MarketplaceFunctionDto?
@@ -3807,7 +3809,7 @@ public class DeleteAiServiceUserRequest : RequestBase, IReturn
     }
 }
 
-// @Route("/{version}/membership/disable", "GET")
+// @Route("/{version}/membership/disable", "PUT")
 public class DisableMembership : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -3823,7 +3825,7 @@ public class DisableMembership : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/membership/enable", "GET")
+// @Route("/{version}/membership/enable", "PUT")
 public class EnableMembership : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -5164,7 +5166,7 @@ public class UpdateAuthenticationSettings : CodeMashRequestBase, IReturn
 /**
 * Disable database service
 */
-// @Route("/{version}/database/disable", "GET")
+// @Route("/{version}/database/disable", "PUT")
 // @Api(Description="Disable database service")
 public class DisableDatabase : CodeMashRequestBase, IReturn
 {
@@ -5181,7 +5183,7 @@ public class DisableDatabase : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/database/enable", "GET")
+// @Route("/{version}/database/enable", "PUT")
 public class EnableDatabase : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -8454,7 +8456,7 @@ public class TermsDeleted : Codable
     required public init(){}
 }
 
-// @Route("/{version}/files/disable", "GET")
+// @Route("/{version}/files/disable", "PUT")
 public class DisableFiles : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -8470,7 +8472,7 @@ public class DisableFiles : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/files/enable", "GET")
+// @Route("/{version}/files/enable", "PUT")
 public class EnableFiles : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -9063,7 +9065,7 @@ public class GetFolderFiles : CodeMashListPaginationRequestBase, IReturn
 /**
 * Disable email service
 */
-// @Route("/{version}/notifications/email/disable", "GET")
+// @Route("/{version}/notifications/email/disable", "PUT")
 // @Api(Description="Disable email service")
 public class DisableEmail : CodeMashRequestBase, IReturn
 {
@@ -9103,7 +9105,7 @@ public class GetEmailDisableDependencies : CodeMashRequestBase, IReturn
 /**
 * Enable email service
 */
-// @Route("/{version}/notifications/email/enable", "GET")
+// @Route("/{version}/notifications/email/enable", "PUT")
 // @Api(Description="Enable email service")
 public class EnableEmail : CodeMashRequestBase, IReturn
 {
@@ -10971,7 +10973,7 @@ public class GetEmailCampaignMessagesRequest : CodeMashListPaginationRequestBase
 /**
 * Disable SMS service
 */
-// @Route("/{version}/notifications/sms/disable", "GET")
+// @Route("/{version}/notifications/sms/disable", "PUT")
 // @Api(Description="Disable SMS service")
 public class DisableSms : CodeMashRequestBase, IReturn
 {
@@ -11011,7 +11013,7 @@ public class GetSmsDisableDependencies : CodeMashRequestBase, IReturn
 /**
 * Enable SMS service
 */
-// @Route("/{version}/notifications/sms/enable", "GET")
+// @Route("/{version}/notifications/sms/enable", "PUT")
 // @Api(Description="Enable SMS service")
 public class EnableSms : CodeMashRequestBase, IReturn
 {
@@ -12352,7 +12354,7 @@ public class GetSmsCampaignMessagesRequest : CodeMashListPaginationRequestBase, 
     }
 }
 
-// @Route("/{version}/code/disable", "GET")
+// @Route("/{version}/code/disable", "PUT")
 public class DisableCode : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -12368,7 +12370,7 @@ public class DisableCode : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/code/enable", "GET")
+// @Route("/{version}/code/enable", "PUT")
 public class EnableCode : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -13425,7 +13427,7 @@ public class TestCodeIntegration : CodeMashRequestBase, IReturn
 /**
 * Disable push service
 */
-// @Route("/{version}/notifications/push/disable", "GET")
+// @Route("/{version}/notifications/push/disable", "PUT")
 // @Api(Description="Disable push service")
 public class DisablePush : CodeMashRequestBase, IReturn
 {
@@ -13465,7 +13467,7 @@ public class GetPushDisableDependencies : CodeMashRequestBase, IReturn
 /**
 * Enable push service
 */
-// @Route("/{version}/notifications/push/enable", "GET")
+// @Route("/{version}/notifications/push/enable", "PUT")
 // @Api(Description="Enable push service")
 public class EnablePush : CodeMashRequestBase, IReturn
 {
@@ -14959,7 +14961,7 @@ public class GetPushCampaignMessagesRequest : CodeMashListPaginationRequestBase,
 /**
 * Disable payments service
 */
-// @Route("/{version}/payments/disable", "GET")
+// @Route("/{version}/payments/disable", "PUT")
 // @Api(Description="Disable payments service")
 public class DisablePayments : CodeMashRequestBase, IReturn
 {
@@ -14979,7 +14981,7 @@ public class DisablePayments : CodeMashRequestBase, IReturn
 /**
 * Enable payments service
 */
-// @Route("/{version}/payments/enable", "GET")
+// @Route("/{version}/payments/enable", "PUT")
 // @Api(Description="Enable payments service")
 public class EnablePayments : CodeMashRequestBase, IReturn
 {
@@ -15420,7 +15422,7 @@ public class TestPaymentsIntegration : CodeMashRequestBase, IReturn
 /**
 * Disable logging service
 */
-// @Route("/{version}/logs/disable", "GET")
+// @Route("/{version}/logs/disable", "PUT")
 // @Api(Description="Disable logging service")
 public class DisableLogging : CodeMashRequestBase, IReturn
 {
@@ -15437,7 +15439,7 @@ public class DisableLogging : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/logs/enable", "GET")
+// @Route("/{version}/logs/enable", "PUT")
 public class EnableLogging : CodeMashRequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -31711,6 +31713,66 @@ public class EmailCampaignSchedulerTaskRequest : SchedulerTaskRequest
     }
 }
 
+public class SmsCampaignSchedulerTaskRequest : SchedulerTaskRequest
+{
+    public var campaign:CreateSmsCampaignRequest?
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case campaign
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchedulerTaskType.self, forKey: .type)
+        campaign = try container.decodeIfPresent(CreateSmsCampaignRequest.self, forKey: .campaign)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if campaign != nil { try container.encode(campaign, forKey: .campaign) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
+public class PushCampaignSchedulerTaskRequest : SchedulerTaskRequest
+{
+    public var campaign:PushCampaignRequest?
+    public var databaseIntegrationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case campaign
+        case databaseIntegrationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchedulerTaskType.self, forKey: .type)
+        campaign = try container.decodeIfPresent(PushCampaignRequest.self, forKey: .campaign)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if campaign != nil { try container.encode(campaign, forKey: .campaign) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
 public class MongoDbAggregateDto : IHasViewId, Codable
 {
     // @DataMember
@@ -34793,6 +34855,18 @@ public class TaxonomyListProjection : IHasViewId, Codable
     // @DataMember
     public var parentId:String?
 
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var dependencies:[String]?
+
+    // @DataMember
+    public var parentName:String?
+
+    // @DataMember
+    public var dependencyNames:[String]?
+
     required public init(){}
 }
 
@@ -35009,6 +35083,9 @@ public class SchemaListProjection : IHasViewId, Codable
 
     // @DataMember
     public var Description:String?
+
+    // @DataMember
+    public var env:String?
 
     required public init(){}
 }
@@ -35877,15 +35954,11 @@ public class SmsCampaignDto : CampaignDto
     // @DataMember
     public var template:SmsTemplateDto?
 
-    // @DataMember
-    public var createdById:String?
-
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case recipients
         case template
-        case createdById
     }
 
     required public init(from decoder: Decoder) throws {
@@ -35893,7 +35966,6 @@ public class SmsCampaignDto : CampaignDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         recipients = try container.decodeIfPresent(SmsCampaignDeliverySettingsDto.self, forKey: .recipients)
         template = try container.decodeIfPresent(SmsTemplateDto.self, forKey: .template)
-        createdById = try container.decodeIfPresent(String.self, forKey: .createdById)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -35901,7 +35973,6 @@ public class SmsCampaignDto : CampaignDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if recipients != nil { try container.encode(recipients, forKey: .recipients) }
         if template != nil { try container.encode(template, forKey: .template) }
-        if createdById != nil { try container.encode(createdById, forKey: .createdById) }
     }
 }
 
@@ -39366,6 +39437,12 @@ public class CampaignDto : IHasResponsibleUserId, IHasDatabaseId, Codable
 
     // @DataMember
     public var notes:String?
+
+    // @DataMember
+    public var createdById:String?
+
+    // @DataMember
+    public var timeZoneId:String?
 
     // @DataMember
     public var userId:String?
