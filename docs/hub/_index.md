@@ -7,7 +7,7 @@
 | [`ai`](./ai.md) | 14 |
 | [`apikeys`](./apikeys.md) | 2 |
 | [`auth`](./auth.md) | 1 |
-| [`database`](./database.md) | 41 |
+| [`database`](./database.md) | 67 |
 | [`echo`](./echo.md) | 1 |
 | [`email`](./email.md) | 1 |
 | [`files`](./files.md) | 15 |

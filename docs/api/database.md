@@ -22,6 +22,8 @@
 | `replaceOne` | `PUT` | `/{version}/database/collections/{collectionName}/{id}/replace` | `project` |
 | `updateMany` | `PUT` | `/{version}/database/collections/{collectionName}/many` | `project` |
 | `updateOne` | `PUT` | `/{version}/database/collections/{collectionName}/{id}` | `project` |
+| `findOwn` | `GET` | `/{version}/database/collections/{collectionName}/own` | `project` |
+| `findMergedTermTree` | `GET` | `/{version}/database/taxonomies/{taxonomyName}/merged-tree` | `project` |
 
 ## Working with terms
 
