@@ -21,6 +21,8 @@ public final class RegionsModule: Sendable {
     ///
     /// Lists the regions available to the account. Each item carries `id`
     /// (the region code, e.g. "nb-eu-germany"), `continent`, and `name`.
+    /// Anonymous (`.unauthenticated`): the gateway route has no
+    /// `[Authenticate]`, so no token and no `accountId` are needed.
     public func getAccountRegions(
         _ request: [String: Any] = [:],
         timeout: TimeInterval? = nil,
@@ -31,7 +33,7 @@ public final class RegionsModule: Sendable {
             path: "/{version}/account/regions",
             method: "GET",
             request: request,
-            scope: .project,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken,
             region: region

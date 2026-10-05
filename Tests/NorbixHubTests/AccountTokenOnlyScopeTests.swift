@@ -7,6 +7,8 @@ import NorbixCore
 /// at all. So each method works with a token only — a client with no `accountId` — like the
 /// TypeScript, .NET, Go and Python SDKs. One test per method, on the mock executor (verb,
 /// resolved path, auth header, no account header). Never a real gateway.
+/// The four anonymous routes (sign-up, invitation, regions, verify) are in
+/// `HubAccountNoTokenScopeTests` below.
 final class HubAccountTokenOnlyScopeTests: XCTestCase {
     private let p: [String: Any] = ["projectId": "proj_1"]
 
@@ -62,10 +64,6 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         try await check("POST", "/v2/account/stripe/get-portal-url") { try await $0.account.getStripeBillingPortalUrl() }
     }
 
-    func testCreateTeamMemberFromInvitationWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/team/member") { try await $0.account.createTeamMemberFromInvitation() }
-    }
-
     func testDeleteNotificationsGroupWorksWithATokenAndNoAccountId() async throws {
         try await check("DELETE", "/v2/account/projects/proj_1/notifications/settings/group") { try await $0.account.deleteNotificationsGroup(p) }
     }
@@ -100,10 +98,6 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
 
     func testGetProjectsWorksWithATokenAndNoAccountId() async throws {
         try await check("GET", "/v2/account/projects") { try await $0.account.getProjects() }
-    }
-
-    func testGetAccountRegionsWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/regions") { try await $0.account.getAccountRegions() }
     }
 
     func testGetProjectTokensWorksWithATokenAndNoAccountId() async throws {
@@ -162,10 +156,6 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         try await check("PATCH", "/v2/account/projects/proj_1/settings/regions") { try await $0.account.updateProjectRegions(p) }
     }
 
-    func testCreateAccountWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account") { try await $0.account.createAccount() }
-    }
-
     func testGetAccountCollaboratorsWorksWithATokenAndNoAccountId() async throws {
         try await check("GET", "/v2/account/collaborators") { try await $0.account.getAccountCollaborators() }
     }
@@ -178,22 +168,77 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         try await check("GET", "/v2/account/licenses") { try await $0.account.getLicenses() }
     }
 
-    func testRegionsGetAccountRegionsWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/regions") { try await $0.regions.getAccountRegions([:]) }
-    }
-
     func testRegionsUpdateProjectRegionsWorksWithATokenAndNoAccountId() async throws {
         try await check("PATCH", "/v2/account/projects/proj_1/settings/regions") { try await $0.regions.updateProjectRegions(projectId: "proj_1", primaryRegion: "nb-eu-germany") }
     }
+}
 
-    func testVerifyAccountStillNeedsTheAccountIdBecauseTheGatewayReadsItFromTheRequest() async throws {
-        let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", executor: MockHTTPExecutor())
-        client.setScope(projectId: "proj", accountId: nil)
-        do {
-            _ = try await client.account.verifyAccount(["accountId": "acc", "token": "t"])
-            XCTFail("expected NORBIX_ACCOUNT_SCOPE_REQUIRED")
-        } catch let error as NorbixError {
-            XCTAssertEqual(error.code, "NORBIX_ACCOUNT_SCOPE_REQUIRED")
-        }
+/// The gateway has no `[Authenticate]` on these routes (gateway `refactoringV2` ff3c94a04,
+/// `src/Isidos.CodeMash.Gateway.Hub.Account/`: `Account/Create.cs:25-49`,
+/// `Account/Team/Verify.cs:23-50`, `Project/GetRegions.cs:18-29`, `Account/Verify.cs:17-36`).
+/// So each call works on a client with NO token and NO `accountId`: scope `.unauthenticated`,
+/// no `Authorization` header. `verifyAccount` takes the account id once, in the request (query).
+/// The client is built from a `NorbixConfig`, so no `NORBIX_*` environment variable is read.
+final class HubAccountNoTokenScopeTests: XCTestCase {
+    private func send(
+        file: StaticString = #filePath,
+        line: UInt = #line,
+        _ call: (NorbixHubClient) async throws -> Any?
+    ) async throws -> URLRequest {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
+        let config = try NorbixConfig(
+            projectId: "proj",
+            accountId: nil,
+            auth: .unauthenticated,
+            baseUrl: NorbixDefaults.hubBaseUrl,
+            version: NorbixDefaults.hubVersion
+        )
+        let client = NorbixHubClient(config: config, executor: mock)
+
+        _ = try await call(client)
+
+        let request = try XCTUnwrap(mock.lastRequest, file: file, line: line)
+        XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"), file: file, line: line)
+        XCTAssertNil(request.value(forHTTPHeaderField: "X-Api-Key"), file: file, line: line)
+        XCTAssertNil(request.value(forHTTPHeaderField: "X-CM-AccountId"), file: file, line: line)
+        return request
+    }
+
+    private func check(
+        _ verb: String,
+        _ path: String,
+        file: StaticString = #filePath,
+        line: UInt = #line,
+        _ call: (NorbixHubClient) async throws -> Any?
+    ) async throws {
+        let request = try await send(file: file, line: line, call)
+        XCTAssertEqual(request.httpMethod, verb, file: file, line: line)
+        XCTAssertEqual(request.url?.path, path, file: file, line: line)
+    }
+
+    func testCreateAccountWorksWithNoTokenAndNoAccountId() async throws {
+        try await check("POST", "/v2/account") { try await $0.account.createAccount(["email": "a@b.io"]) }
+    }
+
+    func testCreateTeamMemberFromInvitationWorksWithNoTokenAndNoAccountId() async throws {
+        try await check("POST", "/v2/account/team/member") { try await $0.account.createTeamMemberFromInvitation(["token": "inv"]) }
+    }
+
+    func testGetAccountRegionsWorksWithNoTokenAndNoAccountId() async throws {
+        try await check("GET", "/v2/account/regions") { try await $0.account.getAccountRegions() }
+    }
+
+    func testRegionsGetAccountRegionsWorksWithNoTokenAndNoAccountId() async throws {
+        try await check("GET", "/v2/account/regions") { try await $0.regions.getAccountRegions([:]) }
+    }
+
+    func testVerifyAccountWorksWithNoTokenAndSendsTheAccountIdInTheQuery() async throws {
+        let request = try await send { try await $0.account.verifyAccount(["accountId": "acc_1", "token": "t1"]) }
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.url?.path, "/v2/account/verify")
+        let query = URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false)?.queryItems ?? []
+        XCTAssertEqual(query.first { $0.name == "accountId" }?.value, "acc_1")
+        XCTAssertEqual(query.first { $0.name == "token" }?.value, "t1")
     }
 }
