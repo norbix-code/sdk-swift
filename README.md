@@ -288,6 +288,37 @@ let preview = try await hub.notifications.previewEmailNotification(["hash": sign
 A signed-in member can pass `projectId` + `notificationId` instead of `hash`.
 A bad or expired link throws a `NorbixError` with status 401.
 
+### SMS campaigns to account users
+
+An SMS campaign can go to the account's own people — the owner and team
+members (`deliveryType: "AccountUsers"`). A member without a phone number is
+skipped; each member saves their own number with `updateMyAccountUserPhone`.
+The SMS template content has a `body` only (no `subject` — the sender is the
+integration), and `getSmsCampaigns` takes an optional `campaignId` filter.
+
+```swift
+let hub = try NorbixHubClient(projectId: "proj_123", bearerToken: token, accountId: "acc_456")
+_ = try await hub.notifications.createSmsCampaign([
+    "templateId": "tmpl_1",
+    "integrationId": "nbin_1",
+    "deliveryType": "AccountUsers",
+    "accountUsers": [
+        "recipientsSourceType": "AccountUsers",
+        "recipients": ["usr_owner", "usr_member"],
+        "campaignTime": 1767225600, // unix seconds, UTC
+    ],
+])
+
+// Your own team-member record (not the organisation profile) and your own phone.
+let me = try await hub.account.getMyAccountUserProfile()            // GET /{version}/account/me
+_ = try await hub.account.updateMyAccountUserPhone(["phone": "+37060000000"]) // PUT /{version}/account/me/phone; "" clears it
+```
+
+The one-message calls `getSmsCampaignMessage` and `getEmailCampaignMessage`
+(`GET …/campaigns/{campaignId}/messages/{id}`) are gone: the gateway no longer
+serves that route. Use `getSmsCampaignMessages` / `getEmailCampaignMessages`
+(the list), or the batch notification calls.
+
 ## Environment configuration
 
 ```bash

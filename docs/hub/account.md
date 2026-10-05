@@ -4,6 +4,8 @@
 | --- | --- | --- | --- |
 | `getAccountProfile` | `GET` | `/{version}/account/profile` | `account` |
 | `updateAccountProfile` | `PUT` | `/{version}/account/profile` | `account` |
+| `getMyAccountUserProfile` | `GET` | `/{version}/account/me` | `account` |
+| `updateMyAccountUserPhone` | `PUT` | `/{version}/account/me/phone` | `account` |
 | `resendAccountVerificationToken` | `GET` | `/{version}/account/verify/resend` | `account` |
 | `getAccountStatus` | `GET` | `/{version}/account/status` | `account` |
 | `createStripeCheckoutSession` | `POST` | `/{version}/account/stripe/create-checkout-session` | `account` |
