@@ -459,4 +459,376 @@ public final class DatabaseModule: Sendable {
         )
     }
 
+    // MARK: - Collections / Records
+
+    /// Finds records in a collection (paginated). Pass `collectionName` and optional `filter`, `sortBy`, `sortOrder`, `pagingArgs`.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}` · request DTO `FindRecords`.
+    public func findRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Finds one record by `id` in `collectionName`.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}/{id}` · request DTO `FindOneRecord`.
+    public func findOneRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/{id}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Inserts one record (`document`) into `collectionName`.
+    ///
+    /// `POST /{version}/database/collections/{collectionName}` · request DTO `InsertRecord`.
+    public func insertRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Inserts several records (`documents`) into `collectionName`.
+    ///
+    /// `POST /{version}/database/collections/{collectionName}/many` · request DTO `InsertManyRecords`.
+    public func insertManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/many",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Updates one record by `id` with an `update` document.
+    ///
+    /// `PUT /{version}/database/collections/{collectionName}/{id}` · request DTO `UpdateOneRecord`.
+    public func updateOneRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/{id}",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Updates every record matching `filter` with an `update` document.
+    ///
+    /// `PUT /{version}/database/collections/{collectionName}/many` · request DTO `UpdateManyRecords`.
+    public func updateManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/many",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Replaces one record by `id` with a whole new `document`.
+    ///
+    /// `PUT /{version}/database/collections/{collectionName}/{id}/replace` · request DTO `ReplaceRecord`.
+    public func replaceRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/{id}/replace",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Deletes one record by `id`.
+    ///
+    /// `DELETE /{version}/database/collections/{collectionName}/{id}` · request DTO `DeleteRecord`.
+    public func deleteRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/{id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Deletes every record matching `filter`.
+    ///
+    /// `DELETE /{version}/database/collections/{collectionName}/many` · request DTO `DeleteManyRecords`.
+    public func deleteManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/many",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Counts the records matching `filter`.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}/count` · request DTO `CountRecords`.
+    public func countRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/count",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Returns the distinct values of `field` among the records matching `filter`.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}/distinct` · request DTO `DistinctRecordValues`.
+    public func distinctRecordValues(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/distinct",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Runs an ad-hoc aggregation `pipeline` on `collectionName`.
+    ///
+    /// `POST /{version}/database/collections/{collectionName}/aggregate` · request DTO `AggregateRecords`.
+    public func aggregateRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/aggregate",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Runs a saved aggregate (`aggregateId`) on `collectionName`.
+    ///
+    /// `POST /{version}/database/collections/{collectionName}/aggregates/{aggregateId}/execute` · request DTO `ExecuteRecordsAggregate`.
+    public func executeRecordsAggregate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/aggregates/{aggregateId}/execute",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Moves a record (`id`) to another responsible user (`newResponsibleUserId`).
+    ///
+    /// `PUT /{version}/database/collections/{collectionName}/{id}/responsibility` · request DTO `ChangeRecordResponsibility`.
+    public func changeRecordResponsibility(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/{id}/responsibility",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Lists the indexes of `collectionName`.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}/indexes` · request DTO `GetCollectionIndexes`.
+    public func getCollectionIndexes(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/indexes",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Seeds collections (`collections`) with sample records.
+    ///
+    /// `POST /{version}/database/collections/seed` · request DTO `SeedCollectionRecords`.
+    public func seedCollectionRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/seed",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Schemas
+
+    /// Applies a schema bundle (`bundleJson`) in one call.
+    ///
+    /// `POST /{version}/database/schemas/apply-bundle` · request DTO `ApplyDatabaseSchemaBundleRequest`.
+    public func applyDatabaseSchemaBundle(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/schemas/apply-bundle",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Updates the embed settings of schema `Id`.
+    ///
+    /// `PUT /{version}/database/schemas/{Id}/embed` · request DTO `UpdateDatabaseSchemaEmbedRequest`.
+    public func updateDatabaseSchemaEmbed(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/schemas/{Id}/embed",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Reads the list (table view) settings of schema `Id`.
+    ///
+    /// `GET /{version}/database/schemas/{Id}/list-settings` · request DTO `GetDatabaseSchemaListSettings`.
+    public func getDatabaseSchemaListSettings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/schemas/{Id}/list-settings",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Updates the list (table view) settings of schema `Id`.
+    ///
+    /// `PUT /{version}/database/schemas/{Id}/list-settings` · request DTO `UpdateDatabaseSchemaListSettingsRequest`.
+    public func updateDatabaseSchemaListSettings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/schemas/{Id}/list-settings",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Taxonomies
+
+    /// Returns the taxonomy structure as a tree (optionally `includeTerms`).
+    ///
+    /// `GET /{version}/database/taxonomies/tree` · request DTO `GetDatabaseTaxonomyTreeRequest`.
+    public func getDatabaseTaxonomyTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Returns the terms of `TaxonomyName` as a nested tree.
+    ///
+    /// `GET /{version}/database/taxonomies/{TaxonomyName}/terms/tree` · request DTO `GetDatabaseTaxonomyTermTreeRequest`.
+    public func getDatabaseTaxonomyTermTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/{TaxonomyName}/terms/tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Returns the merged term tree of `TaxonomyName`.
+    ///
+    /// `GET /{version}/database/taxonomies/{TaxonomyName}/merged-tree` · request DTO `GetDatabaseMergedTermTreeRequest`.
+    public func getDatabaseMergedTermTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/{TaxonomyName}/merged-tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Integrations
+
+    /// Lists the managed Flex database tiers this project may use.
+    ///
+    /// `GET /{version}/database/integrations/flex-tiers` · request DTO `GetAllowedFlexTiers`.
+    public func getAllowedFlexTiers(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/integrations/flex-tiers",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Tests a database connection before it is saved.
+    ///
+    /// `POST /{version}/database/integrations/test` · request DTO `TestDatabaseIntegration`.
+    public func testDatabaseIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/integrations/test",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Reveals the connection string of managed Flex integration `Id`. The answer is a secret: do not log it.
+    ///
+    /// `GET /{version}/database/integrations/{Id}/connection-string` · request DTO `RevealManagedFlexConnectionString`.
+    public func revealManagedFlexConnectionString(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/integrations/{Id}/connection-string",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }
