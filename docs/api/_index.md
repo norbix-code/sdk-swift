@@ -6,7 +6,7 @@
 | [`ai`](./ai.md) | 16 |
 | [`apikeys`](./apikeys.md) | 2 |
 | [`auth`](./auth.md) | 1 |
-| [`database`](./database.md) | 18 |
+| [`database`](./database.md) | 22 |
 | [`echo`](./echo.md) | 1 |
 | [`files`](./files.md) | 8 |
 | [`membership`](./membership.md) | 18 |
