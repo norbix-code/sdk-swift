@@ -79,10 +79,9 @@ import NorbixHub
 
 let hub = try NorbixHubClient(
     projectId: "proj_123",
-    apiKey: "sk_live_xxx",
-    accountId: "acc_456"
+    apiKey: "sk_live_xxx"
 )
-let account = try await hub.account.getAccountProfile()
+let account = try await hub.account.getAccountProfile() // no accountId needed
 let integrations = try await hub.files.getFilesIntegrations()
 ```
 
@@ -131,7 +130,6 @@ let client = try NorbixApiClient(
 let hub = try NorbixHubClient(
     projectId: "proj_123",
     apiKey: "sk_live_xxx",
-    accountId: "acc_456",
     region: "nb-eu-germany"
 )
 ```
@@ -185,8 +183,8 @@ header is still sent, but the URL stays exactly as you configured it.
 
 ### Managing a project's regions (Hub)
 
-`hub.regions` wraps the regions endpoints. Both are account-scoped, so the
-client needs `accountId`:
+`hub.regions` wraps the regions endpoints. Both work with a token only (the
+client needs no `accountId`):
 
 ```swift
 // GET /v2/account/regions — regions available to the account.
@@ -250,15 +248,18 @@ let me = try await client.membership.getCurrentUser()
 print(me)
 ```
 
-### 3) Account-scoped Hub call
+### 3) Account Hub call (token only)
+
+Account calls take the account from the signed-in token, so the client needs
+no `accountId`. Only `hub.account.verifyAccount` is account-scoped: the
+gateway reads the account id from that request (the verification email link).
 
 ```swift
 import NorbixHub
 
 let hub = try NorbixHubClient(
     projectId: "proj_123",
-    apiKey: "sk_live_xxx",
-    accountId: "acc_456" // required for account-scoped hub endpoints
+    apiKey: "sk_live_xxx"
 )
 
 let account = try await hub.account.getAccountProfile()
@@ -297,7 +298,7 @@ The SMS template content has a `body` only (no `subject` — the sender is the
 integration), and `getSmsCampaigns` takes an optional `campaignId` filter.
 
 ```swift
-let hub = try NorbixHubClient(projectId: "proj_123", bearerToken: token, accountId: "acc_456")
+let hub = try NorbixHubClient(projectId: "proj_123", bearerToken: token) // no accountId needed
 _ = try await hub.notifications.createSmsCampaign([
     "templateId": "tmpl_1",
     "integrationId": "nbin_1",
@@ -355,7 +356,7 @@ do {
 } catch let error as NorbixError {
     switch error.code {
     case "NORBIX_NOT_AUTHENTICATED":      /* re-login */ break
-    case "NORBIX_ACCOUNT_SCOPE_REQUIRED": /* set accountId */ break
+    case "NORBIX_ACCOUNT_SCOPE_REQUIRED": /* set accountId (only hub.account.verifyAccount) */ break
     case "NORBIX_NETWORK_ERROR":          /* retry */ break
     default:                              print(error.localizedDescription)
     }

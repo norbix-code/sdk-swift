@@ -26,12 +26,17 @@ let profile = try await client.api.membership.getCurrentUser([:])
 print(profile)
 ```
 
-### Account-scoped Hub call
+### Hub call (token only)
+
+Hub calls, the account ones included, work with a token only — no `accountId`.
+Only `hub.account.verifyAccount` needs `accountId` (the gateway reads it from
+that request).
 
 ```swift
 import NorbixSwift
 
-let client = Norbix(apiKey: "sk_live_xxx", projectId: "proj_123", accountId: "acc_456")
+let client = Norbix(apiKey: "sk_live_xxx", projectId: "proj_123")
 let schemas = try await client.hub.database.getDatabaseSchemas([:])
-print(schemas)
+let profile = try await client.hub.account.getAccountProfile()
+print(schemas, profile)
 ```

@@ -2,44 +2,44 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `getAccountProfile` | `GET` | `/{version}/account/profile` | `account` |
-| `updateAccountProfile` | `PUT` | `/{version}/account/profile` | `account` |
-| `getMyAccountUserProfile` | `GET` | `/{version}/account/me` | `account` |
-| `updateMyAccountUserPhone` | `PUT` | `/{version}/account/me/phone` | `account` |
-| `resendAccountVerificationToken` | `GET` | `/{version}/account/verify/resend` | `account` |
-| `getAccountStatus` | `GET` | `/{version}/account/status` | `account` |
-| `createStripeCheckoutSession` | `POST` | `/{version}/account/stripe/create-checkout-session` | `account` |
-| `getStripeBillingPortalUrl` | `POST` | `/{version}/account/stripe/get-portal-url` | `account` |
-| `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `account` |
+| `getAccountProfile` | `GET` | `/{version}/account/profile` | `project` |
+| `updateAccountProfile` | `PUT` | `/{version}/account/profile` | `project` |
+| `getMyAccountUserProfile` | `GET` | `/{version}/account/me` | `project` |
+| `updateMyAccountUserPhone` | `PUT` | `/{version}/account/me/phone` | `project` |
+| `resendAccountVerificationToken` | `GET` | `/{version}/account/verify/resend` | `project` |
+| `getAccountStatus` | `GET` | `/{version}/account/status` | `project` |
+| `createStripeCheckoutSession` | `POST` | `/{version}/account/stripe/create-checkout-session` | `project` |
+| `getStripeBillingPortalUrl` | `POST` | `/{version}/account/stripe/get-portal-url` | `project` |
+| `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `project` |
 | `verifyAccount` | `GET` | `/{version}/account/verify` | `account` |
-| `deleteNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `account` |
-| `deleteNotificationsTag` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/tag` | `account` |
-| `removeTagFromNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group/tag` | `account` |
-| `saveNotificationsGroup` | `POST` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `account` |
-| `saveNotificationsTag` | `POST` | `/{version}/account/projects/{projectId}/notifications/settings/tag` | `account` |
-| `createProject` | `POST` | `/{version}/account/projects` | `account` |
-| `deleteProject` | `DELETE` | `/{version}/account/projects/{projectId}` | `account` |
-| `getProject` | `GET` | `/{version}/account/projects/{projectId}` | `account` |
-| `getProjects` | `GET` | `/{version}/account/projects` | `account` |
-| `getAccountRegions` | `GET` | `/{version}/account/regions` | `account` |
-| `getProjectTokens` | `GET` | `/{version}/account/projects/{projectId}/tokens` | `account` |
-| `updateProjectAccentColor` | `PATCH` | `/{version}/account/projects/{projectId}/settings/accent-color` | `account` |
-| `updateProjectIcon` | `PATCH` | `/{version}/account/projects/{projectId}/settings/icon` | `account` |
-| `updateProjectLogo` | `PATCH` | `/{version}/account/projects/{projectId}/settings/logo` | `account` |
-| `updateProjectMainColor` | `PATCH` | `/{version}/account/projects/{projectId}/settings/main-color` | `account` |
-| `updateProjectAllowedOrigins` | `PATCH` | `/{version}/account/projects/{projectId}/settings/origins` | `account` |
-| `updateProjectDefaultLanguage` | `PATCH` | `/{version}/account/projects/{projectId}/settings/default-language` | `account` |
-| `updateProjectDescription` | `PATCH` | `/{version}/account/projects/{projectId}/settings/description` | `account` |
-| `disableProject` | `PATCH` | `/{version}/account/projects/{projectId}/disable` | `account` |
-| `enableProject` | `PATCH` | `/{version}/account/projects/{projectId}/enable` | `account` |
-| `updateProjectLanguages` | `PATCH` | `/{version}/account/projects/{projectId}/settings/languages` | `account` |
-| `updateProjectUrl` | `PATCH` | `/{version}/account/projects/{projectId}/settings/url` | `account` |
-| `updateProjectName` | `PATCH` | `/{version}/account/projects/{projectId}/settings/name` | `account` |
-| `updateProjectRegions` | `PATCH` | `/{version}/account/projects/{projectId}/settings/regions` | `account` |
-| `createAccount` | `POST` | `/{version}/account` | `account` |
-| `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `account` |
-| `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `account` |
-| `getLicenses` | `GET` | `/{version}/account/licenses` | `account` |
+| `deleteNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `project` |
+| `deleteNotificationsTag` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/tag` | `project` |
+| `removeTagFromNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group/tag` | `project` |
+| `saveNotificationsGroup` | `POST` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `project` |
+| `saveNotificationsTag` | `POST` | `/{version}/account/projects/{projectId}/notifications/settings/tag` | `project` |
+| `createProject` | `POST` | `/{version}/account/projects` | `project` |
+| `deleteProject` | `DELETE` | `/{version}/account/projects/{projectId}` | `project` |
+| `getProject` | `GET` | `/{version}/account/projects/{projectId}` | `project` |
+| `getProjects` | `GET` | `/{version}/account/projects` | `project` |
+| `getAccountRegions` | `GET` | `/{version}/account/regions` | `project` |
+| `getProjectTokens` | `GET` | `/{version}/account/projects/{projectId}/tokens` | `project` |
+| `updateProjectAccentColor` | `PATCH` | `/{version}/account/projects/{projectId}/settings/accent-color` | `project` |
+| `updateProjectIcon` | `PATCH` | `/{version}/account/projects/{projectId}/settings/icon` | `project` |
+| `updateProjectLogo` | `PATCH` | `/{version}/account/projects/{projectId}/settings/logo` | `project` |
+| `updateProjectMainColor` | `PATCH` | `/{version}/account/projects/{projectId}/settings/main-color` | `project` |
+| `updateProjectAllowedOrigins` | `PATCH` | `/{version}/account/projects/{projectId}/settings/origins` | `project` |
+| `updateProjectDefaultLanguage` | `PATCH` | `/{version}/account/projects/{projectId}/settings/default-language` | `project` |
+| `updateProjectDescription` | `PATCH` | `/{version}/account/projects/{projectId}/settings/description` | `project` |
+| `disableProject` | `PATCH` | `/{version}/account/projects/{projectId}/disable` | `project` |
+| `enableProject` | `PATCH` | `/{version}/account/projects/{projectId}/enable` | `project` |
+| `updateProjectLanguages` | `PATCH` | `/{version}/account/projects/{projectId}/settings/languages` | `project` |
+| `updateProjectUrl` | `PATCH` | `/{version}/account/projects/{projectId}/settings/url` | `project` |
+| `updateProjectName` | `PATCH` | `/{version}/account/projects/{projectId}/settings/name` | `project` |
+| `updateProjectRegions` | `PATCH` | `/{version}/account/projects/{projectId}/settings/regions` | `project` |
+| `createAccount` | `POST` | `/{version}/account` | `project` |
+| `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `project` |
+| `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `project` |
+| `getLicenses` | `GET` | `/{version}/account/licenses` | `project` |
 | `getProjectAiSettings` | `GET` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `updateProjectAiSettings` | `PUT` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `createProjectAiAssistant` | `POST` | `/{version}/account/projects/{projectId}/ai/assistants` | `project` |
@@ -62,6 +62,12 @@
 | `sendMcpMessage` | `POST` | `/{version}/account/mcp` | `project` |
 | `openMcpStream` | `GET` | `/{version}/account/mcp` | `project` |
 | `endMcpSession` | `DELETE` | `/{version}/account/mcp` | `project` |
+
+Every method here works with a token only (`apiKey` or `bearerToken`): the
+gateway takes the account from the signed-in session, or from the project id in
+the path. The client does not need `accountId`. The one exception is
+`verifyAccount` (scope `account`): the gateway reads the account id from the
+request — pass `accountId` and `token` from the verification email.
 
 ## Developer MCP endpoint
 
