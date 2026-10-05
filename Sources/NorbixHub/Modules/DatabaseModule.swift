@@ -534,6 +534,13 @@ public final class DatabaseModule: Sendable {
     /// Updates every record matching `filter` with an `update` document.
     ///
     /// `PUT /{version}/database/collections/{collectionName}/many` · request DTO `UpdateManyRecords`.
+    /// Updates every record that matches `filter`. The update body holds the
+    /// plain fields to set: `$` operators (`$inc`, `$set`, …) are refused with
+    /// `CM-ERRORS-DATABASE-035`. An empty filter (`{}`, or no filter) matches
+    /// the whole collection and is refused with `CM-ERRORS-DATABASE-037`
+    /// unless the request has `"allRecords": true`. A caller with only
+    /// own-record rights changes only the records it owns; soft-deleted
+    /// records are skipped. See `docs/database-rules.md`.
     public func updateManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}/many",
@@ -576,6 +583,11 @@ public final class DatabaseModule: Sendable {
     /// Deletes every record matching `filter`.
     ///
     /// `DELETE /{version}/database/collections/{collectionName}/many` · request DTO `DeleteManyRecords`.
+    /// Deletes every record that matches `filter`. An empty filter (`{}`)
+    /// matches the whole collection and is refused with
+    /// `CM-ERRORS-DATABASE-037` unless the request has `"allRecords": true`.
+    /// A caller with only own-record rights deletes only the records it owns.
+    /// See `docs/database-rules.md`.
     public func deleteManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}/many",

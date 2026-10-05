@@ -25,6 +25,11 @@
 | `findOwn` | `GET` | `/{version}/database/collections/{collectionName}/own` | `project` |
 | `findMergedTermTree` | `GET` | `/{version}/database/taxonomies/{taxonomyName}/merged-tree` | `project` |
 
+Bulk writes, update bodies, owners, aggregates and term reads follow rules the
+gateway checks (an empty filter on `updateMany` / `deleteMany` needs
+`"allRecords": true`; `$` operators in an update body are refused). The rules
+and their error codes: [Database — rules the gateway checks](../database-rules.md).
+
 ## Working with terms
 
 A **taxonomy** is a named tree of **terms** (labels). A term can have one parent (a clean hierarchy) or several parents (the same item under many categories). Pick the call that matches what you want:
