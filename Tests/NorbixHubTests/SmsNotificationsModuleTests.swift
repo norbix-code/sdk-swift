@@ -30,7 +30,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
         _ = try await client.notifications.enableSms([:])
 
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/enable")
-        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
 
@@ -41,7 +41,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
         _ = try await client.notifications.disableSms([:])
 
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/disable")
-        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
 

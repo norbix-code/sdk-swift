@@ -11,7 +11,7 @@ public final class FilesModule: Sendable {
     public func disableFiles(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/files/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -22,7 +22,7 @@ public final class FilesModule: Sendable {
     public func enableFiles(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/files/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,

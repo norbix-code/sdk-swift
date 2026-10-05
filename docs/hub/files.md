@@ -2,8 +2,8 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `disableFiles` | `GET` | `/{version}/files/disable` | `project` |
-| `enableFiles` | `GET` | `/{version}/files/enable` | `project` |
+| `disableFiles` | `PUT` | `/{version}/files/disable` | `project` |
+| `enableFiles` | `PUT` | `/{version}/files/enable` | `project` |
 | `deleteFilesTrigger` | `DELETE` | `/{version}/files/triggers/{triggerId}` | `project` |
 | `disableFilesTrigger` | `PATCH` | `/{version}/files/triggers/{triggerId}/disable` | `project` |
 | `enableFilesTrigger` | `PATCH` | `/{version}/files/triggers/{triggerId}/enable` | `project` |

@@ -2,8 +2,8 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `disablePayments` | `GET` | `/{version}/payments/disable` | `project` |
-| `enablePayments` | `GET` | `/{version}/payments/enable` | `project` |
+| `disablePayments` | `PUT` | `/{version}/payments/disable` | `project` |
+| `enablePayments` | `PUT` | `/{version}/payments/enable` | `project` |
 | `deletePaymentsTrigger` | `DELETE` | `/{version}/payments/triggers/{triggerId}` | `project` |
 | `disablePaymentsTrigger` | `PATCH` | `/{version}/payments/triggers/{triggerId}/disable` | `project` |
 | `enablePaymentsTrigger` | `PATCH` | `/{version}/payments/triggers/{triggerId}/enable` | `project` |
