@@ -10,8 +10,8 @@
 | `getAccountStatus` | `GET` | `/{version}/account/status` | `project` |
 | `createStripeCheckoutSession` | `POST` | `/{version}/account/stripe/create-checkout-session` | `project` |
 | `getStripeBillingPortalUrl` | `POST` | `/{version}/account/stripe/get-portal-url` | `project` |
-| `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `project` |
-| `verifyAccount` | `GET` | `/{version}/account/verify` | `account` |
+| `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `unauthenticated` |
+| `verifyAccount` | `GET` | `/{version}/account/verify` | `unauthenticated` |
 | `deleteNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `project` |
 | `deleteNotificationsTag` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/tag` | `project` |
 | `removeTagFromNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group/tag` | `project` |
@@ -21,7 +21,7 @@
 | `deleteProject` | `DELETE` | `/{version}/account/projects/{projectId}` | `project` |
 | `getProject` | `GET` | `/{version}/account/projects/{projectId}` | `project` |
 | `getProjects` | `GET` | `/{version}/account/projects` | `project` |
-| `getAccountRegions` | `GET` | `/{version}/account/regions` | `project` |
+| `getAccountRegions` | `GET` | `/{version}/account/regions` | `unauthenticated` |
 | `getProjectTokens` | `GET` | `/{version}/account/projects/{projectId}/tokens` | `project` |
 | `updateProjectAccentColor` | `PATCH` | `/{version}/account/projects/{projectId}/settings/accent-color` | `project` |
 | `updateProjectIcon` | `PATCH` | `/{version}/account/projects/{projectId}/settings/icon` | `project` |
@@ -36,7 +36,7 @@
 | `updateProjectUrl` | `PATCH` | `/{version}/account/projects/{projectId}/settings/url` | `project` |
 | `updateProjectName` | `PATCH` | `/{version}/account/projects/{projectId}/settings/name` | `project` |
 | `updateProjectRegions` | `PATCH` | `/{version}/account/projects/{projectId}/settings/regions` | `project` |
-| `createAccount` | `POST` | `/{version}/account` | `project` |
+| `createAccount` | `POST` | `/{version}/account` | `unauthenticated` |
 | `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `project` |
 | `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `project` |
 | `getLicenses` | `GET` | `/{version}/account/licenses` | `project` |
@@ -63,11 +63,16 @@
 | `openMcpStream` | `GET` | `/{version}/account/mcp` | `project` |
 | `endMcpSession` | `DELETE` | `/{version}/account/mcp` | `project` |
 
-Every method here works with a token only (`apiKey` or `bearerToken`): the
-gateway takes the account from the signed-in session, or from the project id in
-the path. The client does not need `accountId`. The one exception is
-`verifyAccount` (scope `account`): the gateway reads the account id from the
-request — pass `accountId` and `token` from the verification email.
+Every `project` method here works with a token only (`apiKey` or
+`bearerToken`): the gateway takes the account from the signed-in session, or
+from the project id in the path. The client does not need `accountId`.
+
+The four `unauthenticated` methods — `createAccount` (sign-up),
+`createTeamMemberFromInvitation`, `getAccountRegions` and `verifyAccount` —
+need no token and no `accountId`: the gateway routes are anonymous, and the SDK
+sends no `Authorization` header. `verifyAccount` takes the account id once, in
+the request — pass `accountId` and `token` from the verification email; they go
+in the query. `hub.regions.getAccountRegions` is anonymous too.
 
 ## Developer MCP endpoint
 
