@@ -397,6 +397,11 @@ when the body has no `responseStatus` are the top-level `message` and
 the last fallback, used when the body says nothing — a 500 page that is not
 JSON, say.
 
+The Database calls follow rules the gateway checks (bulk writes with an empty
+filter need `"allRecords": true`, `$` operators in an update body are refused,
+one schema-trigger copy per env) — the rules and each refusal's error code are
+in [`docs/database-rules.md`](./docs/database-rules.md).
+
 ### Breaking change — a refused call now throws
 
 The gateway answers a business refusal (an unknown id, a rule that says no)

@@ -89,9 +89,15 @@ let page = try await client.database.findRecords([
 _ = try await client.database.updateOneRecord([
     "collectionName": "orders",
     "id": "rec_1",
-    "update": #"{ "$set": { "status": "shipped" } }"#
+    "update": #"{ "status": "shipped" }"#
 ])
 ```
+
+The update body holds the plain fields to set. `$` operators (`$set`,
+`$inc`, …) are refused with `CM-ERRORS-DATABASE-035`. An empty filter on
+`updateManyRecords` / `deleteManyRecords` is refused with
+`CM-ERRORS-DATABASE-037` unless you send `"allRecords": true`. All the rules
+and their error codes: [Database — rules the gateway checks](../database-rules.md).
 
 Every record method also accepts an optional `databaseIntegrationId` to
 target a non-default database.
