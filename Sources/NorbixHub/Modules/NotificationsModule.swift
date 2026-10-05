@@ -757,17 +757,6 @@ public final class NotificationsModule: Sendable {
         )
     }
 
-    public func registerCodeMashAppPushIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/notifications/push/integrations/app/request",
-            method: "POST",
-            request: request,
-            scope: .account,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     public func registerDevice(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/push/devices",

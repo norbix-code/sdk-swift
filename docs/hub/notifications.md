@@ -102,5 +102,4 @@
 | `savePushIntegration` | `POST` | `/{version}/notifications/push/integrations` | `project` |
 | `setPushIntegrationAsDefault` | `PUT` | `/{version}/notifications/push/integrations/{Id}/default` | `project` |
 | `testPushIntegration` | `POST` | `/{version}/notifications/push/integrations/test` | `project` |
-| `registerCodeMashAppPushIntegration` | `POST` | `/{version}/notifications/push/integrations/app/request` | `account` |
 | `registerDevice` | `POST` | `/{version}/notifications/push/devices` | `project` |
