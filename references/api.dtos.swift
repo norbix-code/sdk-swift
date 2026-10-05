@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-02 15:58:21
+Date: 2026-10-05 07:55:00
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -36,6 +36,40 @@ public class Echo : RequestBase, IReturn
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+    }
+}
+
+// @Route("/{version}/public/projects/{ProjectId}/brand/{Kind}", "GET")
+public class GetPublicProjectBrandAsset : RequestBase, IReturn
+{
+    public typealias Return = [UInt8]
+
+    public var projectId:String?
+    public var kind:String?
+    public var v:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case projectId
+        case kind
+        case v
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+        kind = try container.decodeIfPresent(String.self, forKey: .kind)
+        v = try container.decodeIfPresent(String.self, forKey: .v)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+        if kind != nil { try container.encode(kind, forKey: .kind) }
+        if v != nil { try container.encode(v, forKey: .v) }
     }
 }
 
@@ -92,6 +126,586 @@ public class GetPublicProjectLegal : RequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if projectId != nil { try container.encode(projectId, forKey: .projectId) }
         if kind != nil { try container.encode(kind, forKey: .kind) }
+    }
+}
+
+/**
+* Adds a file to one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/attachments", "POST")
+// @Api(Description="Adds a file to one of the caller's own AI chats.")
+public class UploadEndUserChatAttachmentRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    public var sessionId:String?
+    public var fileName:String?
+    public var contentType:String?
+    public var base64Content:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case fileName
+        case contentType
+        case base64Content
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        fileName = try container.decodeIfPresent(String.self, forKey: .fileName)
+        contentType = try container.decodeIfPresent(String.self, forKey: .contentType)
+        base64Content = try container.decodeIfPresent(String.self, forKey: .base64Content)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if fileName != nil { try container.encode(fileName, forKey: .fileName) }
+        if contentType != nil { try container.encode(contentType, forKey: .contentType) }
+        if base64Content != nil { try container.encode(base64Content, forKey: .base64Content) }
+    }
+}
+
+/**
+* Lists the files in one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/attachments", "GET")
+// @Api(Description="Lists the files in one of the caller's own AI chats.")
+public class ListEndUserChatAttachmentsRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = ListEndUserChatAttachmentsResponse
+
+    public var sessionId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+    }
+}
+
+/**
+* Removes a file from one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/attachments/{AttachmentId}", "DELETE")
+// @Api(Description="Removes a file from one of the caller's own AI chats.")
+public class DeleteEndUserChatAttachmentRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var attachmentId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case attachmentId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        attachmentId = try container.decodeIfPresent(String.self, forKey: .attachmentId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if attachmentId != nil { try container.encode(attachmentId, forKey: .attachmentId) }
+    }
+}
+
+/**
+* Likes, dislikes or clears one message of the caller's own AI chat.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/entries/{EntryId}/feedback", "PUT")
+// @Api(Description="Likes, dislikes or clears one message of the caller's own AI chat.")
+public class SetEndUserChatEntryFeedbackRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var sessionId:String?
+    public var entryId:String?
+    public var feedback:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case entryId
+        case feedback
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
+        feedback = try container.decodeIfPresent(String.self, forKey: .feedback)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if entryId != nil { try container.encode(entryId, forKey: .entryId) }
+        if feedback != nil { try container.encode(feedback, forKey: .feedback) }
+    }
+}
+
+/**
+* Lists what the AI chat remembers about the caller.
+*/
+// @Route("/{version}/ai/chat/memory", "GET")
+// @Api(Description="Lists what the AI chat remembers about the caller.")
+public class ListEndUserChatMemoryRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = ListEndUserChatMemoryResponse
+
+    public var take:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case take
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        take = try container.decodeIfPresent(Int.self, forKey: .take)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if take != nil { try container.encode(take, forKey: .take) }
+    }
+}
+
+/**
+* Forgets one thing the AI chat remembers about the caller.
+*/
+// @Route("/{version}/ai/chat/memory/{NoteId}", "DELETE")
+// @Api(Description="Forgets one thing the AI chat remembers about the caller.")
+public class ForgetEndUserChatMemoryRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var noteId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case noteId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        noteId = try container.decodeIfPresent(String.self, forKey: .noteId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if noteId != nil { try container.encode(noteId, forKey: .noteId) }
+    }
+}
+
+/**
+* Whether the AI chat can run for the caller, and which assistants it offers.
+*/
+// @Route("/{version}/ai/chat/availability", "GET")
+// @Api(Description="Whether the AI chat can run for the caller, and which assistants it offers.")
+public class GetEndUserChatAvailabilityRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetEndUserChatAvailabilityResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
+* Lists the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions", "GET")
+// @Api(Description="Lists the caller's own AI chats.")
+public class ListEndUserChatSessionsRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = ListEndUserChatSessionsResponse
+
+    public var take:Int?
+    public var includeArchived:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case take
+        case includeArchived
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        take = try container.decodeIfPresent(Int.self, forKey: .take)
+        includeArchived = try container.decodeIfPresent(Bool.self, forKey: .includeArchived)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if take != nil { try container.encode(take, forKey: .take) }
+        if includeArchived != nil { try container.encode(includeArchived, forKey: .includeArchived) }
+    }
+}
+
+/**
+* Opens a new AI chat for the caller.
+*/
+// @Route("/{version}/ai/chat/sessions", "POST")
+// @Api(Description="Opens a new AI chat for the caller.")
+public class CreateEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    public var assistantId:String?
+    public var title:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case assistantId
+        case title
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
+        title = try container.decodeIfPresent(String.self, forKey: .title)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
+        if title != nil { try container.encode(title, forKey: .title) }
+    }
+}
+
+/**
+* Returns one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}", "GET")
+// @Api(Description="Returns one of the caller's own AI chats.")
+public class GetEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetEndUserChatSessionResponse
+
+    public var sessionId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+    }
+}
+
+/**
+* Renames one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}", "PATCH")
+// @Api(Description="Renames one of the caller's own AI chats.")
+public class RenameEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var sessionId:String?
+    public var title:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case title
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        title = try container.decodeIfPresent(String.self, forKey: .title)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if title != nil { try container.encode(title, forKey: .title) }
+    }
+}
+
+/**
+* Pins or unpins one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/pin", "PUT")
+// @Api(Description="Pins or unpins one of the caller's own AI chats.")
+public class PinEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var sessionId:String?
+    public var pinned:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case pinned
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        pinned = try container.decodeIfPresent(Bool.self, forKey: .pinned)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if pinned != nil { try container.encode(pinned, forKey: .pinned) }
+    }
+}
+
+/**
+* Archives or unarchives one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/archive", "PUT")
+// @Api(Description="Archives or unarchives one of the caller's own AI chats.")
+public class ArchiveEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var sessionId:String?
+    public var archived:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case archived
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        archived = try container.decodeIfPresent(Bool.self, forKey: .archived)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if archived != nil { try container.encode(archived, forKey: .archived) }
+    }
+}
+
+/**
+* Deletes one of the caller's own AI chats.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}", "DELETE")
+// @Api(Description="Deletes one of the caller's own AI chats.")
+public class DeleteEndUserChatSessionRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    public var sessionId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+    }
+}
+
+/**
+* Returns a page of one of the caller's own AI chat transcripts.
+*/
+// @Route("/{version}/ai/chat/sessions/{SessionId}/entries", "GET")
+// @Api(Description="Returns a page of one of the caller's own AI chat transcripts.")
+public class GetEndUserChatEntriesRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetEndUserChatEntriesResponse
+
+    public var sessionId:String?
+    public var afterSeq:Int?
+    public var take:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case afterSeq
+        case take
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        afterSeq = try container.decodeIfPresent(Int.self, forKey: .afterSeq)
+        take = try container.decodeIfPresent(Int.self, forKey: .take)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if afterSeq != nil { try container.encode(afterSeq, forKey: .afterSeq) }
+        if take != nil { try container.encode(take, forKey: .take) }
+    }
+}
+
+/**
+* Sends a message to the AI chat; the answer streams on the caller's channel.
+*/
+// @Route("/{version}/ai/chat/turn", "POST")
+// @Api(Description="Sends a message to the AI chat; the answer streams on the caller's channel.")
+public class StartEndUserChatTurnRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = StartEndUserChatTurnResponse
+
+    public var sessionId:String?
+    public var assistantId:String?
+    public var message:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case assistantId
+        case message
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
+        if message != nil { try container.encode(message, forKey: .message) }
+    }
+}
+
+/**
+* Lists the AI tools a project user may use: only their own data (own:* toolsets).
+*/
+// @Route("/{version}/ai/tools", "GET")
+// @Api(Description="Lists the AI tools a project user may use: only their own data (own:* toolsets).")
+public class GetEndUserAiToolsRequest : RequestBase, IReturn
+{
+    public typealias Return = GetEndUserAiToolsResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
+* Invokes one own-scope AI tool as the calling project user.
+*/
+// @Route("/{version}/ai/tools/{ToolName}", "POST")
+// @Api(Description="Invokes one own-scope AI tool as the calling project user.")
+public class InvokeEndUserAiToolRequest : RequestBase, IReturn
+{
+    public typealias Return = InvokeEndUserAiToolResponse
+
+    public var toolName:String?
+    public var argumentsJson:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case toolName
+        case argumentsJson
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
+        argumentsJson = try container.decodeIfPresent(String.self, forKey: .argumentsJson)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if toolName != nil { try container.encode(toolName, forKey: .toolName) }
+        if argumentsJson != nil { try container.encode(argumentsJson, forKey: .argumentsJson) }
     }
 }
 
@@ -3433,586 +4047,6 @@ public class TestFilesIntegrationRequest : CodeMashRequestBase, IReturn
 }
 
 /**
-* Adds a file to one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/attachments", "POST")
-// @Api(Description="Adds a file to one of the caller's own AI chats.")
-public class UploadEndUserChatAttachmentRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = IdResponse
-
-    public var sessionId:String?
-    public var fileName:String?
-    public var contentType:String?
-    public var base64Content:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case fileName
-        case contentType
-        case base64Content
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        fileName = try container.decodeIfPresent(String.self, forKey: .fileName)
-        contentType = try container.decodeIfPresent(String.self, forKey: .contentType)
-        base64Content = try container.decodeIfPresent(String.self, forKey: .base64Content)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if fileName != nil { try container.encode(fileName, forKey: .fileName) }
-        if contentType != nil { try container.encode(contentType, forKey: .contentType) }
-        if base64Content != nil { try container.encode(base64Content, forKey: .base64Content) }
-    }
-}
-
-/**
-* Lists the files in one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/attachments", "GET")
-// @Api(Description="Lists the files in one of the caller's own AI chats.")
-public class ListEndUserChatAttachmentsRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = ListEndUserChatAttachmentsResponse
-
-    public var sessionId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-    }
-}
-
-/**
-* Removes a file from one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/attachments/{AttachmentId}", "DELETE")
-// @Api(Description="Removes a file from one of the caller's own AI chats.")
-public class DeleteEndUserChatAttachmentRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var attachmentId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case attachmentId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        attachmentId = try container.decodeIfPresent(String.self, forKey: .attachmentId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if attachmentId != nil { try container.encode(attachmentId, forKey: .attachmentId) }
-    }
-}
-
-/**
-* Likes, dislikes or clears one message of the caller's own AI chat.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/entries/{EntryId}/feedback", "PUT")
-// @Api(Description="Likes, dislikes or clears one message of the caller's own AI chat.")
-public class SetEndUserChatEntryFeedbackRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var sessionId:String?
-    public var entryId:String?
-    public var feedback:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case entryId
-        case feedback
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        entryId = try container.decodeIfPresent(String.self, forKey: .entryId)
-        feedback = try container.decodeIfPresent(String.self, forKey: .feedback)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if entryId != nil { try container.encode(entryId, forKey: .entryId) }
-        if feedback != nil { try container.encode(feedback, forKey: .feedback) }
-    }
-}
-
-/**
-* Lists what the AI chat remembers about the caller.
-*/
-// @Route("/{version}/ai/chat/memory", "GET")
-// @Api(Description="Lists what the AI chat remembers about the caller.")
-public class ListEndUserChatMemoryRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = ListEndUserChatMemoryResponse
-
-    public var take:Int?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case take
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        take = try container.decodeIfPresent(Int.self, forKey: .take)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if take != nil { try container.encode(take, forKey: .take) }
-    }
-}
-
-/**
-* Forgets one thing the AI chat remembers about the caller.
-*/
-// @Route("/{version}/ai/chat/memory/{NoteId}", "DELETE")
-// @Api(Description="Forgets one thing the AI chat remembers about the caller.")
-public class ForgetEndUserChatMemoryRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var noteId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case noteId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        noteId = try container.decodeIfPresent(String.self, forKey: .noteId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if noteId != nil { try container.encode(noteId, forKey: .noteId) }
-    }
-}
-
-/**
-* Whether the AI chat can run for the caller, and which assistants it offers.
-*/
-// @Route("/{version}/ai/chat/availability", "GET")
-// @Api(Description="Whether the AI chat can run for the caller, and which assistants it offers.")
-public class GetEndUserChatAvailabilityRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = GetEndUserChatAvailabilityResponse
-
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-/**
-* Lists the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions", "GET")
-// @Api(Description="Lists the caller's own AI chats.")
-public class ListEndUserChatSessionsRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = ListEndUserChatSessionsResponse
-
-    public var take:Int?
-    public var includeArchived:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case take
-        case includeArchived
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        take = try container.decodeIfPresent(Int.self, forKey: .take)
-        includeArchived = try container.decodeIfPresent(Bool.self, forKey: .includeArchived)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if take != nil { try container.encode(take, forKey: .take) }
-        if includeArchived != nil { try container.encode(includeArchived, forKey: .includeArchived) }
-    }
-}
-
-/**
-* Opens a new AI chat for the caller.
-*/
-// @Route("/{version}/ai/chat/sessions", "POST")
-// @Api(Description="Opens a new AI chat for the caller.")
-public class CreateEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = IdResponse
-
-    public var assistantId:String?
-    public var title:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case assistantId
-        case title
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
-        title = try container.decodeIfPresent(String.self, forKey: .title)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
-        if title != nil { try container.encode(title, forKey: .title) }
-    }
-}
-
-/**
-* Returns one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}", "GET")
-// @Api(Description="Returns one of the caller's own AI chats.")
-public class GetEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = GetEndUserChatSessionResponse
-
-    public var sessionId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-    }
-}
-
-/**
-* Renames one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}", "PATCH")
-// @Api(Description="Renames one of the caller's own AI chats.")
-public class RenameEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var sessionId:String?
-    public var title:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case title
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        title = try container.decodeIfPresent(String.self, forKey: .title)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if title != nil { try container.encode(title, forKey: .title) }
-    }
-}
-
-/**
-* Pins or unpins one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/pin", "PUT")
-// @Api(Description="Pins or unpins one of the caller's own AI chats.")
-public class PinEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var sessionId:String?
-    public var pinned:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case pinned
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        pinned = try container.decodeIfPresent(Bool.self, forKey: .pinned)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if pinned != nil { try container.encode(pinned, forKey: .pinned) }
-    }
-}
-
-/**
-* Archives or unarchives one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/archive", "PUT")
-// @Api(Description="Archives or unarchives one of the caller's own AI chats.")
-public class ArchiveEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var sessionId:String?
-    public var archived:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case archived
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        archived = try container.decodeIfPresent(Bool.self, forKey: .archived)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if archived != nil { try container.encode(archived, forKey: .archived) }
-    }
-}
-
-/**
-* Deletes one of the caller's own AI chats.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}", "DELETE")
-// @Api(Description="Deletes one of the caller's own AI chats.")
-public class DeleteEndUserChatSessionRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    public var sessionId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-    }
-}
-
-/**
-* Returns a page of one of the caller's own AI chat transcripts.
-*/
-// @Route("/{version}/ai/chat/sessions/{SessionId}/entries", "GET")
-// @Api(Description="Returns a page of one of the caller's own AI chat transcripts.")
-public class GetEndUserChatEntriesRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = GetEndUserChatEntriesResponse
-
-    public var sessionId:String?
-    public var afterSeq:Int?
-    public var take:Int?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case afterSeq
-        case take
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        afterSeq = try container.decodeIfPresent(Int.self, forKey: .afterSeq)
-        take = try container.decodeIfPresent(Int.self, forKey: .take)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if afterSeq != nil { try container.encode(afterSeq, forKey: .afterSeq) }
-        if take != nil { try container.encode(take, forKey: .take) }
-    }
-}
-
-/**
-* Sends a message to the AI chat; the answer streams on the caller's channel.
-*/
-// @Route("/{version}/ai/chat/turn", "POST")
-// @Api(Description="Sends a message to the AI chat; the answer streams on the caller's channel.")
-public class StartEndUserChatTurnRequest : CodeMashRequestBase, IReturn
-{
-    public typealias Return = StartEndUserChatTurnResponse
-
-    public var sessionId:String?
-    public var assistantId:String?
-    public var message:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case assistantId
-        case message
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        assistantId = try container.decodeIfPresent(String.self, forKey: .assistantId)
-        message = try container.decodeIfPresent(String.self, forKey: .message)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if assistantId != nil { try container.encode(assistantId, forKey: .assistantId) }
-        if message != nil { try container.encode(message, forKey: .message) }
-    }
-}
-
-/**
-* Lists the AI tools a project user may use: only their own data (own:* toolsets).
-*/
-// @Route("/{version}/ai/tools", "GET")
-// @Api(Description="Lists the AI tools a project user may use: only their own data (own:* toolsets).")
-public class GetEndUserAiToolsRequest : RequestBase, IReturn
-{
-    public typealias Return = GetEndUserAiToolsResponse
-
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-/**
-* Invokes one own-scope AI tool as the calling project user.
-*/
-// @Route("/{version}/ai/tools/{ToolName}", "POST")
-// @Api(Description="Invokes one own-scope AI tool as the calling project user.")
-public class InvokeEndUserAiToolRequest : RequestBase, IReturn
-{
-    public typealias Return = InvokeEndUserAiToolResponse
-
-    public var toolName:String?
-    public var argumentsJson:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case toolName
-        case argumentsJson
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        toolName = try container.decodeIfPresent(String.self, forKey: .toolName)
-        argumentsJson = try container.decodeIfPresent(String.self, forKey: .argumentsJson)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if toolName != nil { try container.encode(toolName, forKey: .toolName) }
-        if argumentsJson != nil { try container.encode(argumentsJson, forKey: .argumentsJson) }
-    }
-}
-
-/**
 * Sign In
 */
 // @Route("/auth", "GET,POST")
@@ -4151,6 +4185,253 @@ public class IdResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if id != nil { try container.encode(id, forKey: .id) }
         if status != nil { try container.encode(status, forKey: .status) }
+    }
+}
+
+public class ListEndUserChatAttachmentsResponse : ResponseBase
+{
+    public var attachments:[EndUserChatAttachment] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case attachments
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        attachments = try container.decodeIfPresent([EndUserChatAttachment].self, forKey: .attachments) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if attachments.count > 0 { try container.encode(attachments, forKey: .attachments) }
+    }
+}
+
+public class ListEndUserChatMemoryResponse : ResponseBase
+{
+    public var notes:[EndUserChatMemoryNote] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case notes
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        notes = try container.decodeIfPresent([EndUserChatMemoryNote].self, forKey: .notes) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if notes.count > 0 { try container.encode(notes, forKey: .notes) }
+    }
+}
+
+public class GetEndUserChatAvailabilityResponse : ResponseBase
+{
+    public var enabled:Bool?
+    public var available:Bool?
+    public var reason:String?
+    public var defaultAssistantId:String?
+    public var assistants:[EndUserChatAssistant] = []
+    public var plan:EndUserChatPlan?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case enabled
+        case available
+        case reason
+        case defaultAssistantId
+        case assistants
+        case plan
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
+        available = try container.decodeIfPresent(Bool.self, forKey: .available)
+        reason = try container.decodeIfPresent(String.self, forKey: .reason)
+        defaultAssistantId = try container.decodeIfPresent(String.self, forKey: .defaultAssistantId)
+        assistants = try container.decodeIfPresent([EndUserChatAssistant].self, forKey: .assistants) ?? []
+        plan = try container.decodeIfPresent(EndUserChatPlan.self, forKey: .plan)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if enabled != nil { try container.encode(enabled, forKey: .enabled) }
+        if available != nil { try container.encode(available, forKey: .available) }
+        if reason != nil { try container.encode(reason, forKey: .reason) }
+        if defaultAssistantId != nil { try container.encode(defaultAssistantId, forKey: .defaultAssistantId) }
+        if assistants.count > 0 { try container.encode(assistants, forKey: .assistants) }
+        if plan != nil { try container.encode(plan, forKey: .plan) }
+    }
+}
+
+public class ListEndUserChatSessionsResponse : ResponseBase
+{
+    public var sessions:[EndUserChatSession] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessions
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessions = try container.decodeIfPresent([EndUserChatSession].self, forKey: .sessions) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessions.count > 0 { try container.encode(sessions, forKey: .sessions) }
+    }
+}
+
+public class GetEndUserChatSessionResponse : ResponseBase
+{
+    public var session:EndUserChatSession?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case session
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        session = try container.decodeIfPresent(EndUserChatSession.self, forKey: .session)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if session != nil { try container.encode(session, forKey: .session) }
+    }
+}
+
+public class GetEndUserChatEntriesResponse : ResponseBase
+{
+    public var sessionId:String?
+    public var entries:[AiChatEntryWireDto] = []
+    public var lastSeq:Int?
+    public var hasMore:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sessionId
+        case entries
+        case lastSeq
+        case hasMore
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        entries = try container.decodeIfPresent([AiChatEntryWireDto].self, forKey: .entries) ?? []
+        lastSeq = try container.decodeIfPresent(Int.self, forKey: .lastSeq)
+        hasMore = try container.decodeIfPresent(Bool.self, forKey: .hasMore)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if entries.count > 0 { try container.encode(entries, forKey: .entries) }
+        if lastSeq != nil { try container.encode(lastSeq, forKey: .lastSeq) }
+        if hasMore != nil { try container.encode(hasMore, forKey: .hasMore) }
+    }
+}
+
+public class StartEndUserChatTurnResponse : ResponseBase
+{
+    public var turnId:String?
+    public var sessionId:String?
+    public var channel:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case turnId
+        case sessionId
+        case channel
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        turnId = try container.decodeIfPresent(String.self, forKey: .turnId)
+        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
+        channel = try container.decodeIfPresent(String.self, forKey: .channel)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if turnId != nil { try container.encode(turnId, forKey: .turnId) }
+        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
+        if channel != nil { try container.encode(channel, forKey: .channel) }
+    }
+}
+
+public class GetEndUserAiToolsResponse : ResponseBase
+{
+    public var tools:[EndUserAiTool]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case tools
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        tools = try container.decodeIfPresent([EndUserAiTool].self, forKey: .tools) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if tools != nil { try container.encode(tools, forKey: .tools) }
+    }
+}
+
+public class InvokeEndUserAiToolResponse : ResponseBase
+{
+    public var result:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(String.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
     }
 }
 
@@ -4811,249 +5092,6 @@ public class TestFilesIntegrationResponse : ResponseBase
     }
 }
 
-public class ListEndUserChatAttachmentsResponse : ResponseBase
-{
-    public var attachments:[EndUserChatAttachment] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case attachments
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        attachments = try container.decodeIfPresent([EndUserChatAttachment].self, forKey: .attachments) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if attachments.count > 0 { try container.encode(attachments, forKey: .attachments) }
-    }
-}
-
-public class ListEndUserChatMemoryResponse : ResponseBase
-{
-    public var notes:[EndUserChatMemoryNote] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case notes
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        notes = try container.decodeIfPresent([EndUserChatMemoryNote].self, forKey: .notes) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if notes.count > 0 { try container.encode(notes, forKey: .notes) }
-    }
-}
-
-public class GetEndUserChatAvailabilityResponse : ResponseBase
-{
-    public var enabled:Bool?
-    public var available:Bool?
-    public var reason:String?
-    public var defaultAssistantId:String?
-    public var assistants:[EndUserChatAssistant] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case enabled
-        case available
-        case reason
-        case defaultAssistantId
-        case assistants
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled)
-        available = try container.decodeIfPresent(Bool.self, forKey: .available)
-        reason = try container.decodeIfPresent(String.self, forKey: .reason)
-        defaultAssistantId = try container.decodeIfPresent(String.self, forKey: .defaultAssistantId)
-        assistants = try container.decodeIfPresent([EndUserChatAssistant].self, forKey: .assistants) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if enabled != nil { try container.encode(enabled, forKey: .enabled) }
-        if available != nil { try container.encode(available, forKey: .available) }
-        if reason != nil { try container.encode(reason, forKey: .reason) }
-        if defaultAssistantId != nil { try container.encode(defaultAssistantId, forKey: .defaultAssistantId) }
-        if assistants.count > 0 { try container.encode(assistants, forKey: .assistants) }
-    }
-}
-
-public class ListEndUserChatSessionsResponse : ResponseBase
-{
-    public var sessions:[EndUserChatSession] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessions
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessions = try container.decodeIfPresent([EndUserChatSession].self, forKey: .sessions) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessions.count > 0 { try container.encode(sessions, forKey: .sessions) }
-    }
-}
-
-public class GetEndUserChatSessionResponse : ResponseBase
-{
-    public var session:EndUserChatSession?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case session
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        session = try container.decodeIfPresent(EndUserChatSession.self, forKey: .session)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if session != nil { try container.encode(session, forKey: .session) }
-    }
-}
-
-public class GetEndUserChatEntriesResponse : ResponseBase
-{
-    public var sessionId:String?
-    public var entries:[AiChatEntryWireDto] = []
-    public var lastSeq:Int?
-    public var hasMore:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case sessionId
-        case entries
-        case lastSeq
-        case hasMore
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        entries = try container.decodeIfPresent([AiChatEntryWireDto].self, forKey: .entries) ?? []
-        lastSeq = try container.decodeIfPresent(Int.self, forKey: .lastSeq)
-        hasMore = try container.decodeIfPresent(Bool.self, forKey: .hasMore)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if entries.count > 0 { try container.encode(entries, forKey: .entries) }
-        if lastSeq != nil { try container.encode(lastSeq, forKey: .lastSeq) }
-        if hasMore != nil { try container.encode(hasMore, forKey: .hasMore) }
-    }
-}
-
-public class StartEndUserChatTurnResponse : ResponseBase
-{
-    public var turnId:String?
-    public var sessionId:String?
-    public var channel:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case turnId
-        case sessionId
-        case channel
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        turnId = try container.decodeIfPresent(String.self, forKey: .turnId)
-        sessionId = try container.decodeIfPresent(String.self, forKey: .sessionId)
-        channel = try container.decodeIfPresent(String.self, forKey: .channel)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if turnId != nil { try container.encode(turnId, forKey: .turnId) }
-        if sessionId != nil { try container.encode(sessionId, forKey: .sessionId) }
-        if channel != nil { try container.encode(channel, forKey: .channel) }
-    }
-}
-
-public class GetEndUserAiToolsResponse : ResponseBase
-{
-    public var tools:[EndUserAiTool]?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case tools
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        tools = try container.decodeIfPresent([EndUserAiTool].self, forKey: .tools) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if tools != nil { try container.encode(tools, forKey: .tools) }
-    }
-}
-
-public class InvokeEndUserAiToolResponse : ResponseBase
-{
-    public var result:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case result
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        result = try container.decodeIfPresent(String.self, forKey: .result)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if result != nil { try container.encode(result, forKey: .result) }
-    }
-}
-
 // @DataContract
 public class AuthenticateResponse : IHasSessionId, IHasBearerToken, Codable
 {
@@ -5525,6 +5563,97 @@ public class ResponseBase : Codable
     required public init(){}
 }
 
+public class EndUserChatAttachment : Codable
+{
+    public var id:String?
+    public var sessionId:String?
+    public var fileName:String?
+    public var contentType:String?
+    public var kind:String?
+    public var size:Int?
+    public var summary:String?
+    public var createdAtUtc:Date?
+
+    required public init(){}
+}
+
+public class EndUserChatMemoryNote : Codable
+{
+    public var id:String?
+    public var sessionId:String?
+    public var kind:String?
+    public var text:String?
+    public var createdAtUtc:Date?
+
+    required public init(){}
+}
+
+public class EndUserChatAssistant : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var welcomeMessage:String?
+    public var isDefault:Bool?
+    public var memoryEnabled:Bool?
+
+    required public init(){}
+}
+
+public class EndUserChatPlan : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var quotaUnit:String?
+    public var monthlyQuota:Int?
+    public var used:Int?
+    public var remaining:Int?
+    public var attachments:Bool?
+    public var rag:Bool?
+    public var memory:Bool?
+
+    required public init(){}
+}
+
+public class EndUserChatSession : Codable
+{
+    public var id:String?
+    public var assistantId:String?
+    public var title:String?
+    public var isPinned:Bool?
+    public var isArchived:Bool?
+    public var lastSeq:Int?
+    public var createdAtUtc:Date?
+    public var updatedAtUtc:Date?
+
+    required public init(){}
+}
+
+public class AiChatEntryWireDto : Codable
+{
+    public var kind:String?
+    public var id:String?
+    public var seq:Int?
+    public var atUtc:Date?
+    public var refEntryId:String?
+    public var workItemId:String?
+    public var feedback:String?
+    public var feedbackAtUtc:Date?
+    public var feedbackByUserAuthId:String?
+
+    required public init(){}
+}
+
+public class EndUserAiTool : Codable
+{
+    public var name:String?
+    public var Description:String?
+    public var toolsets:[String] = []
+    public var requiresConfirmation:Bool?
+    public var parameters:[EndUserAiToolParameter] = []
+
+    required public init(){}
+}
+
 public class AuthDto : IBindableContract, Codable
 {
     public var id:String?
@@ -5707,6 +5836,9 @@ public class SchemaDto : IHasViewId, Codable
     public var settings:SchemaSettingsDto?
 
     // @DataMember
+    public var embed:SchemaEmbedSettingsDto?
+
+    // @DataMember
     public var triggers:[TriggerDto]?
 
     required public init(){}
@@ -5795,82 +5927,6 @@ public class IntegrationTestResultItemDto : Codable
     required public init(){}
 }
 
-public class EndUserChatAttachment : Codable
-{
-    public var id:String?
-    public var sessionId:String?
-    public var fileName:String?
-    public var contentType:String?
-    public var kind:String?
-    public var size:Int?
-    public var summary:String?
-    public var createdAtUtc:Date?
-
-    required public init(){}
-}
-
-public class EndUserChatMemoryNote : Codable
-{
-    public var id:String?
-    public var sessionId:String?
-    public var kind:String?
-    public var text:String?
-    public var createdAtUtc:Date?
-
-    required public init(){}
-}
-
-public class EndUserChatAssistant : Codable
-{
-    public var id:String?
-    public var name:String?
-    public var welcomeMessage:String?
-    public var isDefault:Bool?
-    public var memoryEnabled:Bool?
-
-    required public init(){}
-}
-
-public class EndUserChatSession : Codable
-{
-    public var id:String?
-    public var assistantId:String?
-    public var title:String?
-    public var isPinned:Bool?
-    public var isArchived:Bool?
-    public var lastSeq:Int?
-    public var createdAtUtc:Date?
-    public var updatedAtUtc:Date?
-
-    required public init(){}
-}
-
-public class AiChatEntryWireDto : Codable
-{
-    public var kind:String?
-    public var id:String?
-    public var seq:Int?
-    public var atUtc:Date?
-    public var refEntryId:String?
-    public var workItemId:String?
-    public var feedback:String?
-    public var feedbackAtUtc:Date?
-    public var feedbackByUserAuthId:String?
-
-    required public init(){}
-}
-
-public class EndUserAiTool : Codable
-{
-    public var name:String?
-    public var Description:String?
-    public var toolsets:[String] = []
-    public var requiresConfirmation:Bool?
-    public var parameters:[EndUserAiToolParameter] = []
-
-    required public init(){}
-}
-
 public enum Gender : String, Codable
 {
     case Male
@@ -5924,6 +5980,16 @@ public class ErrorDto : Codable
     public var errorCode:String?
     public var context:[String:String]?
     public var stackTrace:[ErrorDto]?
+
+    required public init(){}
+}
+
+public class EndUserAiToolParameter : Codable
+{
+    public var name:String?
+    public var type:String?
+    public var required:Bool?
+    public var Description:String?
 
     required public init(){}
 }
@@ -6018,6 +6084,23 @@ public class SchemaSettingsDto : Codable
     required public init(){}
 }
 
+public class SchemaEmbedSettingsDto : Codable
+{
+    // @DataMember
+    public var enabled:Bool?
+
+    // @DataMember
+    public var fields:[String] = []
+
+    // @DataMember
+    public var embeddingIntegrationId:String?
+
+    // @DataMember
+    public var perUser:Bool?
+
+    required public init(){}
+}
+
 // @DataContract
 public class TriggerDto : IHasViewId, Codable
 {
@@ -6090,16 +6173,6 @@ public enum FileProvider : String, Codable
     case GoogleDrive
 }
 
-public class EndUserAiToolParameter : Codable
-{
-    public var name:String?
-    public var type:String?
-    public var required:Bool?
-    public var Description:String?
-
-    required public init(){}
-}
-
 public protocol ICursorArgs
 {
     var field:String? { get set }
@@ -6130,6 +6203,7 @@ public enum TriggerType : String, Codable
     case Schema
     case Files
     case Payments
+    case Ai
 }
 
 // @DataContract
