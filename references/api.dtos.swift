@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-05 16:12:05
+Date: 2026-10-05 20:52:59
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -2967,12 +2967,16 @@ public class DeleteManyRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var filter:String?
 
+    // @DataMember
+    public var allRecords:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case collectionName
         case databaseIntegrationId
         case filter
+        case allRecords
     }
 
     required public init(from decoder: Decoder) throws {
@@ -2981,6 +2985,7 @@ public class DeleteManyRequest : CodeMashRequestBase, IReturn
         collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
+        allRecords = try container.decodeIfPresent(Bool.self, forKey: .allRecords)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -2989,6 +2994,7 @@ public class DeleteManyRequest : CodeMashRequestBase, IReturn
         if collectionName != nil { try container.encode(collectionName, forKey: .collectionName) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if filter != nil { try container.encode(filter, forKey: .filter) }
+        if allRecords != nil { try container.encode(allRecords, forKey: .allRecords) }
     }
 }
 
@@ -3468,6 +3474,9 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
     public var filter:String?
 
     // @DataMember
+    public var allRecords:Bool?
+
+    // @DataMember
     public var update:String?
 
     required public init(){ super.init() }
@@ -3476,6 +3485,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         case collectionName
         case databaseIntegrationId
         case filter
+        case allRecords
         case update
     }
 
@@ -3485,6 +3495,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
+        allRecords = try container.decodeIfPresent(Bool.self, forKey: .allRecords)
         update = try container.decodeIfPresent(String.self, forKey: .update)
     }
 
@@ -3494,6 +3505,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         if collectionName != nil { try container.encode(collectionName, forKey: .collectionName) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if filter != nil { try container.encode(filter, forKey: .filter) }
+        if allRecords != nil { try container.encode(allRecords, forKey: .allRecords) }
         if update != nil { try container.encode(update, forKey: .update) }
     }
 }
