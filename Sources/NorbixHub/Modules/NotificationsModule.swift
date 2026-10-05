@@ -526,17 +526,6 @@ public final class NotificationsModule: Sendable {
         )
     }
 
-    public func getEmailCampaignMessage(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/notifications/emails/campaigns/{campaignId}/messages/{id}",
-            method: "GET",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     public func getEmailCampaignMessages(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/emails/campaigns/{campaignId}/messages",
@@ -816,18 +805,6 @@ public final class NotificationsModule: Sendable {
     public func getSmsCampaignMessages(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/sms/campaigns/{campaignId}/messages",
-            method: "GET",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
-    /// One message (notification) of a campaign. Pass `campaignId` and `notificationId`; the latter comes from `getSmsCampaignMessages`.
-    public func getSmsCampaignMessage(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/notifications/sms/campaigns/{campaignId}/messages/{notificationId}",
             method: "GET",
             request: request,
             scope: .project,

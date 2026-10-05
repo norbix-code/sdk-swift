@@ -51,7 +51,6 @@
 | `getSmsCampaigns` | `GET` | `/{version}/notifications/sms/campaigns` | `project` |
 | `createSmsCampaign` | `POST` | `/{version}/notifications/sms/campaigns` | `project` |
 | `getSmsCampaignMessages` | `GET` | `/{version}/notifications/sms/campaigns/{campaignId}/messages` | `project` |
-| `getSmsCampaignMessage` | `GET` | `/{version}/notifications/sms/campaigns/{campaignId}/messages/{notificationId}` | `project` |
 | `deleteSmsCampaign` | `DELETE` | `/{version}/notifications/sms/campaigns/{id}` | `project` |
 | `getSmsCampaign` | `GET` | `/{version}/notifications/sms/campaigns/{id}` | `project` |
 | `getSmsCampaignBatches` | `GET` | `/{version}/notifications/sms/campaigns/{id}/batches` | `project` |
@@ -82,7 +81,6 @@
 | `unArchiveSmsTemplate` | `PUT` | `/{version}/notifications/sms/templates/{Id}/unarchive` | `project` |
 | `getSmsTemplate` | `GET` | `/{version}/notifications/sms/templates/{id}` | `project` |
 | `getSmsMessageContentTokens` | `GET` | `/{version}/notifications/sms/templates/{id}/tokens` | `project` |
-| `getEmailCampaignMessage` | `GET` | `/{version}/notifications/emails/campaigns/{campaignId}/messages/{id}` | `project` |
 | `getEmailCampaignMessages` | `GET` | `/{version}/notifications/emails/campaigns/{campaignId}/messages` | `project` |
 | `disablePush` | `GET` | `/{version}/notifications/push/disable` | `project` |
 | `enablePush` | `GET` | `/{version}/notifications/push/enable` | `project` |
