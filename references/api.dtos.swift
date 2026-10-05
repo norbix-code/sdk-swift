@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-05 07:55:00
+Date: 2026-10-05 16:12:05
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -5866,6 +5866,9 @@ public class SchemaListProjection : IHasViewId, Codable
 
     // @DataMember
     public var Description:String?
+
+    // @DataMember
+    public var env:String?
 
     required public init(){}
 }
