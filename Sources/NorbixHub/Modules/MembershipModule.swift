@@ -11,7 +11,7 @@ public final class MembershipModule: Sendable {
     public func disableMembership(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/membership/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -22,7 +22,7 @@ public final class MembershipModule: Sendable {
     public func enableMembership(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/membership/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,

@@ -2,8 +2,8 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `disableMembership` | `GET` | `/{version}/membership/disable` | `project` |
-| `enableMembership` | `GET` | `/{version}/membership/enable` | `project` |
+| `disableMembership` | `PUT` | `/{version}/membership/disable` | `project` |
+| `enableMembership` | `PUT` | `/{version}/membership/enable` | `project` |
 | `deleteMembershipTrigger` | `DELETE` | `/{version}/membership/triggers/{triggerId}` | `project` |
 | `disableMembershipTrigger` | `PATCH` | `/{version}/membership/triggers/{triggerId}/disable` | `project` |
 | `enableMembershipTrigger` | `PATCH` | `/{version}/membership/triggers/{triggerId}/enable` | `project` |

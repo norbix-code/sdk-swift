@@ -33,7 +33,7 @@ public final class NotificationsModule: Sendable {
     public func disableEmail(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/email/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -44,7 +44,7 @@ public final class NotificationsModule: Sendable {
     public func enableEmail(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/email/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -540,7 +540,7 @@ public final class NotificationsModule: Sendable {
     public func disablePush(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/push/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -551,7 +551,7 @@ public final class NotificationsModule: Sendable {
     public func enablePush(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/push/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -883,7 +883,7 @@ public final class NotificationsModule: Sendable {
     public func disableSms(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/sms/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -906,7 +906,7 @@ public final class NotificationsModule: Sendable {
     public func enableSms(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/sms/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,

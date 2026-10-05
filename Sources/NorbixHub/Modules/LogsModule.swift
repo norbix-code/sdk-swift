@@ -11,7 +11,7 @@ public final class LogsModule: Sendable {
     public func disableLogging(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/logs/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -22,7 +22,7 @@ public final class LogsModule: Sendable {
     public func enableLogging(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/logs/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,

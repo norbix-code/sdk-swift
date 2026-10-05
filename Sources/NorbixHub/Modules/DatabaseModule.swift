@@ -11,7 +11,7 @@ public final class DatabaseModule: Sendable {
     public func disableDatabase(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/disable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
@@ -22,7 +22,7 @@ public final class DatabaseModule: Sendable {
     public func enableDatabase(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/enable",
-            method: "GET",
+            method: "PUT",
             request: request,
             scope: .project,
             timeout: timeout,
