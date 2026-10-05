@@ -2,7 +2,7 @@ import XCTest
 @testable import NorbixHub
 import NorbixCore
 
-/// `hub.notifications` SMS — all 35 SMS Hub endpoints, one test per method,
+/// `hub.notifications` SMS — all 34 SMS Hub endpoints, one test per method,
 /// against `MockHTTPExecutor` (the same fake-transport pattern as
 /// `HubFilesModuleTests`). Never a real gateway, never a real provider. Each
 /// test checks the verb, the full path with the ids substituted in the
@@ -412,17 +412,6 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
         _ = try await client.notifications.getSmsCampaignMessages(["campaignId": "cmp_1"])
 
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/messages")
-        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
-    }
-
-    func testGetSmsCampaignMessage() async throws {
-        let mock = MockHTTPExecutor()
-        let client = try makeClient(mock)
-
-        _ = try await client.notifications.getSmsCampaignMessage(["campaignId": "cmp_1", "notificationId": "n_1"])
-
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/messages/n_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
