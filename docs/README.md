@@ -29,8 +29,10 @@ print(profile)
 ### Hub call (token only)
 
 Hub calls, the account ones included, work with a token only — no `accountId`.
-Only `hub.account.verifyAccount` needs `accountId` (the gateway reads it from
-that request).
+`hub.account.createAccount`, `createTeamMemberFromInvitation`,
+`getAccountRegions` (also `hub.regions.getAccountRegions`) and `verifyAccount`
+need no token at all; `verifyAccount` takes `accountId` and `token` in the
+request (query), from the verification email link.
 
 ```swift
 import NorbixSwift

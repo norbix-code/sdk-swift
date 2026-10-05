@@ -83,6 +83,10 @@ let hub = try NorbixHubClient(
 )
 let account = try await hub.account.getAccountProfile() // no accountId needed
 let integrations = try await hub.files.getFilesIntegrations()
+
+// Sign-up, invitation, regions and verify need no token and no accountId:
+let anon = try NorbixHubClient(projectId: "proj_123") // no apiKey, no bearerToken
+let regions = try await anon.account.getAccountRegions()
 ```
 
 ## Self-hosted / on-prem deployments
@@ -183,8 +187,9 @@ header is still sent, but the URL stays exactly as you configured it.
 
 ### Managing a project's regions (Hub)
 
-`hub.regions` wraps the regions endpoints. Both work with a token only (the
-client needs no `accountId`):
+`hub.regions` wraps the regions endpoints. `getAccountRegions` needs no token
+and no `accountId` (the gateway route is anonymous); `updateProjectRegions`
+works with a token only (the client needs no `accountId`):
 
 ```swift
 // GET /v2/account/regions — regions available to the account.
@@ -251,8 +256,14 @@ print(me)
 ### 3) Account Hub call (token only)
 
 Account calls take the account from the signed-in token, so the client needs
-no `accountId`. Only `hub.account.verifyAccount` is account-scoped: the
-gateway reads the account id from that request (the verification email link).
+no `accountId`.
+
+Four account calls need no token at all (scope `.unauthenticated`, no
+`Authorization` header): `createAccount` (sign-up),
+`createTeamMemberFromInvitation`, `getAccountRegions` (also
+`hub.regions.getAccountRegions`) and `verifyAccount`. `verifyAccount` takes the
+account id once, in the request: pass `accountId` and `token` from the
+verification email link; they go in the query.
 
 ```swift
 import NorbixHub
@@ -264,6 +275,10 @@ let hub = try NorbixHubClient(
 
 let account = try await hub.account.getAccountProfile()
 print(account)
+
+// No token, no accountId:
+let anon = try NorbixHubClient(projectId: "proj_123")
+_ = try await anon.account.verifyAccount(["accountId": "acc_456", "token": codeFromEmail])
 ```
 
 ## Authentication
@@ -273,6 +288,9 @@ print(account)
 - If both set, **bearer token wins**
 - If none set, the SDK throws `NORBIX_NOT_AUTHENTICATED` on the first
   authenticated call
+- Anonymous calls send no `Authorization` header, even when the client has a
+  token: `hub.account.createAccount`, `createTeamMemberFromInvitation`,
+  `getAccountRegions`, `verifyAccount`, and `hub.regions.getAccountRegions`
 
 ### Preview a notification with its signed link (no sign-in)
 
@@ -326,7 +344,7 @@ serves that route. Use `getSmsCampaignMessages` / `getEmailCampaignMessages`
 NORBIX_PROJECT_ID=proj_123
 NORBIX_API_KEY=sk_live_...
 NORBIX_BEARER_TOKEN=...
-NORBIX_ACCOUNT_ID=acc_456
+NORBIX_ACCOUNT_ID=acc_456   # optional: no call needs it
 NORBIX_API_URL=https://api.norbix.ai
 NORBIX_HUB_URL=https://hub.norbix.ai
 NORBIX_API_VERSION=v2
@@ -356,7 +374,7 @@ do {
 } catch let error as NorbixError {
     switch error.code {
     case "NORBIX_NOT_AUTHENTICATED":      /* re-login */ break
-    case "NORBIX_ACCOUNT_SCOPE_REQUIRED": /* set accountId (only hub.account.verifyAccount) */ break
+    case "NORBIX_ACCOUNT_SCOPE_REQUIRED": /* set accountId (no built-in call needs it) */ break
     case "NORBIX_NETWORK_ERROR":          /* retry */ break
     default:                              print(error.localizedDescription)
     }
