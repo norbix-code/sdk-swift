@@ -103,27 +103,29 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// Anonymous (`.unauthenticated`): accepts a team invitation with the invitation token in
+    /// `request` — the invited person has no session yet. No token, no `accountId` needed.
     public func createTeamMemberFromInvitation(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/team/member",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken
         )
     }
 
-    /// The one account route that stays `.account` scope: the gateway reads the account id from
-    /// the request (`accountId` + `token` from the verification email), not from the session —
-    /// same rule as the TypeScript SDK. Every other account route takes the account from the
-    /// signed-in token.
+    /// Anonymous (`.unauthenticated`): the gateway route has no `[Authenticate]` and reads the
+    /// account id and the code from the request (`accountId` + `token` from the verification
+    /// email link), not from a session. Pass them in `request`; they go in the query. The
+    /// client needs no token and no `accountId`.
     public func verifyAccount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/verify",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -228,12 +230,14 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// Anonymous (`.unauthenticated`): the gateway route has no `[Authenticate]`. No token, no
+    /// `accountId` needed.
     public func getAccountRegions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/regions",
             method: "GET",
             request: request,
-            scope: .project,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -393,12 +397,14 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// Anonymous (`.unauthenticated`): sign-up — there is no session yet. No token, no
+    /// `accountId` needed.
     public func createAccount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken
         )

@@ -31,17 +31,16 @@ final class NorbixHubClientTests: XCTestCase {
         )
     }
 
-    func testAccountScopeRequiresAccountId() async throws {
+    func testAccountModuleExists() async throws {
         let client = try NorbixHubClient(
             projectId: "p1",
             apiKey: "key",
             executor: MockHTTPExecutor()
         )
-        // Only hub.account.verifyAccount is account-scoped (the gateway reads
-        // the account id from that request); calling it without accountId
-        // throws NORBIX_ACCOUNT_SCOPE_REQUIRED at the transport layer — see
-        // HubAccountTokenOnlyScopeTests. Every other account call works with
-        // a token only. Here we just assert the module exists.
+        // No hub.account call needs accountId: the signed-in ones work with a
+        // token only (HubAccountTokenOnlyScopeTests), and sign-up, invitation,
+        // regions and verify need no token at all (HubAccountNoTokenScopeTests).
+        // Here we just assert the module exists.
         XCTAssertNotNil(client.account)
     }
 }
