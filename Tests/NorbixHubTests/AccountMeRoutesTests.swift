@@ -3,12 +3,12 @@ import XCTest
 import NorbixCore
 
 /// The signed-in team member's own record (`GET /account/me`) and own phone number
-/// (`PUT /account/me/phone`) on `account`, checked on the mock executor (verb,
+/// (`PUT /account/me/phone`) with a token only (no `accountId`), checked on the mock executor (verb,
 /// resolved path, auth header, body). Never a real gateway.
 final class HubAccountMeRoutesTests: XCTestCase {
     private func makeClient(_ mock: MockHTTPExecutor) throws -> NorbixHubClient {
         mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
-        return try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: mock)
+        return try NorbixHubClient(projectId: "proj", bearerToken: "token", executor: mock)
     }
 
     func testGetMyAccountUserProfile() async throws {

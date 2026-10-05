@@ -37,10 +37,11 @@ final class NorbixHubClientTests: XCTestCase {
             apiKey: "key",
             executor: MockHTTPExecutor()
         )
-        // The hub.account module is account-scoped — calling it without
-        // accountId should throw NORBIX_ACCOUNT_SCOPE_REQUIRED at the
-        // transport layer. We just assert the module exists; the scope
-        // enforcement is covered by NorbixCore tests.
+        // Only hub.account.verifyAccount is account-scoped (the gateway reads
+        // the account id from that request); calling it without accountId
+        // throws NORBIX_ACCOUNT_SCOPE_REQUIRED at the transport layer — see
+        // HubAccountTokenOnlyScopeTests. Every other account call works with
+        // a token only. Here we just assert the module exists.
         XCTAssertNotNil(client.account)
     }
 }
