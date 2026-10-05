@@ -228,4 +228,36 @@ public final class DatabaseModule: Sendable {
         )
     }
 
+    // MARK: - Collections / Records
+
+    /// Finds the records of `collectionName` that belong to the signed-in user.
+    ///
+    /// `GET /{version}/database/collections/{collectionName}/own` · request DTO `FindOwnRequest`.
+    public func findOwn(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/collections/{collectionName}/own",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    // MARK: - Taxonomies
+
+    /// Returns the merged term tree of `taxonomyName`.
+    ///
+    /// `GET /{version}/database/taxonomies/{taxonomyName}/merged-tree` · request DTO `FindMergedTermTreeRequest`.
+    public func findMergedTermTree(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/taxonomies/{taxonomyName}/merged-tree",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }
