@@ -30,6 +30,35 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// The signed-in team member's (or owner's) own record — not the organisation's
+    /// profile (`getAccountProfile`). The answer carries `item`; `item.generalInfo.phone`
+    /// is the number "Account users" SMS campaigns send to.
+    public func getMyAccountUserProfile(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/me",
+            method: "GET",
+            request: request,
+            scope: .account,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Saves or clears the signed-in team member's own phone number: pass `["phone": "+37060000000"]`
+    /// (E.164 — `+`, the country code, then digits); an empty or missing `phone` clears it. There is
+    /// no user id: the user is always the caller. Members without a phone are skipped by
+    /// "Account users" SMS campaigns.
+    public func updateMyAccountUserPhone(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/me/phone",
+            method: "PUT",
+            request: request,
+            scope: .account,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func resendAccountVerificationToken(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/verify/resend",
