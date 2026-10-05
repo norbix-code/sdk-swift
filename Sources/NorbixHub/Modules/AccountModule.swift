@@ -13,7 +13,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/profile",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -24,7 +24,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/profile",
             method: "PUT",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -38,7 +38,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/me",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -53,7 +53,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/me/phone",
             method: "PUT",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -64,7 +64,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/verify/resend",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -75,7 +75,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/status",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -86,7 +86,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/stripe/create-checkout-session",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -97,7 +97,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/stripe/get-portal-url",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -108,12 +108,16 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/team/member",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
     }
 
+    /// The one account route that stays `.account` scope: the gateway reads the account id from
+    /// the request (`accountId` + `token` from the verification email), not from the session —
+    /// same rule as the TypeScript SDK. Every other account route takes the account from the
+    /// signed-in token.
     public func verifyAccount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/verify",
@@ -130,7 +134,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/notifications/settings/group",
             method: "DELETE",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -141,7 +145,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/notifications/settings/tag",
             method: "DELETE",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -152,7 +156,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/notifications/settings/group/tag",
             method: "DELETE",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -163,7 +167,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/notifications/settings/group",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -174,7 +178,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/notifications/settings/tag",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -185,7 +189,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -196,7 +200,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}",
             method: "DELETE",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -207,7 +211,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -218,7 +222,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -229,7 +233,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/regions",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -240,7 +244,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/tokens",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -251,7 +255,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/accent-color",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -262,7 +266,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/icon",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -273,7 +277,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/logo",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -284,7 +288,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/main-color",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -295,7 +299,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/origins",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -306,7 +310,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/default-language",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -317,7 +321,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/description",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -328,7 +332,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/disable",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -339,7 +343,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/enable",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -350,7 +354,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/languages",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -361,7 +365,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/url",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -372,7 +376,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/name",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -383,7 +387,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/regions",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -394,7 +398,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -405,7 +409,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/collaborators",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -416,7 +420,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/team/member/invite",
             method: "POST",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -427,7 +431,7 @@ public final class AccountModule: Sendable {
             path: "/{version}/account/licenses",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
         )

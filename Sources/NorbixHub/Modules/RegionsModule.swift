@@ -31,7 +31,7 @@ public final class RegionsModule: Sendable {
             path: "/{version}/account/regions",
             method: "GET",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken,
             region: region
@@ -58,7 +58,7 @@ public final class RegionsModule: Sendable {
             path: "/{version}/account/projects/{projectId}/settings/regions",
             method: "PATCH",
             request: request,
-            scope: .account,
+            scope: .project,
             timeout: timeout,
             bearerToken: bearerToken,
             region: region
