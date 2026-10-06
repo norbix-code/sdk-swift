@@ -70,6 +70,21 @@
 | `testDatabaseIntegration` | `POST` | `/{version}/database/integrations/test` | `project` |
 | `revealManagedFlexConnectionString` | `GET` | `/{version}/database/integrations/{Id}/connection-string` | `project` |
 
+## Deleting a schema
+
+`deleteDatabaseSchema` deletes the schema **and its records**: the schema's
+MongoDB collection, with its indexes, is dropped in the request environment
+(in every active database integration of that environment). For a schema
+with AI embed on, its records are also removed from the AI knowledge. The
+delete is still refused while a saved aggregate or a schema trigger uses the
+schema, and then nothing is dropped. The request and the response did not
+change, and a retry is safe. Rules and error codes:
+[Database — rules the gateway checks](../database-rules.md#schemas).
+
+```swift
+_ = try await client.database.deleteDatabaseSchema(["Id": "sch_1"])
+```
+
 ## Working with records (Hub)
 
 The Hub record methods are the dashboard / server-side twin of the Api

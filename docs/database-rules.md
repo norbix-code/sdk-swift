@@ -52,6 +52,12 @@ calls were refused with HTTP 403.
 - Deleting a schema is also refused when a saved aggregate joins it.
   `CM-ERRORS-SCHEMA-018` lists the blocking aggregates in
   `context["BlockerAggregateIds"]` and `context["BlockerAggregateNames"]`.
+- `deleteDatabaseSchema` also **drops the schema's records**: its MongoDB
+  collection, with its indexes, in the request environment (in every active
+  database integration of that environment). For a schema with AI embed on,
+  its records are also removed from the AI knowledge. Nothing is dropped when
+  the delete is refused (a saved aggregate or a schema trigger still uses the
+  schema). The request and the response did not change. A retry is safe.
 
 ## Schema triggers — one copy per env
 
