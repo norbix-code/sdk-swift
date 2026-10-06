@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-05 20:52:59
+Date: 2026-10-06 11:07:10
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -36344,6 +36344,7 @@ public class PaymentsWebhookLogEntry : Codable
 {
     public var integrationId:String?
     public var source:String?
+    public var env:String?
     public var eventName:String?
     public var providerEventId:String?
     public var statusCode:Int?
@@ -36553,6 +36554,9 @@ public class TenantLogEntryDto : Codable
 
     // @DataMember
     public var spanId:String?
+
+    // @DataMember
+    public var env:String?
 
     // @DataMember
     public var meta:IReadOnlyDictionary<String, String>?
