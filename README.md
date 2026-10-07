@@ -38,7 +38,7 @@ In Xcode:
 Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/norbix-code/sdk-swift.git", from: "0.1.0")
+.package(url: "https://github.com/norbix-code/sdk-swift.git", from: "1.0.0")
 ```
 
 ```swift
