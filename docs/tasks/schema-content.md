@@ -20,7 +20,7 @@ campaign lands).
 2. [done] feat(sdk-swift:database+files): `ExpandedReference` (NorbixCore, Codable: decodes the pair and a bare id), `expandReferences:` on the typed `find` / `findOne`, typed `findOwn`, `api.files.getFileById(integrationId:id:)` → `FileDetails`, `hub.files.getFileById`, doc comments on the record reads / updates of both clients — no existing method shape changed — commit `b66c539`
 3. [done] test(sdk-swift:database): `ExpandedReferenceTests` (9), Api `SchemaContentContractTests` (23), Hub `SchemaContentContractTests` (13) against the fake transport — commit `f238401`
 4. [done] docs(sdk-swift): API · Database (3 sections), `docs/database-rules.md` (records 014 / 030 / 039–049 / 050–056, schema contract + SCHEMA-010 / 012 / 022 / 036–041, term slug + TAXONOMIES-012 / 013), HUB · Database bullets, API / HUB · Files (by id), index counts, README example 4 — commit `78b4b7b`
-5. [done] chore(sdk-swift:ship): this task file; `swift build` + `swift test` green — NorbixHubTests 232, NorbixApiTests 109, NorbixCoreTests 18 (219 / 86 / 9 before), 0 failures; `nbx-ship --no-merge` → pull request (link below)
+5. [done] chore(sdk-swift:ship): this task file; `swift build` + `swift test` green — NorbixHubTests 232, NorbixApiTests 109, NorbixCoreTests 18 (219 / 86 / 9 before), 0 failures; `nbx-ship --no-merge` → pull request https://github.com/norbix-code/sdk-swift/pull/26 (open, not merged)
 
 ## Changes
 | file (absolute, branch audit/schema-content) | what changed | step |
@@ -58,7 +58,7 @@ campaign lands).
 - Fixing F1 here — it is a separate, pre-existing bug with its own branch; changing the typed decode shape in this item would mix two contracts.
 
 ## Needs you
-- [ ] Merge the pull request (Rebase and merge) after the gateway branch audit/schema-content lands on refactoringV2.
+- [ ] Merge https://github.com/norbix-code/sdk-swift/pull/26 (Rebase and merge) after the gateway branch audit/schema-content lands on refactoringV2.
 
 ## Open questions
 - none
