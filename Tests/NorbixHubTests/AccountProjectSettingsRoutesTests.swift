@@ -9,13 +9,13 @@ final class HubAccountProjectSettingsRoutesTests: XCTestCase {
     private typealias Case = (name: String, verb: String, path: String, call: (NorbixHubClient) async throws -> Void)
 
     private let cases: [Case] = [
-            ("updateProjectAdminUrl", "PATCH", "/v2/account/projects/projectId1/settings/admin-url", { c in _ = try await c.account.updateProjectAdminUrl(["projectId": "projectId1", "probe": "value"]) }),
-            ("updateProjectLegalDocuments", "PATCH", "/v2/account/projects/projectId1/settings/legal", { c in _ = try await c.account.updateProjectLegalDocuments(["projectId": "projectId1", "probe": "value"]) }),
-            ("updateProjectExposeLegal", "PATCH", "/v2/account/projects/projectId1/settings/legal/expose", { c in _ = try await c.account.updateProjectExposeLegal(["projectId": "projectId1", "probe": "value"]) }),
-            ("updateProjectExposeBrand", "PATCH", "/v2/account/projects/projectId1/settings/brand/expose", { c in _ = try await c.account.updateProjectExposeBrand(["projectId": "projectId1", "exposed": true]) }),
-            ("updateProjectExposeAuth", "PATCH", "/v2/account/projects/projectId1/settings/auth/expose", { c in _ = try await c.account.updateProjectExposeAuth(["projectId": "projectId1", "exposed": true]) }),
-            ("getAdminPortalStructure", "GET", "/v2/account/projects/projectId1/admin-portal/structure", { c in _ = try await c.account.getAdminPortalStructure(["projectId": "projectId1", "probe": "value"]) }),
-            ("assignAdminPortalServiceUser", "PUT", "/v2/account/projects/projectId1/settings/admin-portal/service-user", { c in _ = try await c.account.assignAdminPortalServiceUser(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectAdminUrl", "PATCH", "/v3/account/projects/projectId1/settings/admin-url", { c in _ = try await c.account.updateProjectAdminUrl(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectLegalDocuments", "PATCH", "/v3/account/projects/projectId1/settings/legal", { c in _ = try await c.account.updateProjectLegalDocuments(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectExposeLegal", "PATCH", "/v3/account/projects/projectId1/settings/legal/expose", { c in _ = try await c.account.updateProjectExposeLegal(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectExposeBrand", "PATCH", "/v3/account/projects/projectId1/settings/brand/expose", { c in _ = try await c.account.updateProjectExposeBrand(["projectId": "projectId1", "exposed": true]) }),
+            ("updateProjectExposeAuth", "PATCH", "/v3/account/projects/projectId1/settings/auth/expose", { c in _ = try await c.account.updateProjectExposeAuth(["projectId": "projectId1", "exposed": true]) }),
+            ("getAdminPortalStructure", "GET", "/v3/account/projects/projectId1/admin-portal/structure", { c in _ = try await c.account.getAdminPortalStructure(["projectId": "projectId1", "probe": "value"]) }),
+            ("assignAdminPortalServiceUser", "PUT", "/v3/account/projects/projectId1/settings/admin-portal/service-user", { c in _ = try await c.account.assignAdminPortalServiceUser(["projectId": "projectId1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {

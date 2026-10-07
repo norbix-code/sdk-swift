@@ -29,7 +29,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.enableSms([:])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/enable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/enable")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -40,7 +40,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.disableSms([:])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/disable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/disable")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -51,7 +51,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsDisableDependencies([:])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/disable-dependencies")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/disable-dependencies")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -62,7 +62,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsSettings([:])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/settings")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/settings")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -73,7 +73,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.previewSmsNotification(["hash": "abc.def"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/preview")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/preview")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("hash=abc.def"), "got: \(query)")
@@ -85,7 +85,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsIntegrations([:])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -96,7 +96,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsIntegration(["id": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/nbin_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -107,7 +107,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.saveSmsIntegration(["integration": ["smsType": "Fake", "integrationName": "sms-sdk-secondary-fake"]])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual((json["integration"] as? [String: Any])?["smsType"] as? String, "Fake")
@@ -120,7 +120,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.testSmsIntegration(["integrationId": "nbin_1", "phoneNumber": "+37060000000"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/test")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/test")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual(json["integrationId"] as? String, "nbin_1")
@@ -133,7 +133,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.confirmSmsIntegrationHumanDelivery(["integrationId": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/confirm-human-delivery")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/confirm-human-delivery")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual(json["integrationId"] as? String, "nbin_1")
@@ -146,7 +146,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.deleteSmsIntegration(["Id": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/nbin_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -157,7 +157,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.setSmsIntegrationAsDefault(["Id": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/nbin_1/default")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/nbin_1/default")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -168,7 +168,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.enableSmsIntegration(["Id": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/nbin_1/enable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/nbin_1/enable")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -179,7 +179,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.disableSmsIntegration(["Id": "nbin_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/integrations/nbin_1/disable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/integrations/nbin_1/disable")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -190,7 +190,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsTemplates(["pageSize": 20])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("pageSize=20"), "got: \(query)")
@@ -203,7 +203,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsTemplate(["id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -214,7 +214,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.createSmsTemplate(["name": "sms-sdk-secondary-t1", "content": ["body": "Hi @Model.FirstName"]])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual(json["name"] as? String, "sms-sdk-secondary-t1")
@@ -227,7 +227,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.updateSmsTemplate(["id": "tpl_1", "name": "sms-sdk-secondary-t1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         let json = try body(mock)
         XCTAssertEqual(json["id"] as? String, "tpl_1")
@@ -240,7 +240,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.deleteSmsTemplate(["Id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -251,7 +251,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.archiveSmsTemplate(["Id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1/archive")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1/archive")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -262,7 +262,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.unArchiveSmsTemplate(["Id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1/unarchive")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1/unarchive")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -273,7 +273,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.cloneSmsTemplate(["Id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1/clone")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1/clone")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -284,7 +284,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsMessageContentTokens(["id": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/tpl_1/tokens")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/tpl_1/tokens")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -295,7 +295,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.renderSms(["code": "Hi @Model.FirstName", "tokens": [["name": "FirstName", "value": "Ada"]]])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/templates/render")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/templates/render")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual(json["code"] as? String, "Hi @Model.FirstName")
@@ -308,7 +308,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaigns(["templateId": "tpl_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("templateId=tpl_1"), "got: \(query)")
@@ -321,7 +321,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.createSmsCampaign(["templateId": "tpl_1", "deliveryStrategy": "AllUsers"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         let json = try body(mock)
         XCTAssertEqual(json["templateId"] as? String, "tpl_1")
@@ -334,7 +334,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaign(["id": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -345,7 +345,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.deleteSmsCampaign(["id": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -356,7 +356,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.stopSmsCampaign(["Id": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/stop")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/stop")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -367,7 +367,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaignStatistics(["id": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/stats")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/stats")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -378,7 +378,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaignBatches(["id": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/batches")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/batches")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -389,7 +389,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaignBatchNotifications(["id": "cmp_1", "batchId": "b_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/batches/b_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/batches/b_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -400,7 +400,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaignBatchNotification(["id": "cmp_1", "batchId": "b_1", "notificationId": "n_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/batches/b_1/n_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/batches/b_1/n_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
@@ -411,7 +411,7 @@ final class HubSmsNotificationsModuleTests: XCTestCase {
 
         _ = try await client.notifications.getSmsCampaignMessages(["campaignId": "cmp_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/notifications/sms/campaigns/cmp_1/messages")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/notifications/sms/campaigns/cmp_1/messages")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }

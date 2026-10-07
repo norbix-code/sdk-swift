@@ -37,7 +37,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.enableScheduler()
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/enable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/enable")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
 
@@ -48,7 +48,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.disableScheduler()
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/disable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/disable")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
 
@@ -63,7 +63,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks")
         XCTAssertEqual(
             try query(mock),
             ["type": "EmailCampaign", "enabled": "true", "pageSize": "20"]
@@ -78,7 +78,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.getSchedulerTask(["id": "tsk_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks/tsk_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks/tsk_1")
         XCTAssertEqual(try query(mock), [:])
     }
 
@@ -102,7 +102,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks")
         XCTAssertEqual(try query(mock), [:])
         let expected: [String: Any] = [
             "name": "Weekly digest",
@@ -125,7 +125,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.deleteSchedulerTask(["id": "tsk_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks/tsk_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks/tsk_1")
         XCTAssertEqual(try query(mock), [:])
     }
 
@@ -136,7 +136,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.enableSchedulerTask(["id": "tsk_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks/tsk_1/enable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks/tsk_1/enable")
         XCTAssertEqual(try query(mock), [:])
     }
 
@@ -147,7 +147,7 @@ final class HubSchedulerModuleTests: XCTestCase {
         _ = try await client.scheduler.disableSchedulerTask(["id": "tsk_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/scheduler/tasks/tsk_1/disable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/scheduler/tasks/tsk_1/disable")
         XCTAssertEqual(try query(mock), [:])
     }
 }

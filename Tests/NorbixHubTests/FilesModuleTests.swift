@@ -29,7 +29,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/folder")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/folder")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("path=docs"), "got: \(query)")
@@ -44,7 +44,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs/a.pdf"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/item")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/item")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
     }
 
@@ -59,7 +59,7 @@ final class HubFilesModuleTests: XCTestCase {
             "settings": ["bucket": "b"]
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/integrations/test")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/integrations/test")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
 
         let body = try XCTUnwrap(mock.lastRequest?.httpBody)
@@ -78,7 +78,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs/a.pdf"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/item/public")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/item/public")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
 
         let body = try XCTUnwrap(mock.lastRequest?.httpBody)
@@ -96,7 +96,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs/a.pdf"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/item/private")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/item/private")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
     }
 
@@ -109,7 +109,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/folder/public")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/folder/public")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
     }
 
@@ -122,7 +122,7 @@ final class HubFilesModuleTests: XCTestCase {
             "path": "docs"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/folder/private")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/folder/private")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
     }
 
@@ -150,11 +150,11 @@ final class HubFilesModuleTests: XCTestCase {
         let client = try makeClient(mock)
 
         _ = try await client.files.deleteFilesIntegration(["Id": "nbin_1"])
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/integrations/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/integrations/nbin_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
 
         _ = try await client.files.setFilesIntegrationAsDefault(["Id": "nbin_1"])
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/integrations/nbin_1/default")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/integrations/nbin_1/default")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
     }
 }

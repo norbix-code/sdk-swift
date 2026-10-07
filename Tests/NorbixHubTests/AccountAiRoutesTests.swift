@@ -9,13 +9,13 @@ final class HubAccountAiRoutesTests: XCTestCase {
     private typealias Case = (name: String, verb: String, path: String, call: (NorbixHubClient) async throws -> Void)
 
     private let cases: [Case] = [
-            ("getProjectAiSettings", "GET", "/v2/account/projects/projectId1/ai/settings", { c in _ = try await c.account.getProjectAiSettings(["projectId": "projectId1", "probe": "value"]) }),
-            ("updateProjectAiSettings", "PUT", "/v2/account/projects/projectId1/ai/settings", { c in _ = try await c.account.updateProjectAiSettings(["projectId": "projectId1", "probe": "value"]) }),
-            ("createProjectAiAssistant", "POST", "/v2/account/projects/projectId1/ai/assistants", { c in _ = try await c.account.createProjectAiAssistant(["projectId": "projectId1", "probe": "value"]) }),
-            ("updateProjectAiAssistant", "PUT", "/v2/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.updateProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
-            ("deleteProjectAiAssistant", "DELETE", "/v2/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.deleteProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
-            ("getProjectAiUsage", "GET", "/v2/account/projects/projectId1/ai/usage", { c in _ = try await c.account.getProjectAiUsage(["projectId": "projectId1", "probe": "value"]) }),
-            ("setAdminPortalEnabled", "PUT", "/v2/account/projects/projectId1/admin-portal/enabled", { c in _ = try await c.account.setAdminPortalEnabled(["projectId": "projectId1", "probe": "value"]) }),
+            ("getProjectAiSettings", "GET", "/v3/account/projects/projectId1/ai/settings", { c in _ = try await c.account.getProjectAiSettings(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectAiSettings", "PUT", "/v3/account/projects/projectId1/ai/settings", { c in _ = try await c.account.updateProjectAiSettings(["projectId": "projectId1", "probe": "value"]) }),
+            ("createProjectAiAssistant", "POST", "/v3/account/projects/projectId1/ai/assistants", { c in _ = try await c.account.createProjectAiAssistant(["projectId": "projectId1", "probe": "value"]) }),
+            ("updateProjectAiAssistant", "PUT", "/v3/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.updateProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
+            ("deleteProjectAiAssistant", "DELETE", "/v3/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.deleteProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
+            ("getProjectAiUsage", "GET", "/v3/account/projects/projectId1/ai/usage", { c in _ = try await c.account.getProjectAiUsage(["projectId": "projectId1", "probe": "value"]) }),
+            ("setAdminPortalEnabled", "PUT", "/v3/account/projects/projectId1/admin-portal/enabled", { c in _ = try await c.account.setAdminPortalEnabled(["projectId": "projectId1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {

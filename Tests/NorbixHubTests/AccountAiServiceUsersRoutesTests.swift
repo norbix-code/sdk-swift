@@ -9,11 +9,11 @@ final class HubAccountAiServiceUsersRoutesTests: XCTestCase {
     private typealias Case = (name: String, verb: String, path: String, call: (NorbixHubClient) async throws -> Void)
 
     private let cases: [Case] = [
-            ("createAiServiceUser", "POST", "/v2/account/ai/service-users", { c in _ = try await c.account.createAiServiceUser(["probe": "value"]) }),
-            ("listAiServiceUsers", "GET", "/v2/account/ai/service-users", { c in _ = try await c.account.listAiServiceUsers(["probe": "value"]) }),
-            ("rotateAiServiceUserKey", "POST", "/v2/account/ai/service-users/su1/keys", { c in _ = try await c.account.rotateAiServiceUserKey(["Id": "su1", "probe": "value"]) }),
-            ("revokeAiServiceUserKey", "DELETE", "/v2/account/ai/service-users/su1/keys/key1", { c in _ = try await c.account.revokeAiServiceUserKey(["Id": "su1", "KeyId": "key1", "probe": "value"]) }),
-            ("deleteAiServiceUser", "DELETE", "/v2/account/ai/service-users/su1", { c in _ = try await c.account.deleteAiServiceUser(["Id": "su1", "probe": "value"]) }),
+            ("createAiServiceUser", "POST", "/v3/account/ai/service-users", { c in _ = try await c.account.createAiServiceUser(["probe": "value"]) }),
+            ("listAiServiceUsers", "GET", "/v3/account/ai/service-users", { c in _ = try await c.account.listAiServiceUsers(["probe": "value"]) }),
+            ("rotateAiServiceUserKey", "POST", "/v3/account/ai/service-users/su1/keys", { c in _ = try await c.account.rotateAiServiceUserKey(["Id": "su1", "probe": "value"]) }),
+            ("revokeAiServiceUserKey", "DELETE", "/v3/account/ai/service-users/su1/keys/key1", { c in _ = try await c.account.revokeAiServiceUserKey(["Id": "su1", "KeyId": "key1", "probe": "value"]) }),
+            ("deleteAiServiceUser", "DELETE", "/v3/account/ai/service-users/su1", { c in _ = try await c.account.deleteAiServiceUser(["Id": "su1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {

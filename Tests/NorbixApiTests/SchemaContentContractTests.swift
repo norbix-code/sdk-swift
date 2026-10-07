@@ -48,7 +48,7 @@ final class SchemaContentContractTests: XCTestCase {
         _ = try await client.database.find(["collectionName": "posts", "expandReferences": true])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/posts")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/posts")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
     }
 
@@ -58,7 +58,7 @@ final class SchemaContentContractTests: XCTestCase {
 
         _ = try await client.database.findOne(["collectionName": "posts", "id": "rec_1", "expandReferences": true])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/posts/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/posts/rec_1")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
     }
 
@@ -68,7 +68,7 @@ final class SchemaContentContractTests: XCTestCase {
 
         _ = try await client.database.findOwn(["collectionName": "posts", "expandReferences": true])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/posts/own")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/posts/own")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
     }
 
@@ -130,7 +130,7 @@ final class SchemaContentContractTests: XCTestCase {
             collection: "orders", expandReferences: true, as: Order.self
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
         let order = try XCTUnwrap(page.items.first)
         XCTAssertEqual(order.customer, ExpandedReference(id: "usr_1", display: .text("Jane Doe")))
@@ -164,7 +164,7 @@ final class SchemaContentContractTests: XCTestCase {
             collection: "orders", query: ["filter": "{}"], expandReferences: true, as: Order.self
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/own")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/own")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
         XCTAssertEqual(queryItems(mock)["filter"], "{}")
         XCTAssertEqual(page.items.count, 1)
@@ -181,7 +181,7 @@ final class SchemaContentContractTests: XCTestCase {
             collection: "orders", id: "rec_1", expandReferences: true, as: Order.self
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
         XCTAssertEqual(order.customer.displayText(), "Jane Doe")
     }
@@ -200,7 +200,7 @@ final class SchemaContentContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["update"] as? String, #"{"lines.$[line].qty":3,"address.city":"Vilnius"}"#)
         XCTAssertEqual(json["arrayFilters"] as? String, #"[{"line.sku":"A-1"}]"#)
@@ -218,7 +218,7 @@ final class SchemaContentContractTests: XCTestCase {
             "arrayFilters": "[]"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/many")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["update"] as? String, #"{"lines.$[].qty":1}"#)
         XCTAssertEqual(json["arrayFilters"] as? String, "[]")
@@ -296,7 +296,7 @@ final class SchemaContentContractTests: XCTestCase {
         let details = try await client.files.getFileById(integrationId: "nbin_1", id: "nbfl_7f3")
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/by-id/nbfl_7f3")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/by-id/nbfl_7f3")
         XCTAssertNil(mock.lastRequest?.url?.query, "both ids are path parameters")
         XCTAssertEqual(details.file?.resource.id, "nbfl_7f3")
         XCTAssertEqual(details.file?.resource.originalFileName, "report.pdf")

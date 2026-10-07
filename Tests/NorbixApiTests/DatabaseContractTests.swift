@@ -52,7 +52,7 @@ final class DatabaseContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/books/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/books/many")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["allRecords"] as? Bool, true)
         XCTAssertEqual(json["filter"] as? String, "{}")
@@ -70,7 +70,7 @@ final class DatabaseContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/books/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/books/many")
         let query = queryItems(mock)
         XCTAssertEqual(query["allRecords"], "true")
         XCTAssertEqual(query["filter"], "{}")

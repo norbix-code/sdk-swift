@@ -24,7 +24,7 @@ final class FilesModuleTests: XCTestCase {
         )
 
         XCTAssertEqual(url, "https://provider/put?sig=abc")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/upload-url")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/upload-url")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
 
         let body = try XCTUnwrap(mock.lastRequest?.httpBody)
@@ -65,7 +65,7 @@ final class FilesModuleTests: XCTestCase {
             fileName: "x.pdf"
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/commit")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/commit")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
 
         let body = try XCTUnwrap(mock.lastRequest?.httpBody)
@@ -105,7 +105,7 @@ final class FilesModuleTests: XCTestCase {
 
         let page = try await client.files.list(integrationId: "nbin_1", path: "docs")
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(page.files.count, 1)
         XCTAssertEqual(page.files.first?.resource.id, "nbfl_1")
@@ -149,7 +149,7 @@ final class FilesModuleTests: XCTestCase {
             integrationId: "nbin_1", path: "docs/invoice.pdf"
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/info")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/info")
         XCTAssertEqual(details.file?.resource.id, "nbfl_9")
         // Provider sent as numeric ordinal 1 -> AwsS3.
         XCTAssertEqual(details.file?.provider, .awsS3)
@@ -171,7 +171,7 @@ final class FilesModuleTests: XCTestCase {
         )
 
         XCTAssertEqual(url, "https://provider/get?sig=xyz")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/sign")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/sign")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
     }
 
@@ -186,7 +186,7 @@ final class FilesModuleTests: XCTestCase {
         )
 
         XCTAssertEqual(bytes, raw)
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/download")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/download")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
     }
 
@@ -216,7 +216,7 @@ final class FilesModuleTests: XCTestCase {
 
         try await client.files.delete(integrationId: "nbin_1", path: "docs/x.pdf")
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
     }
 
@@ -229,7 +229,7 @@ final class FilesModuleTests: XCTestCase {
             integrationId: "nbin_1", paths: ["docs/a.pdf", "docs/b.pdf"]
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/bulk")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/bulk")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
         let query = mock.lastRequest?.url?.query ?? ""
         XCTAssertTrue(query.contains("paths"), "expected paths in query, got: \(query)")
@@ -256,7 +256,7 @@ final class FilesModuleTests: XCTestCase {
 
         XCTAssertEqual(mock.capturedRequests.count, 1)
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_1/test")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_1/test")
         XCTAssertNil(mock.lastRequest?.url?.query)
         // Project scope, like the other Api Files calls.
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer k")
@@ -297,7 +297,7 @@ final class FilesModuleTests: XCTestCase {
             XCTAssertEqual(error.status, 400)
             XCTAssertEqual(error.rawBody?.contains("Integration not found"), true)
         }
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/nbin_missing/test")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/nbin_missing/test")
     }
 
     // MARK: - Public links
@@ -324,7 +324,7 @@ final class FilesModuleTests: XCTestCase {
             publicId: "nbpf_abc", name: "report.pdf"
         )
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/public/nbpf_abc/report.pdf")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/public/nbpf_abc/report.pdf")
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(String(data: data, encoding: .utf8), "PDF-BYTES")
     }
@@ -342,7 +342,7 @@ final class FilesModuleTests: XCTestCase {
         // folder-relative name have to survive as slashes.
         XCTAssertEqual(
             mock.lastRequest?.url?.path,
-            "/v2/files/public/nbpf_folder/2026/q1/report.pdf"
+            "/v3/files/public/nbpf_folder/2026/q1/report.pdf"
         )
     }
 
@@ -367,7 +367,7 @@ final class FilesModuleTests: XCTestCase {
         mock.responseBody = Data(#"""
         {"list":{"items":[{"resource":{"id":"nbfl_1","originalFileName":"a.pdf"},
         "integrationId":"nbin_1","provider":"AwsS3","path":"docs/a.pdf",
-        "isPublic":true,"publicUrl":"https://api.norbix.ai/v2/files/public/nbpf_a/a.pdf"}],
+        "isPublic":true,"publicUrl":"https://api.norbix.ai/v3/files/public/nbpf_a/a.pdf"}],
         "hasMore":false}}
         """#.utf8)
         let client = try makeClient(mock)
@@ -377,7 +377,7 @@ final class FilesModuleTests: XCTestCase {
         XCTAssertEqual(page.files.first?.isPublic, true)
         XCTAssertEqual(
             page.files.first?.publicUrl,
-            "https://api.norbix.ai/v2/files/public/nbpf_a/a.pdf"
+            "https://api.norbix.ai/v3/files/public/nbpf_a/a.pdf"
         )
     }
 
@@ -387,7 +387,7 @@ final class FilesModuleTests: XCTestCase {
         {"list":{"items":[],"hasMore":false},
          "folders":["docs","private"],
          "publicFolders":[{"path":"docs","publicId":"nbpf_docs",
-         "publicUrl":"https://api.norbix.ai/v2/files/public/nbpf_docs/","inherited":false}]}
+         "publicUrl":"https://api.norbix.ai/v3/files/public/nbpf_docs/","inherited":false}]}
         """#.utf8)
         let client = try makeClient(mock)
 
