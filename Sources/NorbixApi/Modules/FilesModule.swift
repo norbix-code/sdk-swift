@@ -432,6 +432,38 @@ public final class FilesModule: Sendable {
         )
     }
 
+    /// Get metadata for a single file by its **stable id** — the `nbfl_…` id
+    /// every Files call returns (or its bare UUID).
+    ///
+    /// A file's id is derived from its path inside the integration, so the
+    /// same file has the same id on every listing, in `getInfo`, here, and in
+    /// a record's file field; a moved file has a new id. Use it to show a name
+    /// for a file id stored in a record. Answers the `getInfo` shape; an id no
+    /// file of the integration has is a `404` (file not found).
+    ///
+    /// ```swift
+    /// let details = try await client.files.getFileById(
+    ///     integrationId: "nbin_123", id: "nbfl_7f3…"
+    /// )
+    /// print(details.file?.resource.originalFileName ?? "?")
+    /// ```
+    public func getFileById(
+        integrationId: String,
+        id: String,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> FileDetails {
+        try await transport.send(
+            path: "/{version}/files/{filesIntegrationId}/by-id/{id}",
+            method: "GET",
+            request: ["filesIntegrationId": integrationId, "id": id],
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken,
+            as: FileDetails.self
+        )
+    }
+
     // MARK: - Download
 
     /// Get a pre-signed `GET` URL the client downloads straight from the

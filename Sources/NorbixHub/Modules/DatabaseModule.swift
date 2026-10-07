@@ -464,6 +464,16 @@ public final class DatabaseModule: Sendable {
     /// Finds records in a collection (paginated). Pass `collectionName` and optional `filter`, `sortBy`, `sortOrder`, `pagingArgs`.
     ///
     /// `GET /{version}/database/collections/{collectionName}` · request DTO `FindRecords`.
+    ///
+    /// Pass `"expandReferences": true` to get every reference value (a user, a
+    /// role, a taxonomy term, a record of another collection, a file) as
+    /// `{ id, display }` instead of the bare id — a `multiple` reference as a
+    /// list of them. `display` is the target's `displayField` from the schema,
+    /// `null` when the target is gone. Read a pair out of the untyped answer
+    /// with `ExpandedReference.from(_:)` / `listFrom(_:)` (`NorbixCore`).
+    /// The caller needs read permission on every source the schema links to,
+    /// or the read is refused with `CM-ERRORS-DATABASE-056`. Without the flag
+    /// the answer is exactly what it was before.
     public func findRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}",
@@ -478,6 +488,16 @@ public final class DatabaseModule: Sendable {
     /// Finds one record by `id` in `collectionName`.
     ///
     /// `GET /{version}/database/collections/{collectionName}/{id}` · request DTO `FindOneRecord`.
+    ///
+    /// Pass `"expandReferences": true` to get every reference value (a user, a
+    /// role, a taxonomy term, a record of another collection, a file) as
+    /// `{ id, display }` instead of the bare id — a `multiple` reference as a
+    /// list of them. `display` is the target's `displayField` from the schema,
+    /// `null` when the target is gone. Read a pair out of the untyped answer
+    /// with `ExpandedReference.from(_:)` / `listFrom(_:)` (`NorbixCore`).
+    /// The caller needs read permission on every source the schema links to,
+    /// or the read is refused with `CM-ERRORS-DATABASE-056`. Without the flag
+    /// the answer is exactly what it was before.
     public func findOneRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}/{id}",
@@ -520,6 +540,15 @@ public final class DatabaseModule: Sendable {
     /// Updates one record by `id` with an `update` document.
     ///
     /// `PUT /{version}/database/collections/{collectionName}/{id}` · request DTO `UpdateOneRecord`.
+    ///
+    /// The `update` body is applied with `$set`. Its keys may be dotted paths
+    /// into nested data: `{"address.city": "Vilnius"}`, `{"lines.2.qty": 3}`
+    /// (an element by index), `{"lines.$[].qty": 1}` (every element) or
+    /// `{"lines.$[line].qty": 3}` together with `"arrayFilters"` — a JSON
+    /// array of one filter document per `$[name]` identifier, e.g.
+    /// `[{"line.sku": "A-1"}]`. A malformed or unpaired `arrayFilters`, or
+    /// two keys that overlap (`address` and `address.city`), is refused with
+    /// `CM-ERRORS-DATABASE-014` and a reason in the error context.
     public func updateOneRecord(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}/{id}",
@@ -541,6 +570,15 @@ public final class DatabaseModule: Sendable {
     /// unless the request has `"allRecords": true`. A caller with only
     /// own-record rights changes only the records it owns; soft-deleted
     /// records are skipped. See `docs/database-rules.md`.
+    ///
+    /// The `update` body is applied with `$set`. Its keys may be dotted paths
+    /// into nested data: `{"address.city": "Vilnius"}`, `{"lines.2.qty": 3}`
+    /// (an element by index), `{"lines.$[].qty": 1}` (every element) or
+    /// `{"lines.$[line].qty": 3}` together with `"arrayFilters"` — a JSON
+    /// array of one filter document per `$[name]` identifier, e.g.
+    /// `[{"line.sku": "A-1"}]`. A malformed or unpaired `arrayFilters`, or
+    /// two keys that overlap (`address` and `address.city`), is refused with
+    /// `CM-ERRORS-DATABASE-014` and a reason in the error context.
     public func updateManyRecords(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/collections/{collectionName}/many",
