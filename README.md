@@ -281,6 +281,31 @@ let anon = try NorbixHubClient(projectId: "proj_123")
 _ = try await anon.account.verifyAccount(["accountId": "acc_456", "token": codeFromEmail])
 ```
 
+### 4) Linked records with a typed answer (API)
+
+A record read with `expandReferences: true` answers every reference (a user,
+a role, a taxonomy term, a record of another collection, a file) as
+`{ id, display }`. Declare the field as `ExpandedReference` from `NorbixCore`:
+
+```swift
+import NorbixApi
+import NorbixCore
+
+struct Post: Codable, Sendable {
+    let title: String
+    let author: ExpandedReference
+    let tags: [ExpandedReference]
+}
+
+let page: Page<Post> = try await client.database.find(
+    collection: "posts", expandReferences: true, as: Post.self
+)
+print(page.items[0].author.displayText() ?? "?")   // Jane Doe
+```
+
+More in [API · Database → Linked records](./docs/api/database.md#linked-records--expandreferences)
+and [Files by id](./docs/api/files.md#files-by-id).
+
 ## Authentication
 
 - API key mode: `apiKey` or `NORBIX_API_KEY`
