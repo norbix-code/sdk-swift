@@ -209,6 +209,26 @@ public final class FilesModule: Sendable {
         )
     }
 
+    /// `GET /{version}/files/item/by-id`
+    ///
+    /// Reads one file's record by its **stable id** — the `nbfl_…` id every
+    /// Files call returns (or its bare UUID). The id is derived from the
+    /// file's path inside the integration, so the same file has the same id
+    /// on every listing, in `getFile`, here, and in a record's file field; a
+    /// moved file has a new id. Send `filesIntegrationId` and `id` (both go
+    /// in the query string). Answers the `getFile` shape (`file`, `isPublic`,
+    /// `publicUrl`); an unknown id is a `404`.
+    public func getFileById(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/files/item/by-id",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     // MARK: - Integrations
 
     /// `POST /{version}/files/integrations/test`
