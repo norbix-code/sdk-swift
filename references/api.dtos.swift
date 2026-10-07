@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-06 11:07:11
+Date: 2026-10-07 10:47:09
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -3179,6 +3179,9 @@ public class FindRequest : CodeMashListPaginationRequestBase, IReturn
     // @DataMember
     public var sortOrder:Int?
 
+    // @DataMember
+    public var expandReferences:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -3189,6 +3192,7 @@ public class FindRequest : CodeMashListPaginationRequestBase, IReturn
         case pagingArgs
         case sortBy
         case sortOrder
+        case expandReferences
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3201,6 +3205,7 @@ public class FindRequest : CodeMashListPaginationRequestBase, IReturn
         pagingArgs = try container.decodeIfPresent(PagingArgs.self, forKey: .pagingArgs)
         sortBy = try container.decodeIfPresent(String.self, forKey: .sortBy)
         sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder)
+        expandReferences = try container.decodeIfPresent(Bool.self, forKey: .expandReferences)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3213,6 +3218,7 @@ public class FindRequest : CodeMashListPaginationRequestBase, IReturn
         if pagingArgs != nil { try container.encode(pagingArgs, forKey: .pagingArgs) }
         if sortBy != nil { try container.encode(sortBy, forKey: .sortBy) }
         if sortOrder != nil { try container.encode(sortOrder, forKey: .sortOrder) }
+        if expandReferences != nil { try container.encode(expandReferences, forKey: .expandReferences) }
     }
 }
 
@@ -3235,12 +3241,16 @@ public class FindOneRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var databaseIntegrationId:String?
 
+    // @DataMember
+    public var expandReferences:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case collectionName
         case id
         case databaseIntegrationId
+        case expandReferences
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3249,6 +3259,7 @@ public class FindOneRequest : CodeMashRequestBase, IReturn
         collectionName = try container.decodeIfPresent(String.self, forKey: .collectionName)
         id = try container.decodeIfPresent(String.self, forKey: .id)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+        expandReferences = try container.decodeIfPresent(Bool.self, forKey: .expandReferences)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3257,6 +3268,7 @@ public class FindOneRequest : CodeMashRequestBase, IReturn
         if collectionName != nil { try container.encode(collectionName, forKey: .collectionName) }
         if id != nil { try container.encode(id, forKey: .id) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+        if expandReferences != nil { try container.encode(expandReferences, forKey: .expandReferences) }
     }
 }
 
@@ -3285,6 +3297,13 @@ public class FindOwnRequest : CodeMashListPaginationRequestBase, IReturn
     // @DataMember
     public var pagingArgs:PagingArgs?
 
+    /**
+    * Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids.
+    */
+    // @DataMember
+    // @ApiMember(Description="Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids.")
+    public var expandReferences:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -3293,6 +3312,7 @@ public class FindOwnRequest : CodeMashListPaginationRequestBase, IReturn
         case filter
         case schemaVersion
         case pagingArgs
+        case expandReferences
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3303,6 +3323,7 @@ public class FindOwnRequest : CodeMashListPaginationRequestBase, IReturn
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
         schemaVersion = try container.decodeIfPresent(Int.self, forKey: .schemaVersion)
         pagingArgs = try container.decodeIfPresent(PagingArgs.self, forKey: .pagingArgs)
+        expandReferences = try container.decodeIfPresent(Bool.self, forKey: .expandReferences)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3313,6 +3334,7 @@ public class FindOwnRequest : CodeMashListPaginationRequestBase, IReturn
         if filter != nil { try container.encode(filter, forKey: .filter) }
         if schemaVersion != nil { try container.encode(schemaVersion, forKey: .schemaVersion) }
         if pagingArgs != nil { try container.encode(pagingArgs, forKey: .pagingArgs) }
+        if expandReferences != nil { try container.encode(expandReferences, forKey: .expandReferences) }
     }
 }
 
@@ -3479,6 +3501,9 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var update:String?
 
+    // @DataMember
+    public var arrayFilters:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -3487,6 +3512,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         case filter
         case allRecords
         case update
+        case arrayFilters
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3497,6 +3523,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         filter = try container.decodeIfPresent(String.self, forKey: .filter)
         allRecords = try container.decodeIfPresent(Bool.self, forKey: .allRecords)
         update = try container.decodeIfPresent(String.self, forKey: .update)
+        arrayFilters = try container.decodeIfPresent(String.self, forKey: .arrayFilters)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3507,6 +3534,7 @@ public class UpdateManyRequest : CodeMashRequestBase, IReturn
         if filter != nil { try container.encode(filter, forKey: .filter) }
         if allRecords != nil { try container.encode(allRecords, forKey: .allRecords) }
         if update != nil { try container.encode(update, forKey: .update) }
+        if arrayFilters != nil { try container.encode(arrayFilters, forKey: .arrayFilters) }
     }
 }
 
@@ -3532,6 +3560,9 @@ public class UpdateOneRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var update:String?
 
+    // @DataMember
+    public var arrayFilters:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -3539,6 +3570,7 @@ public class UpdateOneRequest : CodeMashRequestBase, IReturn
         case id
         case databaseIntegrationId
         case update
+        case arrayFilters
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3548,6 +3580,7 @@ public class UpdateOneRequest : CodeMashRequestBase, IReturn
         id = try container.decodeIfPresent(String.self, forKey: .id)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         update = try container.decodeIfPresent(String.self, forKey: .update)
+        arrayFilters = try container.decodeIfPresent(String.self, forKey: .arrayFilters)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3557,6 +3590,7 @@ public class UpdateOneRequest : CodeMashRequestBase, IReturn
         if id != nil { try container.encode(id, forKey: .id) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if update != nil { try container.encode(update, forKey: .update) }
+        if arrayFilters != nil { try container.encode(arrayFilters, forKey: .arrayFilters) }
     }
 }
 
@@ -3815,6 +3849,44 @@ public class DownloadFileApiRequest : CodeMashRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
         if path != nil { try container.encode(path, forKey: .path) }
+    }
+}
+
+/**
+* Files
+*/
+// @Route("/{version}/files/{filesIntegrationId}/by-id/{id}", "GET")
+// @Api(Description="Files")
+// @DataContract
+public class GetFileByIdRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetFileByIdResponse
+
+    // @DataMember
+    public var filesIntegrationId:String?
+
+    // @DataMember
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if id != nil { try container.encode(id, forKey: .id) }
     }
 }
 
@@ -4971,6 +5043,37 @@ public class FindOneResponse : ResponseBase
     }
 }
 
+public class GetFileByIdResponse : ResponseBase
+{
+    public var file:FileResourceRefDto?
+    public var isPublic:Bool?
+    public var publicUrl:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case file
+        case isPublic
+        case publicUrl
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        file = try container.decodeIfPresent(FileResourceRefDto.self, forKey: .file)
+        isPublic = try container.decodeIfPresent(Bool.self, forKey: .isPublic)
+        publicUrl = try container.decodeIfPresent(String.self, forKey: .publicUrl)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if file != nil { try container.encode(file, forKey: .file) }
+        if isPublic != nil { try container.encode(isPublic, forKey: .isPublic) }
+        if publicUrl != nil { try container.encode(publicUrl, forKey: .publicUrl) }
+    }
+}
+
 public class GetFileInfoResponse : ResponseBase
 {
     public var file:FileResourceRefDto?
@@ -5740,6 +5843,9 @@ public class TermTreeDto : Codable
     public var names:[String:String]?
 
     // @DataMember
+    public var slug:String?
+
+    // @DataMember
     public var Description:String?
 
     // @DataMember
@@ -5802,6 +5908,9 @@ public class TermDto : Codable
 
     // @DataMember
     public var names:[String:String]?
+
+    // @DataMember
+    public var slug:String?
 
     // @DataMember
     public var Description:String?
@@ -6262,6 +6371,12 @@ public class StringFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var translateOptions:IReadOnlyDictionary<String, String>?
 
+    // @DataMember
+    public var `default`:String?
+
+    // @DataMember
+    public var unique:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -6270,6 +6385,8 @@ public class StringFieldDto : JsonSchemaFieldDto
         case minLength
         case maxLength
         case translateOptions
+        case `default`
+        case unique
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6280,6 +6397,8 @@ public class StringFieldDto : JsonSchemaFieldDto
         minLength = try container.decodeIfPresent(Int.self, forKey: .minLength)
         maxLength = try container.decodeIfPresent(Int.self, forKey: .maxLength)
         translateOptions = try container.decodeIfPresent(IReadOnlyDictionary<String, String>.self, forKey: .translateOptions)
+        `default` = try container.decodeIfPresent(String.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6290,6 +6409,8 @@ public class StringFieldDto : JsonSchemaFieldDto
         if minLength != nil { try container.encode(minLength, forKey: .minLength) }
         if maxLength != nil { try container.encode(maxLength, forKey: .maxLength) }
         if translateOptions != nil { try container.encode(translateOptions, forKey: .translateOptions) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
     }
 }
 
@@ -6304,12 +6425,20 @@ public class DecimalFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var multipleOf:Double?
 
+    // @DataMember
+    public var `default`:Double?
+
+    // @DataMember
+    public var unique:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case minimum
         case maximum
         case multipleOf
+        case `default`
+        case unique
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6318,6 +6447,8 @@ public class DecimalFieldDto : JsonSchemaFieldDto
         minimum = try container.decodeIfPresent(Double.self, forKey: .minimum)
         maximum = try container.decodeIfPresent(Double.self, forKey: .maximum)
         multipleOf = try container.decodeIfPresent(Double.self, forKey: .multipleOf)
+        `default` = try container.decodeIfPresent(Double.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6326,6 +6457,8 @@ public class DecimalFieldDto : JsonSchemaFieldDto
         if minimum != nil { try container.encode(minimum, forKey: .minimum) }
         if maximum != nil { try container.encode(maximum, forKey: .maximum) }
         if multipleOf != nil { try container.encode(multipleOf, forKey: .multipleOf) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
     }
 }
 
@@ -6334,35 +6467,70 @@ public class CurrencyFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var allowedCurrencies:IReadOnlyList<String>?
 
+    // @DataMember
+    public var multipleOf:Double?
+
+    // @DataMember
+    public var minimum:Double?
+
+    // @DataMember
+    public var maximum:Double?
+
+    // @DataMember
+    public var `default`:CurrencyDefaultDto?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case allowedCurrencies
+        case multipleOf
+        case minimum
+        case maximum
+        case `default`
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         allowedCurrencies = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .allowedCurrencies)
+        multipleOf = try container.decodeIfPresent(Double.self, forKey: .multipleOf)
+        minimum = try container.decodeIfPresent(Double.self, forKey: .minimum)
+        maximum = try container.decodeIfPresent(Double.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(CurrencyDefaultDto.self, forKey: .`default`)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if allowedCurrencies != nil { try container.encode(allowedCurrencies, forKey: .allowedCurrencies) }
+        if multipleOf != nil { try container.encode(multipleOf, forKey: .multipleOf) }
+        if minimum != nil { try container.encode(minimum, forKey: .minimum) }
+        if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
     }
 }
 
 public class BooleanFieldDto : JsonSchemaFieldDto
 {
+    // @DataMember
+    public var `default`:Bool?
+
     required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case `default`
+    }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        `default` = try container.decodeIfPresent(Bool.self, forKey: .`default`)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
     }
 }
 
@@ -6374,11 +6542,15 @@ public class DateFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var maximum:Int?
 
+    // @DataMember
+    public var `default`:Int?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case minimum
         case maximum
+        case `default`
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6386,6 +6558,7 @@ public class DateFieldDto : JsonSchemaFieldDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         minimum = try container.decodeIfPresent(Int.self, forKey: .minimum)
         maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(Int.self, forKey: .`default`)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6393,6 +6566,7 @@ public class DateFieldDto : JsonSchemaFieldDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if minimum != nil { try container.encode(minimum, forKey: .minimum) }
         if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
     }
 }
 
@@ -6404,11 +6578,19 @@ public class IntegerFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var maximum:Int?
 
+    // @DataMember
+    public var `default`:Int?
+
+    // @DataMember
+    public var unique:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case minimum
         case maximum
+        case `default`
+        case unique
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6416,6 +6598,8 @@ public class IntegerFieldDto : JsonSchemaFieldDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         minimum = try container.decodeIfPresent(Int.self, forKey: .minimum)
         maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(Int.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6423,6 +6607,8 @@ public class IntegerFieldDto : JsonSchemaFieldDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if minimum != nil { try container.encode(minimum, forKey: .minimum) }
         if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
     }
 }
 
@@ -6452,14 +6638,37 @@ public class GeolocationFieldDto : JsonSchemaFieldDto
 
 public class TagsFieldDto : JsonSchemaFieldDto
 {
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var `default`:IReadOnlyList<String>?
+
     required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case minItems
+        case maxItems
+        case `default`
+    }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        `default` = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .`default`)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
     }
 }
 
@@ -6468,22 +6677,46 @@ public class FileFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var storages:IReadOnlyList<String>?
 
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var allowedFileType:String?
+
+    // @DataMember
+    public var maxSizeMb:Double?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case storages
+        case minItems
+        case maxItems
+        case allowedFileType
+        case maxSizeMb
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         storages = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .storages)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        allowedFileType = try container.decodeIfPresent(String.self, forKey: .allowedFileType)
+        maxSizeMb = try container.decodeIfPresent(Double.self, forKey: .maxSizeMb)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if storages != nil { try container.encode(storages, forKey: .storages) }
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if allowedFileType != nil { try container.encode(allowedFileType, forKey: .allowedFileType) }
+        if maxSizeMb != nil { try container.encode(maxSizeMb, forKey: .maxSizeMb) }
     }
 }
 
@@ -6495,11 +6728,15 @@ public class TaxonomySelectionFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var multiple:Bool?
 
+    // @DataMember
+    public var displayField:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case taxonomyId
         case multiple
+        case displayField
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6507,6 +6744,7 @@ public class TaxonomySelectionFieldDto : JsonSchemaFieldDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         taxonomyId = try container.decodeIfPresent(String.self, forKey: .taxonomyId)
         multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6514,6 +6752,7 @@ public class TaxonomySelectionFieldDto : JsonSchemaFieldDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if taxonomyId != nil { try container.encode(taxonomyId, forKey: .taxonomyId) }
         if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
     }
 }
 
@@ -6558,22 +6797,28 @@ public class UserSelectionFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var multiple:Bool?
 
+    // @DataMember
+    public var displayField:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case multiple
+        case displayField
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
     }
 }
 
@@ -6582,22 +6827,28 @@ public class RoleSelectionFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var multiple:Bool?
 
+    // @DataMember
+    public var displayField:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case multiple
+        case displayField
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
     }
 }
 
@@ -6609,11 +6860,15 @@ public class EnumSelectionFieldDto : JsonSchemaFieldDto
     // @DataMember
     public var multiple:Bool?
 
+    // @DataMember
+    public var `default`:IReadOnlyList<String>?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case values
         case multiple
+        case `default`
     }
 
     required public init(from decoder: Decoder) throws {
@@ -6621,6 +6876,7 @@ public class EnumSelectionFieldDto : JsonSchemaFieldDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         values = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .values)
         multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        `default` = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .`default`)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -6628,6 +6884,103 @@ public class EnumSelectionFieldDto : JsonSchemaFieldDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if values != nil { try container.encode(values, forKey: .values) }
         if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class ObjectFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var properties:IReadOnlyList<JsonSchemaFieldDto>?
+
+    // @DataMember
+    public var required:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case properties
+        case required
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        properties = try container.decodeIfPresent(IReadOnlyList<JsonSchemaFieldDto>.self, forKey: .properties)
+        required = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .required)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if properties != nil { try container.encode(properties, forKey: .properties) }
+        if required != nil { try container.encode(required, forKey: .required) }
+    }
+}
+
+public class ArrayFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var items:JsonSchemaFieldDto?
+
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var uniqueItems:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case items
+        case minItems
+        case maxItems
+        case uniqueItems
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decodeIfPresent(JsonSchemaFieldDto.self, forKey: .items)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if items != nil { try container.encode(items, forKey: .items) }
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if uniqueItems != nil { try container.encode(uniqueItems, forKey: .uniqueItems) }
+    }
+}
+
+public class JsonFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var maxBytes:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case maxBytes
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        maxBytes = try container.decodeIfPresent(Int.self, forKey: .maxBytes)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if maxBytes != nil { try container.encode(maxBytes, forKey: .maxBytes) }
     }
 }
 
@@ -6640,6 +6993,17 @@ public enum TriggerActionType : String, Codable
     case WebhookCall
     case SseCall
     case Marketplace
+}
+
+public class CurrencyDefaultDto : Codable
+{
+    // @DataMember
+    public var value:Double?
+
+    // @DataMember
+    public var currency:String?
+
+    required public init(){}
 }
 
 
