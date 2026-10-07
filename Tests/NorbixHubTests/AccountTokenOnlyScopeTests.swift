@@ -33,143 +33,143 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
     }
 
     func testGetAccountProfileWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/profile") { try await $0.account.getAccountProfile() }
+        try await check("GET", "/v3/account/profile") { try await $0.account.getAccountProfile() }
     }
 
     func testUpdateAccountProfileWorksWithATokenAndNoAccountId() async throws {
-        try await check("PUT", "/v2/account/profile") { try await $0.account.updateAccountProfile() }
+        try await check("PUT", "/v3/account/profile") { try await $0.account.updateAccountProfile() }
     }
 
     func testGetMyAccountUserProfileWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/me") { try await $0.account.getMyAccountUserProfile() }
+        try await check("GET", "/v3/account/me") { try await $0.account.getMyAccountUserProfile() }
     }
 
     func testUpdateMyAccountUserPhoneWorksWithATokenAndNoAccountId() async throws {
-        try await check("PUT", "/v2/account/me/phone") { try await $0.account.updateMyAccountUserPhone(["phone": "+37060000000"]) }
+        try await check("PUT", "/v3/account/me/phone") { try await $0.account.updateMyAccountUserPhone(["phone": "+37060000000"]) }
     }
 
     func testResendAccountVerificationTokenWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/verify/resend") { try await $0.account.resendAccountVerificationToken() }
+        try await check("GET", "/v3/account/verify/resend") { try await $0.account.resendAccountVerificationToken() }
     }
 
     func testGetAccountStatusWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/status") { try await $0.account.getAccountStatus() }
+        try await check("GET", "/v3/account/status") { try await $0.account.getAccountStatus() }
     }
 
     func testCreateStripeCheckoutSessionWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/stripe/create-checkout-session") { try await $0.account.createStripeCheckoutSession() }
+        try await check("POST", "/v3/account/stripe/create-checkout-session") { try await $0.account.createStripeCheckoutSession() }
     }
 
     func testGetStripeBillingPortalUrlWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/stripe/get-portal-url") { try await $0.account.getStripeBillingPortalUrl() }
+        try await check("POST", "/v3/account/stripe/get-portal-url") { try await $0.account.getStripeBillingPortalUrl() }
     }
 
     func testDeleteNotificationsGroupWorksWithATokenAndNoAccountId() async throws {
-        try await check("DELETE", "/v2/account/projects/proj_1/notifications/settings/group") { try await $0.account.deleteNotificationsGroup(p) }
+        try await check("DELETE", "/v3/account/projects/proj_1/notifications/settings/group") { try await $0.account.deleteNotificationsGroup(p) }
     }
 
     func testDeleteNotificationsTagWorksWithATokenAndNoAccountId() async throws {
-        try await check("DELETE", "/v2/account/projects/proj_1/notifications/settings/tag") { try await $0.account.deleteNotificationsTag(p) }
+        try await check("DELETE", "/v3/account/projects/proj_1/notifications/settings/tag") { try await $0.account.deleteNotificationsTag(p) }
     }
 
     func testRemoveTagFromNotificationsGroupWorksWithATokenAndNoAccountId() async throws {
-        try await check("DELETE", "/v2/account/projects/proj_1/notifications/settings/group/tag") { try await $0.account.removeTagFromNotificationsGroup(p) }
+        try await check("DELETE", "/v3/account/projects/proj_1/notifications/settings/group/tag") { try await $0.account.removeTagFromNotificationsGroup(p) }
     }
 
     func testSaveNotificationsGroupWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/projects/proj_1/notifications/settings/group") { try await $0.account.saveNotificationsGroup(p) }
+        try await check("POST", "/v3/account/projects/proj_1/notifications/settings/group") { try await $0.account.saveNotificationsGroup(p) }
     }
 
     func testSaveNotificationsTagWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/projects/proj_1/notifications/settings/tag") { try await $0.account.saveNotificationsTag(p) }
+        try await check("POST", "/v3/account/projects/proj_1/notifications/settings/tag") { try await $0.account.saveNotificationsTag(p) }
     }
 
     func testCreateProjectWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/projects") { try await $0.account.createProject() }
+        try await check("POST", "/v3/account/projects") { try await $0.account.createProject() }
     }
 
     func testDeleteProjectWorksWithATokenAndNoAccountId() async throws {
-        try await check("DELETE", "/v2/account/projects/proj_1") { try await $0.account.deleteProject(p) }
+        try await check("DELETE", "/v3/account/projects/proj_1") { try await $0.account.deleteProject(p) }
     }
 
     func testGetProjectWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/projects/proj_1") { try await $0.account.getProject(p) }
+        try await check("GET", "/v3/account/projects/proj_1") { try await $0.account.getProject(p) }
     }
 
     func testGetProjectsWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/projects") { try await $0.account.getProjects() }
+        try await check("GET", "/v3/account/projects") { try await $0.account.getProjects() }
     }
 
     func testGetProjectTokensWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/projects/proj_1/tokens") { try await $0.account.getProjectTokens(p) }
+        try await check("GET", "/v3/account/projects/proj_1/tokens") { try await $0.account.getProjectTokens(p) }
     }
 
     func testUpdateProjectAccentColorWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/accent-color") { try await $0.account.updateProjectAccentColor(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/accent-color") { try await $0.account.updateProjectAccentColor(p) }
     }
 
     func testUpdateProjectIconWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/icon") { try await $0.account.updateProjectIcon(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/icon") { try await $0.account.updateProjectIcon(p) }
     }
 
     func testUpdateProjectLogoWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/logo") { try await $0.account.updateProjectLogo(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/logo") { try await $0.account.updateProjectLogo(p) }
     }
 
     func testUpdateProjectMainColorWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/main-color") { try await $0.account.updateProjectMainColor(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/main-color") { try await $0.account.updateProjectMainColor(p) }
     }
 
     func testUpdateProjectAllowedOriginsWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/origins") { try await $0.account.updateProjectAllowedOrigins(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/origins") { try await $0.account.updateProjectAllowedOrigins(p) }
     }
 
     func testUpdateProjectDefaultLanguageWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/default-language") { try await $0.account.updateProjectDefaultLanguage(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/default-language") { try await $0.account.updateProjectDefaultLanguage(p) }
     }
 
     func testUpdateProjectDescriptionWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/description") { try await $0.account.updateProjectDescription(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/description") { try await $0.account.updateProjectDescription(p) }
     }
 
     func testDisableProjectWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/disable") { try await $0.account.disableProject(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/disable") { try await $0.account.disableProject(p) }
     }
 
     func testEnableProjectWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/enable") { try await $0.account.enableProject(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/enable") { try await $0.account.enableProject(p) }
     }
 
     func testUpdateProjectLanguagesWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/languages") { try await $0.account.updateProjectLanguages(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/languages") { try await $0.account.updateProjectLanguages(p) }
     }
 
     func testUpdateProjectUrlWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/url") { try await $0.account.updateProjectUrl(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/url") { try await $0.account.updateProjectUrl(p) }
     }
 
     func testUpdateProjectNameWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/name") { try await $0.account.updateProjectName(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/name") { try await $0.account.updateProjectName(p) }
     }
 
     func testUpdateProjectRegionsWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/regions") { try await $0.account.updateProjectRegions(p) }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/regions") { try await $0.account.updateProjectRegions(p) }
     }
 
     func testGetAccountCollaboratorsWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/collaborators") { try await $0.account.getAccountCollaborators() }
+        try await check("GET", "/v3/account/collaborators") { try await $0.account.getAccountCollaborators() }
     }
 
     func testSendInviteToTeamMemberWorksWithATokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/team/member/invite") { try await $0.account.sendInviteToTeamMember() }
+        try await check("POST", "/v3/account/team/member/invite") { try await $0.account.sendInviteToTeamMember() }
     }
 
     func testGetLicensesWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/licenses") { try await $0.account.getLicenses() }
+        try await check("GET", "/v3/account/licenses") { try await $0.account.getLicenses() }
     }
 
     func testRegionsUpdateProjectRegionsWorksWithATokenAndNoAccountId() async throws {
-        try await check("PATCH", "/v2/account/projects/proj_1/settings/regions") { try await $0.regions.updateProjectRegions(projectId: "proj_1", primaryRegion: "nb-eu-germany") }
+        try await check("PATCH", "/v3/account/projects/proj_1/settings/regions") { try await $0.regions.updateProjectRegions(projectId: "proj_1", primaryRegion: "nb-eu-germany") }
     }
 }
 
@@ -218,25 +218,25 @@ final class HubAccountNoTokenScopeTests: XCTestCase {
     }
 
     func testCreateAccountWorksWithNoTokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account") { try await $0.account.createAccount(["email": "a@b.io"]) }
+        try await check("POST", "/v3/account") { try await $0.account.createAccount(["email": "a@b.io"]) }
     }
 
     func testCreateTeamMemberFromInvitationWorksWithNoTokenAndNoAccountId() async throws {
-        try await check("POST", "/v2/account/team/member") { try await $0.account.createTeamMemberFromInvitation(["token": "inv"]) }
+        try await check("POST", "/v3/account/team/member") { try await $0.account.createTeamMemberFromInvitation(["token": "inv"]) }
     }
 
     func testGetAccountRegionsWorksWithNoTokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/regions") { try await $0.account.getAccountRegions() }
+        try await check("GET", "/v3/account/regions") { try await $0.account.getAccountRegions() }
     }
 
     func testRegionsGetAccountRegionsWorksWithNoTokenAndNoAccountId() async throws {
-        try await check("GET", "/v2/account/regions") { try await $0.regions.getAccountRegions([:]) }
+        try await check("GET", "/v3/account/regions") { try await $0.regions.getAccountRegions([:]) }
     }
 
     func testVerifyAccountWorksWithNoTokenAndSendsTheAccountIdInTheQuery() async throws {
         let request = try await send { try await $0.account.verifyAccount(["accountId": "acc_1", "token": "t1"]) }
         XCTAssertEqual(request.httpMethod, "GET")
-        XCTAssertEqual(request.url?.path, "/v2/account/verify")
+        XCTAssertEqual(request.url?.path, "/v3/account/verify")
         let query = URLComponents(url: try XCTUnwrap(request.url), resolvingAgainstBaseURL: false)?.queryItems ?? []
         XCTAssertEqual(query.first { $0.name == "accountId" }?.value, "acc_1")
         XCTAssertEqual(query.first { $0.name == "token" }?.value, "t1")

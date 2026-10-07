@@ -9,12 +9,12 @@ final class HubAiEmbeddingRoutesTests: XCTestCase {
     private typealias Case = (name: String, verb: String, path: String, call: (NorbixHubClient) async throws -> Void)
 
     private let cases: [Case] = [
-            ("getEmbeddingIntegrations", "GET", "/v2/ai/integrations/embeddings", { c in _ = try await c.ai.getEmbeddingIntegrations(["probe": "value"]) }),
-            ("saveEmbeddingIntegration", "POST", "/v2/ai/integrations/embeddings", { c in _ = try await c.ai.saveEmbeddingIntegration(["probe": "value"]) }),
-            ("getEmbeddingIntegration", "GET", "/v2/ai/integrations/embeddings/id1", { c in _ = try await c.ai.getEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
-            ("deleteEmbeddingIntegration", "DELETE", "/v2/ai/integrations/embeddings/id1", { c in _ = try await c.ai.deleteEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
-            ("testEmbeddingIntegration", "POST", "/v2/ai/integrations/embeddings/id1/test", { c in _ = try await c.ai.testEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
-            ("setLlmIntegrationAsDefault", "PUT", "/v2/ai/integrations/llms/id1/default", { c in _ = try await c.ai.setLlmIntegrationAsDefault(["Id": "id1", "probe": "value"]) }),
+            ("getEmbeddingIntegrations", "GET", "/v3/ai/integrations/embeddings", { c in _ = try await c.ai.getEmbeddingIntegrations(["probe": "value"]) }),
+            ("saveEmbeddingIntegration", "POST", "/v3/ai/integrations/embeddings", { c in _ = try await c.ai.saveEmbeddingIntegration(["probe": "value"]) }),
+            ("getEmbeddingIntegration", "GET", "/v3/ai/integrations/embeddings/id1", { c in _ = try await c.ai.getEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
+            ("deleteEmbeddingIntegration", "DELETE", "/v3/ai/integrations/embeddings/id1", { c in _ = try await c.ai.deleteEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
+            ("testEmbeddingIntegration", "POST", "/v3/ai/integrations/embeddings/id1/test", { c in _ = try await c.ai.testEmbeddingIntegration(["Id": "id1", "probe": "value"]) }),
+            ("setLlmIntegrationAsDefault", "PUT", "/v3/ai/integrations/llms/id1/default", { c in _ = try await c.ai.setLlmIntegrationAsDefault(["Id": "id1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {

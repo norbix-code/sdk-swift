@@ -48,7 +48,7 @@ final class HubSchemaContentContractTests: XCTestCase {
         _ = try await client.database.findRecords(["collectionName": "posts", "expandReferences": true])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/posts")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/posts")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
     }
 
@@ -62,7 +62,7 @@ final class HubSchemaContentContractTests: XCTestCase {
 
         let answer = try await client.database.findOneRecord(["collectionName": "posts", "id": "rec_1", "expandReferences": true])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/posts/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/posts/rec_1")
         XCTAssertEqual(queryItems(mock)["expandReferences"], "true")
         let record = try XCTUnwrap((answer as? [String: Any])?["result"] as? [String: Any])
         XCTAssertEqual(ExpandedReference.from(record["author"])?.displayText(), "Jane Doe")
@@ -82,7 +82,7 @@ final class HubSchemaContentContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["update"] as? String, #"{"lines.$[line].qty":3}"#)
         XCTAssertEqual(json["arrayFilters"] as? String, #"[{"line.sku":"A-1"}]"#)
@@ -99,7 +99,7 @@ final class HubSchemaContentContractTests: XCTestCase {
             "arrayFilters": "[]"
         ])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/many")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["arrayFilters"] as? String, "[]")
         XCTAssertEqual(json["update"] as? String, #"{"lines.$[].qty":1,"address.city":"Vilnius"}"#)
@@ -134,7 +134,7 @@ final class HubSchemaContentContractTests: XCTestCase {
         _ = try await client.database.saveDatabaseSchema(["collectionName": "orders", "dataSchema": dataSchema])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/schemas")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/schemas")
         XCTAssertEqual(try bodyJSON(mock)["dataSchema"] as? String, dataSchema)
     }
 
@@ -180,7 +180,7 @@ final class HubSchemaContentContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/txn_1/terms")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/txn_1/terms")
         XCTAssertEqual(try bodyJSON(mock)["document"] as? String, #"{"name":"France","slug":"fr","order":1}"#)
         let term = try XCTUnwrap((answer as? [String: Any])?["result"] as? [String: Any])
         XCTAssertEqual(term["slug"] as? String, "fr")
@@ -211,7 +211,7 @@ final class HubSchemaContentContractTests: XCTestCase {
         let answer = try await client.files.getFileById(["filesIntegrationId": "nbin_1", "id": "nbfl_7f3"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/files/item/by-id")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/files/item/by-id")
         XCTAssertEqual(queryItems(mock)["filesIntegrationId"], "nbin_1")
         XCTAssertEqual(queryItems(mock)["id"], "nbfl_7f3")
         XCTAssertNil(mock.lastRequest?.httpBody)

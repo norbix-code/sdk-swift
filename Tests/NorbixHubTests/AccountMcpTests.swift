@@ -20,7 +20,7 @@ final class HubAccountMcpTests: XCTestCase {
 
         let req = try XCTUnwrap(mock.lastRequest)
         XCTAssertEqual(req.httpMethod, "POST")
-        XCTAssertEqual(req.url?.path, "/v2/account/mcp")
+        XCTAssertEqual(req.url?.path, "/v3/account/mcp")
         XCTAssertEqual(URLComponents(url: req.url!, resolvingAgainstBaseURL: false)?.queryItems?.first?.value, "ai:campaigns")
         XCTAssertEqual(req.value(forHTTPHeaderField: "Accept"), "application/json, text/event-stream")
         XCTAssertEqual(req.value(forHTTPHeaderField: "Authorization"), "Bearer token")
@@ -53,7 +53,7 @@ final class HubAccountMcpTests: XCTestCase {
 
         let req = try XCTUnwrap(mock.lastRequest)
         XCTAssertEqual(req.httpMethod, "GET")
-        XCTAssertEqual(req.url?.path, "/v2/account/mcp")
+        XCTAssertEqual(req.url?.path, "/v3/account/mcp")
         XCTAssertEqual(req.value(forHTTPHeaderField: "Accept"), "text/event-stream")
         XCTAssertEqual(req.value(forHTTPHeaderField: "Mcp-Session-Id"), "sess_1")
         XCTAssertEqual(req.value(forHTTPHeaderField: "Last-Event-ID"), "ev_9")
@@ -68,7 +68,7 @@ final class HubAccountMcpTests: XCTestCase {
         _ = try await client.account.endMcpSession(sessionId: "sess_1")
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/account/mcp")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/account/mcp")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Mcp-Session-Id"), "sess_1")
     }
 

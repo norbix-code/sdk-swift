@@ -18,7 +18,7 @@ final class HubAccountMeRoutesTests: XCTestCase {
         _ = try await client.account.getMyAccountUserProfile()
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/account/me")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/account/me")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
     }
 
@@ -29,7 +29,7 @@ final class HubAccountMeRoutesTests: XCTestCase {
         _ = try await client.account.updateMyAccountUserPhone(["phone": "+37060000000"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/account/me/phone")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/account/me/phone")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token")
         let data = try XCTUnwrap(mock.lastRequest?.httpBody)
         let body = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])

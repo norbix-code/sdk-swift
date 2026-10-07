@@ -6,8 +6,8 @@ public enum NorbixDefaults {
     public static let apiBaseUrl = "https://api.norbix.ai"
     /// Production Hub endpoint (`https://hub.norbix.ai`).
     public static let hubBaseUrl = "https://hub.norbix.ai"
-    public static let apiVersion = "v2"
-    public static let hubVersion = "v2"
+    public static let apiVersion = "v3"
+    public static let hubVersion = "v3"
     public static let timeout: TimeInterval = 30.0
 
     /// Composes the regional variant of an SDK-default base URL by prefixing

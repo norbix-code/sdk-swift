@@ -53,7 +53,7 @@ final class HubDatabaseContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/books/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/books/many")
         let json = try bodyJSON(mock)
         XCTAssertEqual(json["allRecords"] as? Bool, true)
         XCTAssertNil(json["collectionName"], "path parameter collectionName leaked into the body")
@@ -70,7 +70,7 @@ final class HubDatabaseContractTests: XCTestCase {
         ])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/books/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/books/many")
         XCTAssertEqual(queryItems(mock)["allRecords"], "true")
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
@@ -85,7 +85,7 @@ final class HubDatabaseContractTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-env"), "TEST")
 
         _ = try await client.database.disableSchemaTrigger(["triggerId": "trg_1"])
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/schemas/triggers/trg_1/disable")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/schemas/triggers/trg_1/disable")
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-env"), "TEST")
     }
 
@@ -145,7 +145,7 @@ final class HubDatabaseContractTests: XCTestCase {
 
         let res = try await client.database.getDatabaseAggregate(["Id": "agg_1"])
 
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/aggregates/agg_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/aggregates/agg_1")
         let result = try XCTUnwrap((res as? [String: Any])?["result"] as? [String: Any])
         XCTAssertEqual(result["joinedCollections"] as? [String], ["authors", "publishers"])
     }
@@ -203,6 +203,6 @@ final class HubDatabaseContractTests: XCTestCase {
         } catch let error as NorbixError {
             XCTAssertEqual(error.httpStatus, 403)
         }
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/aggregates/test")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/aggregates/test")
     }
 }

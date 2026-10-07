@@ -45,7 +45,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findTerms(["taxonomyName": "services", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/services/terms")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/services/terms")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("taxonomyName"), "path parameter taxonomyName leaked into the query")
     }
@@ -57,7 +57,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findTermsChildren(["taxonomyName": "services", "parentId": "term_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/services/terms/term_1/children")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/services/terms/term_1/children")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("taxonomyName"), "path parameter taxonomyName leaked into the query")
         XCTAssertFalse(queryNames(mock).contains("parentId"), "path parameter parentId leaked into the query")
@@ -70,7 +70,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findTermTree(["taxonomyName": "services", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/services/terms/tree")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/services/terms/tree")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("taxonomyName"), "path parameter taxonomyName leaked into the query")
     }
@@ -82,7 +82,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findTaxonomyTree(["databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/tree")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/tree")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
     }
 
@@ -93,7 +93,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.getDatabaseSchema(["id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/schemas/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/schemas/rec_1")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("id"), "path parameter id leaked into the query")
     }
@@ -105,7 +105,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.getDatabaseSchemas(["databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/schemas")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/schemas")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
     }
 
@@ -116,7 +116,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.aggregate(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/aggregate")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/aggregate")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -127,7 +127,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.changeResponsibility(["collectionName": "orders", "id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1/responsibility")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1/responsibility")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -138,7 +138,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.count(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/count")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/count")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
     }
@@ -150,7 +150,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.deleteMany(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/many")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
     }
@@ -162,7 +162,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.deleteOne(["collectionName": "orders", "id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "DELETE")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
         XCTAssertFalse(queryNames(mock).contains("id"), "path parameter id leaked into the query")
@@ -175,7 +175,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.distinct(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/distinct")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/distinct")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
     }
@@ -187,7 +187,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.executeAggregate(["collectionName": "orders", "aggregateId": "agg_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/aggregates/agg_1/execute")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/aggregates/agg_1/execute")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -198,7 +198,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.find(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
     }
@@ -210,7 +210,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findOne(["collectionName": "orders", "id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
         XCTAssertFalse(queryNames(mock).contains("id"), "path parameter id leaked into the query")
@@ -223,7 +223,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.insertMany(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/many")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -234,7 +234,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.insertOne(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -245,7 +245,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.replaceOne(["collectionName": "orders", "id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1/replace")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1/replace")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -256,7 +256,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.updateMany(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/many")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/many")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -267,7 +267,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.updateOne(["collectionName": "orders", "id": "rec_1", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/rec_1")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/rec_1")
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
@@ -278,7 +278,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findOwn(["collectionName": "orders", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/collections/orders/own")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/collections/orders/own")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("collectionName"), "path parameter collectionName leaked into the query")
     }
@@ -290,7 +290,7 @@ final class DatabaseModuleTests: XCTestCase {
         _ = try await client.database.findMergedTermTree(["taxonomyName": "services", "databaseIntegrationId": "dbi_1"])
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/database/taxonomies/services/merged-tree")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/taxonomies/services/merged-tree")
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
         XCTAssertFalse(queryNames(mock).contains("taxonomyName"), "path parameter taxonomyName leaked into the query")
     }

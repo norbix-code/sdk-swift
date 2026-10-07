@@ -17,7 +17,7 @@ final class PublicProjectsModuleTests: XCTestCase {
         let res = try await client.publicProjects.getPublicProjectConfig(projectId: "p1")
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/public/projects/p1/config")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/public/projects/p1/config")
         XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"),
                      "the public config must be readable before sign-in")
         XCTAssertEqual((res as? [String: Any])?["displayName"] as? String, "Shop")
@@ -31,7 +31,7 @@ final class PublicProjectsModuleTests: XCTestCase {
         _ = try await client.publicProjects.getPublicProjectLegal(projectId: "p1", kind: "terms")
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v2/public/projects/p1/legal/terms")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/public/projects/p1/legal/terms")
         XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"),
                      "a legal page link must work without signing in")
     }
