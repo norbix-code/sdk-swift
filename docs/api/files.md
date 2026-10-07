@@ -15,6 +15,7 @@ and are addressed by a **path** inside that integration's storage.
 | `deleteMany` | `DELETE` | `/{version}/files/{filesIntegrationId}/bulk` | `project` |
 | `testFilesIntegration` | `POST` | `/{version}/files/{filesIntegrationId}/test` | `project` |
 | `getPublicFile` | `GET` | `/{version}/files/public/{PublicId}/{Name*}` | `unauthenticated` |
+| `getFileById` | `GET` | `/{version}/files/{filesIntegrationId}/by-id/{id}` | `project` |
 
 ## Uploading
 
@@ -29,6 +30,23 @@ Norbix:
 
 Use `getSignedUrl(...)` to download straight from the provider, or
 `download(...)` to stream the bytes through the API.
+
+## Files by id
+
+Every Files call returns a file with a **stable id** (`nbfl_…`): it is derived
+from the file's path inside the integration, so the same file has the same id
+on every listing, in `getInfo`, and in a record's file field (a moved file has
+a new id). `getFileById(integrationId:id:)` reads one file by that id — use it
+to show a name for a file id stored in a record. It answers the `getInfo`
+shape (`FileDetails`).
+
+```swift
+let details = try await client.files.getFileById(integrationId: "nbin_123", id: "nbfl_7f3…")
+print(details.file?.resource.originalFileName ?? "?", details.isPublic ?? false)
+```
+
+An id no file of the integration has is a plain `404` (file not found). A
+record's file field accepts the `nbfl_…` id or its bare UUID.
 
 ## Testing an integration
 

@@ -8,6 +8,6 @@
 | [`auth`](./auth.md) | 1 |
 | [`database`](./database.md) | 22 |
 | [`echo`](./echo.md) | 1 |
-| [`files`](./files.md) | 8 |
+| [`files`](./files.md) | 9 |
 | [`membership`](./membership.md) | 18 |
 | [`public_projects`](./public_projects.md) | 2 |

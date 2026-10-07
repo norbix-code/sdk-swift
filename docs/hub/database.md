@@ -114,6 +114,20 @@ The update body holds the plain fields to set. `$` operators (`$set`,
 `CM-ERRORS-DATABASE-037` unless you send `"allRecords": true`. All the rules
 and their error codes: [Database — rules the gateway checks](../database-rules.md).
 
+- `findRecords` / `findOneRecord` take `"expandReferences": true` and answer
+  every reference as `{ id, display }` (`ExpandedReference.from(_:)` in
+  `NorbixCore` reads a pair); a linked source the caller may not read →
+  `CM-ERRORS-DATABASE-056`. Full story in
+  [API · Database → Linked records](../api/database.md#linked-records--expandreferences).
+- `updateOneRecord` / `updateManyRecords` take dotted paths in `update`
+  (`{"address.city":"Vilnius"}`, `{"lines.$[line].qty":3}`) and `arrayFilters`
+  (`[{"line.sku":"A-1"}]`); a bad pairing → `CM-ERRORS-DATABASE-014`.
+- Record validation refusals are one code per keyword: `CM-ERRORS-DATABASE-039`
+  … `049` (context `Keyword`, `FieldName` = full path), `050` … `054` for a
+  reference whose target does not exist (`MissingId`), `055` for a target that
+  cannot be read. Full table in
+  [Database — rules the gateway checks](../database-rules.md).
+
 Every record method also accepts an optional `databaseIntegrationId` to
 target a non-default database.
 
