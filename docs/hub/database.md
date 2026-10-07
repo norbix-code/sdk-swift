@@ -61,6 +61,7 @@
 | `seedCollectionRecords` | `POST` | `/{version}/database/collections/seed` | `project` |
 | `applyDatabaseSchemaBundle` | `POST` | `/{version}/database/schemas/apply-bundle` | `project` |
 | `updateDatabaseSchemaEmbed` | `PUT` | `/{version}/database/schemas/{Id}/embed` | `project` |
+| `getDatabaseSchemaIndexStatus` | `GET` | `/{version}/database/schemas/{Id}/index-status` | `project` |
 | `getDatabaseSchemaListSettings` | `GET` | `/{version}/database/schemas/{Id}/list-settings` | `project` |
 | `updateDatabaseSchemaListSettings` | `PUT` | `/{version}/database/schemas/{Id}/list-settings` | `project` |
 | `getDatabaseTaxonomyTree` | `GET` | `/{version}/database/taxonomies/tree` | `project` |

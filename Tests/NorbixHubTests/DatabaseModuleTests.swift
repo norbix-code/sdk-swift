@@ -716,6 +716,17 @@ final class HubDatabaseModuleTests: XCTestCase {
         try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
     }
 
+    func testGetDatabaseSchemaIndexStatusSendsToGetRoute() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.database.getDatabaseSchemaIndexStatus(["Id": "rec_1"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/schemas/rec_1/index-status")
+        XCTAssertFalse(queryNames(mock).contains("Id"), "path parameter Id leaked into the query")
+    }
+
     func testGetDatabaseSchemaListSettingsSendsToGetRoute() async throws {
         let mock = MockHTTPExecutor()
         let client = try makeClient(mock)
