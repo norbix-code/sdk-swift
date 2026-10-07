@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-06 11:07:12
+Date: 2026-10-07 10:47:09
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
 BaseUrl: http://localhost:5002
@@ -623,6 +623,9 @@ export module CodeMashApi2
         public names?: { [index:string]: string; };
 
         // @DataMember
+        public slug?: string;
+
+        // @DataMember
         public description?: string;
 
         // @DataMember
@@ -685,6 +688,9 @@ export module CodeMashApi2
 
         // @DataMember
         public names?: { [index:string]: string; };
+
+        // @DataMember
+        public slug?: string;
 
         // @DataMember
         public description?: string;
@@ -1064,6 +1070,12 @@ export module CodeMashApi2
         // @DataMember
         public translateOptions?: IReadOnlyDictionary<string, string>;
 
+        // @DataMember
+        public default?: string;
+
+        // @DataMember
+        public unique?: boolean;
+
         public constructor(init?: Partial<StringFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
 
@@ -1078,7 +1090,24 @@ export module CodeMashApi2
         // @DataMember
         public multipleOf?: number;
 
+        // @DataMember
+        public default?: number;
+
+        // @DataMember
+        public unique?: boolean;
+
         public constructor(init?: Partial<DecimalFieldDto>) { super(init); (Object as any).assign(this, init); }
+    }
+
+    export class CurrencyDefaultDto
+    {
+        // @DataMember
+        public value: number;
+
+        // @DataMember
+        public currency: string;
+
+        public constructor(init?: Partial<CurrencyDefaultDto>) { (Object as any).assign(this, init); }
     }
 
     export class CurrencyFieldDto extends JsonSchemaFieldDto
@@ -1086,11 +1115,25 @@ export module CodeMashApi2
         // @DataMember
         public allowedCurrencies?: IReadOnlyList<string>;
 
+        // @DataMember
+        public multipleOf?: number;
+
+        // @DataMember
+        public minimum?: number;
+
+        // @DataMember
+        public maximum?: number;
+
+        // @DataMember
+        public default?: CurrencyDefaultDto;
+
         public constructor(init?: Partial<CurrencyFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
 
     export class BooleanFieldDto extends JsonSchemaFieldDto
     {
+        // @DataMember
+        public default?: boolean;
 
         public constructor(init?: Partial<BooleanFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1103,6 +1146,9 @@ export module CodeMashApi2
         // @DataMember
         public maximum?: number;
 
+        // @DataMember
+        public default?: number;
+
         public constructor(init?: Partial<DateFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
 
@@ -1113,6 +1159,12 @@ export module CodeMashApi2
 
         // @DataMember
         public maximum?: number;
+
+        // @DataMember
+        public default?: number;
+
+        // @DataMember
+        public unique?: boolean;
 
         public constructor(init?: Partial<IntegerFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1127,6 +1179,14 @@ export module CodeMashApi2
 
     export class TagsFieldDto extends JsonSchemaFieldDto
     {
+        // @DataMember
+        public minItems?: number;
+
+        // @DataMember
+        public maxItems?: number;
+
+        // @DataMember
+        public default?: IReadOnlyList<string>;
 
         public constructor(init?: Partial<TagsFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1135,6 +1195,18 @@ export module CodeMashApi2
     {
         // @DataMember
         public storages?: IReadOnlyList<string>;
+
+        // @DataMember
+        public minItems?: number;
+
+        // @DataMember
+        public maxItems?: number;
+
+        // @DataMember
+        public allowedFileType?: string;
+
+        // @DataMember
+        public maxSizeMb?: number;
 
         public constructor(init?: Partial<FileFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1146,6 +1218,9 @@ export module CodeMashApi2
 
         // @DataMember
         public multiple: boolean;
+
+        // @DataMember
+        public displayField?: string;
 
         public constructor(init?: Partial<TaxonomySelectionFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1169,6 +1244,9 @@ export module CodeMashApi2
         // @DataMember
         public multiple: boolean;
 
+        // @DataMember
+        public displayField?: string;
+
         public constructor(init?: Partial<UserSelectionFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
 
@@ -1176,6 +1254,9 @@ export module CodeMashApi2
     {
         // @DataMember
         public multiple: boolean;
+
+        // @DataMember
+        public displayField?: string;
 
         public constructor(init?: Partial<RoleSelectionFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
@@ -1188,7 +1269,46 @@ export module CodeMashApi2
         // @DataMember
         public multiple: boolean;
 
+        // @DataMember
+        public default?: IReadOnlyList<string>;
+
         public constructor(init?: Partial<EnumSelectionFieldDto>) { super(init); (Object as any).assign(this, init); }
+    }
+
+    export class ObjectFieldDto extends JsonSchemaFieldDto
+    {
+        // @DataMember
+        public properties: IReadOnlyList<JsonSchemaFieldDto>;
+
+        // @DataMember
+        public required?: IReadOnlyList<string>;
+
+        public constructor(init?: Partial<ObjectFieldDto>) { super(init); (Object as any).assign(this, init); }
+    }
+
+    export class ArrayFieldDto extends JsonSchemaFieldDto
+    {
+        // @DataMember
+        public items: JsonSchemaFieldDto;
+
+        // @DataMember
+        public minItems?: number;
+
+        // @DataMember
+        public maxItems?: number;
+
+        // @DataMember
+        public uniqueItems?: boolean;
+
+        public constructor(init?: Partial<ArrayFieldDto>) { super(init); (Object as any).assign(this, init); }
+    }
+
+    export class JsonFieldDto extends JsonSchemaFieldDto
+    {
+        // @DataMember
+        public maxBytes?: number;
+
+        public constructor(init?: Partial<JsonFieldDto>) { super(init); (Object as any).assign(this, init); }
     }
 
     export class EchoResponse
@@ -1490,6 +1610,15 @@ export module CodeMashApi2
         public result?: Object;
 
         public constructor(init?: Partial<FindOneResponse>) { super(init); (Object as any).assign(this, init); }
+    }
+
+    export class GetFileByIdResponse extends ResponseBase
+    {
+        public file?: FileResourceRefDto;
+        public isPublic?: boolean;
+        public publicUrl?: string;
+
+        public constructor(init?: Partial<GetFileByIdResponse>) { super(init); (Object as any).assign(this, init); }
     }
 
     export class GetFileInfoResponse extends ResponseBase
@@ -3079,6 +3208,9 @@ export module CodeMashApi2
         // @DataMember
         public sortOrder?: number;
 
+        // @DataMember
+        public expandReferences: boolean;
+
         public constructor(init?: Partial<FindRequest>) { super(init); (Object as any).assign(this, init); }
         public getTypeName() { return 'FindRequest'; }
         public getMethod() { return 'GET'; }
@@ -3099,6 +3231,9 @@ export module CodeMashApi2
 
         // @DataMember
         public databaseIntegrationId?: string;
+
+        // @DataMember
+        public expandReferences: boolean;
 
         public constructor(init?: Partial<FindOneRequest>) { super(init); (Object as any).assign(this, init); }
         public getTypeName() { return 'FindOneRequest'; }
@@ -3126,6 +3261,11 @@ export module CodeMashApi2
 
         // @DataMember
         public pagingArgs?: PagingArgs;
+
+        /** @description Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids. */
+        // @DataMember
+        // @ApiMember(Description="Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids.")
+        public expandReferences: boolean;
 
         public constructor(init?: Partial<FindOwnRequest>) { super(init); (Object as any).assign(this, init); }
         public getTypeName() { return 'FindOwnRequest'; }
@@ -3220,6 +3360,9 @@ export module CodeMashApi2
         // @DataMember
         public update: string;
 
+        // @DataMember
+        public arrayFilters?: string;
+
         public constructor(init?: Partial<UpdateManyRequest>) { super(init); (Object as any).assign(this, init); }
         public getTypeName() { return 'UpdateManyRequest'; }
         public getMethod() { return 'PUT'; }
@@ -3243,6 +3386,9 @@ export module CodeMashApi2
 
         // @DataMember
         public update: string;
+
+        // @DataMember
+        public arrayFilters?: string;
 
         public constructor(init?: Partial<UpdateOneRequest>) { super(init); (Object as any).assign(this, init); }
         public getTypeName() { return 'UpdateOneRequest'; }
@@ -3371,6 +3517,24 @@ export module CodeMashApi2
         public getTypeName() { return 'DownloadFileApiRequest'; }
         public getMethod() { return 'GET'; }
         public createResponse() { return new Blob(); }
+    }
+
+    /** @description Files */
+    // @Route("/{version}/files/{filesIntegrationId}/by-id/{id}", "GET")
+    // @Api(Description="Files")
+    // @DataContract
+    export class GetFileByIdRequest extends CodeMashRequestBase implements IReturn<GetFileByIdResponse>
+    {
+        // @DataMember
+        public filesIntegrationId: string;
+
+        // @DataMember
+        public id: string;
+
+        public constructor(init?: Partial<GetFileByIdRequest>) { super(init); (Object as any).assign(this, init); }
+        public getTypeName() { return 'GetFileByIdRequest'; }
+        public getMethod() { return 'GET'; }
+        public createResponse() { return new GetFileByIdResponse(); }
     }
 
     /** @description Files */
