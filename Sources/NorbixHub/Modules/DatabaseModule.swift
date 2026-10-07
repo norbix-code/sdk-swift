@@ -765,6 +765,21 @@ public final class DatabaseModule: Sendable {
         )
     }
 
+    /// Reads the last schema-index run of schema `Id` — which indexes Norbix wanted, created, dropped
+    /// or could not create, per database (state building | ready | refused | partial).
+    ///
+    /// `GET /{version}/database/schemas/{Id}/index-status` · request DTO `GetDatabaseSchemaIndexStatus`.
+    public func getDatabaseSchemaIndexStatus(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/schemas/{Id}/index-status",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     /// Reads the list (table view) settings of schema `Id`.
     ///
     /// `GET /{version}/database/schemas/{Id}/list-settings` · request DTO `GetDatabaseSchemaListSettings`.
