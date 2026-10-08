@@ -3,9 +3,19 @@ import Foundation
 /// Controls how the SDK retries transient failures.
 ///
 /// The default `.standard` policy retries on `429 Too Many Requests` and
-/// `5xx` server errors with exponential backoff and a small random jitter,
-/// up to 3 retries. POSTs without an explicit `Idempotency-Key` header get
-/// one auto-injected so a retry can't cause a duplicate write.
+/// `5xx` server errors (a `502` included: the tenant's provider failed) with
+/// exponential backoff and a small random jitter, up to 3 retries.
+///
+/// Which requests are retried by default:
+/// - `GET`, `HEAD`, `OPTIONS`, `PUT`, `DELETE` — always (idempotent methods).
+/// - `POST`, `PATCH` — only when the **caller** set an `Idempotency-Key`
+///   header (per call or in `NorbixConfig.defaultHeaders`). The gateway
+///   de-duplicates such a request only for endpoints marked idempotent, so
+///   the key the SDK attaches on its own is not enough to make a resend safe:
+///   a `500` on a write is a real server failure and the write may already
+///   have happened.
+///
+/// To always retry a method, add it to `retryableMethods`.
 public struct RetryPolicy: Sendable {
     /// Maximum number of *retries* (i.e. attempts after the first one).
     /// `0` means no retries.
@@ -17,24 +27,29 @@ public struct RetryPolicy: Sendable {
     public var maxDelay: TimeInterval
     /// HTTP status codes considered retryable. Defaults to `429` plus `5xx`.
     public var retryableStatusCodes: Set<Int>
-    /// HTTP methods considered safe to retry. Defaults to all methods because
-    /// the SDK auto-attaches an `Idempotency-Key` to POST/PUT/PATCH/DELETE
-    /// requests when the policy is active and the caller has not supplied
-    /// their own.
+    /// HTTP methods always retried on a retryable status or a network error.
+    /// Defaults to the idempotent methods: `GET`, `HEAD`, `OPTIONS`, `PUT`,
+    /// `DELETE`.
     public var retryableMethods: Set<String>
+    /// HTTP methods retried only when the caller supplied an
+    /// `Idempotency-Key` header itself. Defaults to `POST` and `PATCH`. The
+    /// key the SDK attaches automatically does not count.
+    public var idempotencyKeyMethods: Set<String>
 
     public init(
         maxRetries: Int,
         baseDelay: TimeInterval,
         maxDelay: TimeInterval,
         retryableStatusCodes: Set<Int> = Set(500..<600).union([429]),
-        retryableMethods: Set<String> = ["GET", "HEAD", "OPTIONS", "POST", "PUT", "PATCH", "DELETE"]
+        retryableMethods: Set<String> = ["GET", "HEAD", "OPTIONS", "PUT", "DELETE"],
+        idempotencyKeyMethods: Set<String> = ["POST", "PATCH"]
     ) {
         self.maxRetries = maxRetries
         self.baseDelay = baseDelay
         self.maxDelay = maxDelay
         self.retryableStatusCodes = retryableStatusCodes
         self.retryableMethods = retryableMethods
+        self.idempotencyKeyMethods = idempotencyKeyMethods
     }
 
     /// No retries at all. Useful in tests.
@@ -60,8 +75,25 @@ public struct RetryPolicy: Sendable {
         return Double.random(in: 0...capped)
     }
 
+    /// Whether a response with `status` may be retried for `method`, when the
+    /// caller did not supply an `Idempotency-Key`.
     public func isRetryable(status: Int, method: String) -> Bool {
+        isRetryable(status: status, method: method, callerSuppliedIdempotencyKey: false)
+    }
+
+    /// Whether a response with `status` may be retried for `method`.
+    /// `callerSuppliedIdempotencyKey` is true only when the caller set the
+    /// `Idempotency-Key` header, not when the SDK attached one.
+    public func isRetryable(status: Int, method: String, callerSuppliedIdempotencyKey: Bool) -> Bool {
         retryableStatusCodes.contains(status) &&
-        retryableMethods.contains(method.uppercased())
+        allowsRetry(method: method, callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey)
+    }
+
+    /// Whether `method` may be sent again at all (status aside) — also used
+    /// after a network error.
+    public func allowsRetry(method: String, callerSuppliedIdempotencyKey: Bool) -> Bool {
+        let m = method.uppercased()
+        if retryableMethods.contains(m) { return true }
+        return callerSuppliedIdempotencyKey && idempotencyKeyMethods.contains(m)
     }
 }
