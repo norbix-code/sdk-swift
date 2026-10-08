@@ -91,7 +91,7 @@ final class RetryAndIdempotencyTests: XCTestCase {
         XCTAssertEqual(mock.capturedRequests.count, 1)
     }
 
-    func testIdempotencyKeyIsAddedOnPost() async throws {
+    func testIdempotencyKeyIsNotAddedOnPost() async throws {
         let mock = MockHTTPExecutor()
         mock.responseBody = Data(#"{"id":"new"}"#.utf8)
         let client = try NorbixApiClient(
@@ -103,9 +103,8 @@ final class RetryAndIdempotencyTests: XCTestCase {
             "doc": ["total": 10]
         ])
 
-        let key = mock.lastRequest?.value(forHTTPHeaderField: "Idempotency-Key")
-        XCTAssertNotNil(key)
-        XCTAssertFalse(key?.isEmpty ?? true)
+        // The SDK no longer invents a key; only a caller-supplied one is sent.
+        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Idempotency-Key"))
     }
 
     func testIdempotencyKeyNotAddedOnGet() async throws {
@@ -165,9 +164,7 @@ final class RetryAndIdempotencyTests: XCTestCase {
             _ = try await transport.sendRaw(path: "/{version}/db/orders", method: "POST", body: Data("{}".utf8))
         }
         XCTAssertEqual(mock.capturedRequests.count, 1)
-        // The SDK still attaches its own key, but that key alone does not make
-        // the POST retryable.
-        XCTAssertNotNil(mock.lastRequest?.value(forHTTPHeaderField: "Idempotency-Key"))
+        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Idempotency-Key"))
     }
 
     func testGetWith500IsRetriedUpToMax() async throws {
