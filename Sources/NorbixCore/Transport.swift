@@ -342,8 +342,15 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue(v, forHTTPHeaderField: k)
         }
 
-        // Auto-attach Idempotency-Key for write methods so a retry can't
-        // double-write. Caller may override by passing one in defaultHeaders.
+        // Remember whether the CALLER supplied an Idempotency-Key (per call or
+        // in defaultHeaders). Only then may a POST / PATCH be retried: the
+        // gateway de-duplicates by key only on endpoints marked idempotent,
+        // so the key attached below does not make a resend safe.
+        let callerSuppliedIdempotencyKey =
+            httpRequest.value(forHTTPHeaderField: "Idempotency-Key") != nil
+
+        // Auto-attach Idempotency-Key for write methods. Caller may override
+        // by passing one in defaultHeaders or per call.
         let writeMethods: Set<String> = ["POST", "PUT", "PATCH", "DELETE"]
         if writeMethods.contains(method.uppercased()),
            httpRequest.value(forHTTPHeaderField: "Idempotency-Key") == nil {
@@ -355,6 +362,7 @@ public final class Transport: @unchecked Sendable {
             method: method,
             url: built.url,
             policy: snapshot.retryPolicy,
+            callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey,
             verbose: snapshot.verbose,
             verboseBody: built.body
         )
@@ -366,6 +374,7 @@ public final class Transport: @unchecked Sendable {
         method: String,
         url: String,
         policy: RetryPolicy,
+        callerSuppliedIdempotencyKey: Bool,
         verbose: Bool,
         verboseBody: [String: Any]?
     ) async throws -> (Data, HTTPURLResponse) {
@@ -387,7 +396,11 @@ public final class Transport: @unchecked Sendable {
                 let durationMs = Int(Date().timeIntervalSince(started) * 1000)
 
                 if response.statusCode >= 400 {
-                    let retryable = policy.isRetryable(status: response.statusCode, method: method)
+                    let retryable = policy.isRetryable(
+                        status: response.statusCode,
+                        method: method,
+                        callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey
+                    )
                     if retryable, attempt < policy.maxRetries {
                         let retryAfter = parseRetryAfter(response.value(forHTTPHeaderField: "Retry-After"))
                         attempt += 1
@@ -437,7 +450,10 @@ public final class Transport: @unchecked Sendable {
             } catch {
                 // Network-level failure — retry if the method allows it.
                 if attempt < policy.maxRetries,
-                   policy.retryableMethods.contains(method.uppercased()) {
+                   policy.allowsRetry(
+                       method: method,
+                       callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey
+                   ) {
                     attempt += 1
                     let delay = policy.delay(forAttempt: attempt)
                     logger.log(NorbixLogEvent(
