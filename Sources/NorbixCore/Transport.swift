@@ -342,20 +342,13 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue(v, forHTTPHeaderField: k)
         }
 
-        // Remember whether the CALLER supplied an Idempotency-Key (per call or
-        // in defaultHeaders). Only then may a POST / PATCH be retried: the
-        // gateway de-duplicates by key only on endpoints marked idempotent,
-        // so the key attached below does not make a resend safe.
+        // An Idempotency-Key is sent only when the CALLER supplies one (per
+        // call or in defaultHeaders); the SDK does not invent one. Only then
+        // may a POST / PATCH be retried — the gateway de-duplicates by key on
+        // the endpoints marked idempotent, and a random key per call protects
+        // nothing on the others.
         let callerSuppliedIdempotencyKey =
             httpRequest.value(forHTTPHeaderField: "Idempotency-Key") != nil
-
-        // Auto-attach Idempotency-Key for write methods. Caller may override
-        // by passing one in defaultHeaders or per call.
-        let writeMethods: Set<String> = ["POST", "PUT", "PATCH", "DELETE"]
-        if writeMethods.contains(method.uppercased()),
-           httpRequest.value(forHTTPHeaderField: "Idempotency-Key") == nil {
-            httpRequest.setValue(UUID().uuidString, forHTTPHeaderField: "Idempotency-Key")
-        }
 
         return try await runWithRetry(
             httpRequest: httpRequest,

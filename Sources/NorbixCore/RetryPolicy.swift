@@ -83,7 +83,7 @@ public struct RetryPolicy: Sendable {
 
     /// Whether a response with `status` may be retried for `method`.
     /// `callerSuppliedIdempotencyKey` is true only when the caller set the
-    /// `Idempotency-Key` header, not when the SDK attached one.
+    /// `Idempotency-Key` header (the SDK never adds one itself).
     public func isRetryable(status: Int, method: String, callerSuppliedIdempotencyKey: Bool) -> Bool {
         retryableStatusCodes.contains(status) &&
         allowsRetry(method: method, callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey)
