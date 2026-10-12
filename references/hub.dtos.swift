@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-12 13:40:50
+Date: 2026-10-12 16:29:06
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -235,7 +235,6 @@ public class InternalsTypeGen : Codable
     public var typegen_205_SaveCodeIntegration:SaveCodeIntegration?
     public var typegen_206_TestCodeIntegration:TestCodeIntegration?
     public var typegen_207_ConfirmCodeIntegrationHumanDeliveryRequest:ConfirmCodeIntegrationHumanDeliveryRequest?
-    public var typegen_208_SetCodeIntegrationAsDefault:SetCodeIntegrationAsDefault?
     public var typegen_209_DeleteCodeIntegrationRequest:DeleteCodeIntegrationRequest?
     public var typegen_210_EnableCodeIntegrationRequest:EnableCodeIntegrationRequest?
     public var typegen_211_DisableCodeIntegrationRequest:DisableCodeIntegrationRequest?
@@ -3675,6 +3674,32 @@ public class GetInstallationLicenseStatus : RequestBase, IReturn
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+    }
+}
+
+// @Route("/{version}/account/licenses/{Id}/key", "GET")
+public class GetLicenseKey : RequestBase, IReturn
+{
+    public typealias Return = GetLicenseKeyResponse
+
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
     }
 }
 
@@ -13505,36 +13530,6 @@ public class SaveCodeIntegration : CodeMashRequestBase, IReturn
     }
 }
 
-// @Route("/{version}/code/integrations/{Id}/default", "PUT")
-public class SetCodeIntegrationAsDefault : CodeMashRequestBase, IReturn
-{
-    public typealias Return = EmptyResponse
-
-    /**
-    * Integration id, from get_code_integrations.
-    */
-    // @ApiMember(Description="Integration id, from get_code_integrations.", IsRequired=true)
-    public var id:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case id
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(String.self, forKey: .id)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if id != nil { try container.encode(id, forKey: .id) }
-    }
-}
-
 // @Route("/{version}/code/integrations/test", "POST")
 public class TestCodeIntegration : CodeMashRequestBase, IReturn
 {
@@ -21674,6 +21669,29 @@ public class GetInstallationLicenseStatusResponse : ResponseBase
     }
 }
 
+public class GetLicenseKeyResponse : ResponseBase
+{
+    public var key:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case key
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        key = try container.decodeIfPresent(String.self, forKey: .key)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if key != nil { try container.encode(key, forKey: .key) }
+    }
+}
+
 // @DataContract
 public class CreateAiServiceUserResponse : ResponseBase
 {
@@ -24467,27 +24485,23 @@ public class GetCodeIntegrationResponse : ResponseBase
 
 public class GetCodeIntegrationsResponse : ResponseBase
 {
-    public var defaultIntegrationId:String?
     public var list:PaginatedResponse<CodeIntegrationListProjection>?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
-        case defaultIntegrationId
         case list
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        defaultIntegrationId = try container.decodeIfPresent(String.self, forKey: .defaultIntegrationId)
         list = try container.decodeIfPresent(PaginatedResponse<CodeIntegrationListProjection>.self, forKey: .list)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        if defaultIntegrationId != nil { try container.encode(defaultIntegrationId, forKey: .defaultIntegrationId) }
         if list != nil { try container.encode(list, forKey: .list) }
     }
 }
@@ -38750,6 +38764,9 @@ public class CodeFunctionRunDto : Codable
     // @DataMember
     public var requestId:String?
 
+    // @DataMember
+    public var input:String?
+
     required public init(){}
 }
 
@@ -41490,9 +41507,6 @@ public class CodeDto : Codable
 {
     // @DataMember
     public var isEnabled:Bool?
-
-    // @DataMember
-    public var defaultIntegrationViewId:String?
 
     required public init(){}
 }

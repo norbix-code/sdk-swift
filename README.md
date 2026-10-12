@@ -392,7 +392,7 @@ _ = try await hub.membership.saveMembershipTrigger([
 Norbix does not host code: a trigger's `Code` action, a scheduler task or a
 manual call runs a function in **your** cloud (AWS Lambda, Azure Functions,
 Google Cloud Functions) through a Code integration. `hub.code` covers every
-Code Hub endpoint (38); the five cloud-function routes list the functions an
+Code Hub endpoint (37); the five cloud-function routes list the functions an
 integration may call, their aliases and versions, invoke one by hand, give a
 sample envelope for a local run and the last runs of a trigger or task —
 `getCodeFunctions`, `getCodeFunctionQualifiers`, `invokeCodeFunction`,

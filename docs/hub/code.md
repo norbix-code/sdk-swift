@@ -18,7 +18,6 @@ for `GET` / `DELETE` and the JSON body otherwise.
 | `saveCodeIntegration` | `POST` | `/{version}/code/integrations` | `project` |
 | `testCodeIntegration` | `POST` | `/{version}/code/integrations/test` | `project` |
 | `confirmCodeIntegrationHumanDelivery` | `POST` | `/{version}/code/integrations/confirm-human-delivery` | `project` |
-| `setCodeIntegrationAsDefault` | `PUT` | `/{version}/code/integrations/{Id}/default` | `project` |
 | `deleteCodeIntegration` | `DELETE` | `/{version}/code/integrations/{Id}` | `project` |
 | `enableCodeIntegration` | `PUT` | `/{version}/code/integrations/{Id}/enable` | `project` |
 | `disableCodeIntegration` | `PUT` | `/{version}/code/integrations/{Id}/disable` | `project` |
@@ -61,8 +60,8 @@ five also query / body) in `Tests/NorbixHubTests/CodeModuleTests.swift`.
 | `getCodeFunctions` | query: `integrationId` (required), `prefix`, `tag` (`key` or `key=value`), `pageSize`, `startingAfter`, `endingBefore` — a live listing from the provider |
 | `getCodeFunctionQualifiers` | query: `integrationId`, `functionId` — the aliases and versions |
 | `invokeCodeFunction` | body: `functionRef` `{integrationId, functionId, qualifier?}`, `payload?`, `invocationType` (`Sync` / `Async`), `runAsUserId?`, `config?` → `{statusCode, output, durationMs, requestId?, logs?}` |
-| `getCodeFunctionEventSample` | query: `source` (`database` · `membership` · `files` · `payments` · `ai` · `scheduler` · `manual`), `event?`, `schemaId?` — a sample envelope for a local run |
-| `getCodeFunctionRuns` | query: exactly one of `triggerId` / `taskId`, `limit` (1–50, default 20) — the last runs, newest first |
+| `getCodeFunctionEventSample` | query: `source` (`database` · `membership` · `files` · `payments` · `ai` · `scheduler` · `manual`, any case), `event?`, `schemaId?` — a sample envelope for a local run |
+| `getCodeFunctionRuns` | query: exactly one of `triggerId` / `taskId`, `limit` (1–50, default 20) — the last runs, newest first; each run carries `input` — the scrubbed envelope a Fake-provider run received |
 
 ```swift
 let functions = try await hub.code.getCodeFunctions(["integrationId": "int_1", "prefix": "orders-"])
