@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-07 10:47:09
+Date: 2026-10-12 13:40:50
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -271,6 +271,38 @@ public class InternalsTypeGen : Codable
     public var typegen_243_ActionPendingEntryWireDto:ActionPendingEntryWireDto?
     public var typegen_244_NoticeEntryWireDto:NoticeEntryWireDto?
     public var typegen_245_ConversationSnapshotEntryWireDto:ConversationSnapshotEntryWireDto?
+    public var typegen_252_StringFieldDto:StringFieldDto?
+    public var typegen_253_DecimalFieldDto:DecimalFieldDto?
+    public var typegen_254_CurrencyFieldDto:CurrencyFieldDto?
+    public var typegen_255_BooleanFieldDto:BooleanFieldDto?
+    public var typegen_256_DateFieldDto:DateFieldDto?
+    public var typegen_257_IntegerFieldDto:IntegerFieldDto?
+    public var typegen_258_GeolocationFieldDto:GeolocationFieldDto?
+    public var typegen_259_TagsFieldDto:TagsFieldDto?
+    public var typegen_260_FileFieldDto:FileFieldDto?
+    public var typegen_261_TaxonomySelectionFieldDto:TaxonomySelectionFieldDto?
+    public var typegen_262_CollectionSelectionFieldDto:CollectionSelectionFieldDto?
+    public var typegen_263_UserSelectionFieldDto:UserSelectionFieldDto?
+    public var typegen_264_RoleSelectionFieldDto:RoleSelectionFieldDto?
+    public var typegen_265_EnumSelectionFieldDto:EnumSelectionFieldDto?
+    public var typegen_266_ObjectFieldDto:ObjectFieldDto?
+    public var typegen_267_ArrayFieldDto:ArrayFieldDto?
+    public var typegen_268_JsonFieldDto:JsonFieldDto?
+    public var typegen_269_FunctionRefDto:FunctionRefDto?
+    public var typegen_270_CodeFunctionEventDto:CodeFunctionEventDto?
+    public var typegen_271_CodeFunctionContextDto:CodeFunctionContextDto?
+    public var typegen_272_CodeFunctionCallerDto:CodeFunctionCallerDto?
+    public var typegen_273_CodeFunctionRunAsDto:CodeFunctionRunAsDto?
+    public var typegen_274_CodeFunctionDataDto:CodeFunctionDataDto?
+    public var typegen_275_DatabaseRecordChangeDto:DatabaseRecordChangeDto?
+    public var typegen_276_UserChangeDto:UserChangeDto?
+    public var typegen_277_FileChangeDto:FileChangeDto?
+    public var typegen_278_PaymentFactDto:PaymentFactDto?
+    public var typegen_279_AiUsageEventDto:AiUsageEventDto?
+    public var typegen_280_ScheduledTaskInfoDto:ScheduledTaskInfoDto?
+    public var typegen_281_FakeCodeIntegrationDto:FakeCodeIntegrationDto?
+    public var typegen_282_FakeCodeIntegrationRequest:FakeCodeIntegrationRequest?
+    public var typegen_283_CodeFunctionSchedulerTaskRequest:CodeFunctionSchedulerTaskRequest?
 
     required public init(){}
 }
@@ -495,7 +527,7 @@ public class UpdateAccountProfile : RequestBase, IReturn
     }
 }
 
-// @Route("/{version}/account/verify/resend", "GET")
+// @Route("/{version}/account/verify/resend", "POST")
 public class ResendAccountVerificationToken : RequestBase, IReturn
 {
     public typealias Return = EmptyResponse
@@ -693,7 +725,7 @@ public class GetAccountUsageBilling : RequestBase, IReturn
     }
 }
 
-// @Route("/{version}/account/verify", "GET")
+// @Route("/{version}/account/verify", "POST")
 public class VerifyAccount : RequestBase, IReturn, IHasAccountId
 {
     public typealias Return = EmptyResponse
@@ -3658,30 +3690,39 @@ public class CreateAiServiceUserRequest : RequestBase, IReturn
     public var name:String?
 
     /**
-    * Reach (account | project + projectId), rights (read | admin), envs (["TEST"] or ["TEST","PROD"]).
+    * Account role ids (acc_…_nr_…) to give, built-in or custom. At least one role in total (account or project).
     */
-    // @ApiMember(Description="Reach (account | project + projectId), rights (read | admin), envs ([\"TEST\"] or [\"TEST\",\"PROD\"]).", IsRequired=true)
-    public var scope:AiScopeDto?
+    // @ApiMember(Description="Account role ids (acc_…_nr_…) to give, built-in or custom. At least one role in total (account or project).")
+    public var accountRoleIds:[String]?
+
+    /**
+    * Project roles to give: [{ projectId, roleIds: [pr_…_nr_…] }]. Without an account role the service user is pinned to these projects.
+    */
+    // @ApiMember(Description="Project roles to give: [{ projectId, roleIds: [pr_…_nr_…] }]. Without an account role the service user is pinned to these projects.")
+    public var projectRoles:[AiProjectRoleIdsDto]?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case name
-        case scope
+        case accountRoleIds
+        case projectRoles
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decodeIfPresent(String.self, forKey: .name)
-        scope = try container.decodeIfPresent(AiScopeDto.self, forKey: .scope)
+        accountRoleIds = try container.decodeIfPresent([String].self, forKey: .accountRoleIds) ?? []
+        projectRoles = try container.decodeIfPresent([AiProjectRoleIdsDto].self, forKey: .projectRoles) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if name != nil { try container.encode(name, forKey: .name) }
-        if scope != nil { try container.encode(scope, forKey: .scope) }
+        if accountRoleIds != nil { try container.encode(accountRoleIds, forKey: .accountRoleIds) }
+        if projectRoles != nil { try container.encode(projectRoles, forKey: .projectRoles) }
     }
 }
 
@@ -6192,6 +6233,42 @@ public class GetDatabaseSchemas : CodeMashListPaginationRequestBase, IReturn
 public class GetDatabaseSchemaDraft : CodeMashRequestBase, IReturn
 {
     public typealias Return = GetDatabaseSchemaDraftResponse
+
+    /**
+    * Schema id from get_database_schemas.
+    */
+    // @DataMember
+    // @ApiMember(Description="Schema id from get_database_schemas.", IsRequired=true)
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+/**
+* Gets the Norbix index status of a database schema
+*/
+// @Route("/{version}/database/schemas/{Id}/index-status", "GET")
+// @Api(Description="Gets the Norbix index status of a database schema")
+// @DataContract
+public class GetDatabaseSchemaIndexStatus : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetDatabaseSchemaIndexStatusResponse
 
     /**
     * Schema id from get_database_schemas.
@@ -9063,6 +9140,45 @@ public class GetFolderFiles : CodeMashListPaginationRequestBase, IReturn
     * Path prefix to list. Empty / null lists the root.
     */
     // @ApiMember(Description="Path prefix to list. Empty / null lists the root.")
+    public var path:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case path
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        path = try container.decodeIfPresent(String.self, forKey: .path)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if path != nil { try container.encode(path, forKey: .path) }
+    }
+}
+
+// @Route("/{version}/files/item/use", "POST")
+public class UseFileRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The files integration the file lives on.
+    */
+    // @ApiMember(Description="The files integration the file lives on.", IsRequired=true)
+    public var filesIntegrationId:String?
+
+    /**
+    * Path of the file, relative to the integration.
+    */
+    // @ApiMember(Description="Path of the file, relative to the integration.", IsRequired=true)
     public var path:String?
 
     required public init(){ super.init() }
@@ -13449,6 +13565,257 @@ public class TestCodeIntegration : CodeMashRequestBase, IReturn
     }
 }
 
+// @Route("/{version}/code/functions", "GET")
+public class GetCodeFunctions : CodeMashListPaginationRequestBase, IReturn
+{
+    public typealias Return = GetCodeFunctionsResponse
+
+    /**
+    * Code integration id (int_…), from get_code_integrations.
+    */
+    // @ApiMember(Description="Code integration id (int_…), from get_code_integrations.", IsRequired=true)
+    public var integrationId:String?
+
+    /**
+    * Only functions whose id starts with this.
+    */
+    // @ApiMember(Description="Only functions whose id starts with this.")
+    public var `prefix`:String?
+
+    /**
+    * Only functions carrying this tag: "key" or "key=value".
+    */
+    // @ApiMember(Description="Only functions carrying this tag: \"key\" or \"key=value\".")
+    public var tag:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationId
+        case `prefix`
+        case tag
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationId = try container.decodeIfPresent(String.self, forKey: .integrationId)
+        `prefix` = try container.decodeIfPresent(String.self, forKey: .`prefix`)
+        tag = try container.decodeIfPresent(String.self, forKey: .tag)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationId != nil { try container.encode(integrationId, forKey: .integrationId) }
+        if `prefix` != nil { try container.encode(`prefix`, forKey: .`prefix`) }
+        if tag != nil { try container.encode(tag, forKey: .tag) }
+    }
+}
+
+// @Route("/{version}/code/functions/event-sample", "GET")
+public class GetCodeFunctionEventSample : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetCodeFunctionEventSampleResponse
+
+    /**
+    * Database | Membership | Files | Payments | Ai | Scheduler | Manual.
+    */
+    // @ApiMember(Description="Database | Membership | Files | Payments | Ai | Scheduler | Manual.", IsRequired=true)
+    public var source:CodeFunctionSource?
+
+    /**
+    * The event name, e.g. database.record.inserted; omitted = the source's usual one.
+    */
+    // @ApiMember(Description="The event name, e.g. database.record.inserted; omitted = the source's usual one.")
+    public var event:String?
+
+    /**
+    * The schema id to put into data.database.schemaId (Database source).
+    */
+    // @ApiMember(Description="The schema id to put into data.database.schemaId (Database source).")
+    public var schemaId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case source
+        case event
+        case schemaId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        source = try container.decodeIfPresent(CodeFunctionSource.self, forKey: .source)
+        event = try container.decodeIfPresent(String.self, forKey: .event)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if source != nil { try container.encode(source, forKey: .source) }
+        if event != nil { try container.encode(event, forKey: .event) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+    }
+}
+
+// @Route("/{version}/code/functions/qualifiers", "GET")
+public class GetCodeFunctionQualifiers : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetCodeFunctionQualifiersResponse
+
+    /**
+    * Code integration id (int_…), from get_code_integrations.
+    */
+    // @ApiMember(Description="Code integration id (int_…), from get_code_integrations.", IsRequired=true)
+    public var integrationId:String?
+
+    /**
+    * Provider-native function id, from get_code_functions.
+    */
+    // @ApiMember(Description="Provider-native function id, from get_code_functions.", IsRequired=true)
+    public var functionId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationId
+        case functionId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationId = try container.decodeIfPresent(String.self, forKey: .integrationId)
+        functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationId != nil { try container.encode(integrationId, forKey: .integrationId) }
+        if functionId != nil { try container.encode(functionId, forKey: .functionId) }
+    }
+}
+
+// @Route("/{version}/code/functions/runs", "GET")
+public class GetCodeFunctionRuns : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetCodeFunctionRunsResponse
+
+    /**
+    * The trigger whose function runs to list (trg_…). One of triggerId / taskId.
+    */
+    // @ApiMember(Description="The trigger whose function runs to list (trg_…). One of triggerId / taskId.")
+    public var triggerId:String?
+
+    /**
+    * The scheduler task whose function runs to list (tsk_…). One of triggerId / taskId.
+    */
+    // @ApiMember(Description="The scheduler task whose function runs to list (tsk_…). One of triggerId / taskId.")
+    public var taskId:String?
+
+    /**
+    * How many runs, newest first: 1-50. Default 20.
+    */
+    // @ApiMember(DataType="integer", Description="How many runs, newest first: 1-50. Default 20.")
+    public var limit:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case triggerId
+        case taskId
+        case limit
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
+        taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
+        limit = try container.decodeIfPresent(Int.self, forKey: .limit)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
+        if taskId != nil { try container.encode(taskId, forKey: .taskId) }
+        if limit != nil { try container.encode(limit, forKey: .limit) }
+    }
+}
+
+// @Route("/{version}/code/functions/invoke", "POST")
+// @DataContract
+public class InvokeCodeFunction : CodeMashRequestBase, IReturn
+{
+    public typealias Return = InvokeCodeFunctionResponse
+
+    /**
+    * Which function: { integrationId, functionId, qualifier? }.
+    */
+    // @DataMember
+    // @ApiMember(Description="Which function: { integrationId, functionId, qualifier? }.", IsRequired=true)
+    public var functionRef:FunctionRefDto?
+
+    // @DataMember
+    public var payload:[String:String]?
+
+    /**
+    * Sync (wait for the result, default) or Async (fire and forget).
+    */
+    // @DataMember
+    // @ApiMember(Description="Sync (wait for the result, default) or Async (fire and forget).")
+    public var invocationType:CodeInvocationType?
+
+    /**
+    * The service user the function acts as (usr_…); omitted = you.
+    */
+    // @DataMember
+    // @ApiMember(Description="The service user the function acts as (usr_…); omitted = you.")
+    public var runAsUserId:String?
+
+    /**
+    * A JSON object → envelope config. No bindings: a manual call has nothing to bind them with.
+    */
+    // @DataMember
+    // @ApiMember(Description="A JSON object → envelope config. No bindings: a manual call has nothing to bind them with.")
+    public var config:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case functionRef
+        case payload
+        case invocationType
+        case runAsUserId
+        case config
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        functionRef = try container.decodeIfPresent(FunctionRefDto.self, forKey: .functionRef)
+        payload = try container.decodeIfPresent([String:String].self, forKey: .payload) ?? [:]
+        invocationType = try container.decodeIfPresent(CodeInvocationType.self, forKey: .invocationType)
+        runAsUserId = try container.decodeIfPresent(String.self, forKey: .runAsUserId)
+        config = try container.decodeIfPresent(String.self, forKey: .config)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if functionRef != nil { try container.encode(functionRef, forKey: .functionRef) }
+        if payload != nil { try container.encode(payload, forKey: .payload) }
+        if invocationType != nil { try container.encode(invocationType, forKey: .invocationType) }
+        if runAsUserId != nil { try container.encode(runAsUserId, forKey: .runAsUserId) }
+        if config != nil { try container.encode(config, forKey: .config) }
+    }
+}
+
 /**
 * Disable push service
 */
@@ -14167,17 +14534,17 @@ public class TestPushIntegration : CodeMashRequestBase, IReturn
     public var integrationId:String?
 
     /**
-    * Optional device token to send the test notification to. Requires DeliveryFamily when set.
+    * The device token the test is sent to — a device registered for the person receiving the test (get it from get_push_devices). Required for every real provider (only the Fake integration tests without one). For a web device it is the browser subscription JSON. Requires DeliveryFamily.
     */
     // @DataMember
-    // @ApiMember(Description="Optional device token to send the test notification to. Requires DeliveryFamily when set.")
+    // @ApiMember(Description="The device token the test is sent to — a device registered for the person receiving the test (get it from get_push_devices). Required for every real provider (only the Fake integration tests without one). For a web device it is the browser subscription JSON. Requires DeliveryFamily.")
     public var testToken:String?
 
     /**
-    * Optional delivery family for the test token (ios, android, chrome or safari). Requires TestToken when set.
+    * The delivery family of TestToken: ios, android, chrome (any browser web push) or safari. Requires TestToken.
     */
     // @DataMember
-    // @ApiMember(Description="Optional delivery family for the test token (ios, android, chrome or safari). Requires TestToken when set.")
+    // @ApiMember(Description="The delivery family of TestToken: ios, android, chrome (any browser web push) or safari. Requires TestToken.")
     public var deliveryFamily:String?
 
     required public init(){ super.init() }
@@ -15819,6 +16186,18 @@ public class GetLogs : CodeMashListPaginationRequestBase, IReturn
     public var search:String?
 
     /**
+    * Meta key to filter on (e.g. taskId). Letters, digits and _ only. Must come with metaValue.
+    */
+    // @ApiMember(DataType="string", Description="Meta key to filter on (e.g. taskId). Letters, digits and _ only. Must come with metaValue.", Name="metaKey", ParameterType="query")
+    public var metaKey:String?
+
+    /**
+    * Exact Meta value for metaKey (e.g. a task id tsk_...). Must come with metaKey.
+    */
+    // @ApiMember(DataType="string", Description="Exact Meta value for metaKey (e.g. a task id tsk_...). Must come with metaKey.", Name="metaValue", ParameterType="query")
+    public var metaValue:String?
+
+    /**
     * Start of the timestamp range (inclusive, UTC). Optional.
     */
     // @ApiMember(Description="Start of the timestamp range (inclusive, UTC). Optional.")
@@ -15838,6 +16217,8 @@ public class GetLogs : CodeMashListPaginationRequestBase, IReturn
         case logCorrelationId
         case eventCode
         case search
+        case metaKey
+        case metaValue
         case fromUtc
         case toUtc
     }
@@ -15850,6 +16231,8 @@ public class GetLogs : CodeMashListPaginationRequestBase, IReturn
         logCorrelationId = try container.decodeIfPresent(String.self, forKey: .logCorrelationId)
         eventCode = try container.decodeIfPresent(String.self, forKey: .eventCode)
         search = try container.decodeIfPresent(String.self, forKey: .search)
+        metaKey = try container.decodeIfPresent(String.self, forKey: .metaKey)
+        metaValue = try container.decodeIfPresent(String.self, forKey: .metaValue)
         fromUtc = try container.decodeIfPresent(Date.self, forKey: .fromUtc)
         toUtc = try container.decodeIfPresent(Date.self, forKey: .toUtc)
     }
@@ -15862,6 +16245,8 @@ public class GetLogs : CodeMashListPaginationRequestBase, IReturn
         if logCorrelationId != nil { try container.encode(logCorrelationId, forKey: .logCorrelationId) }
         if eventCode != nil { try container.encode(eventCode, forKey: .eventCode) }
         if search != nil { try container.encode(search, forKey: .search) }
+        if metaKey != nil { try container.encode(metaKey, forKey: .metaKey) }
+        if metaValue != nil { try container.encode(metaValue, forKey: .metaValue) }
         if fromUtc != nil { try container.encode(fromUtc, forKey: .fromUtc) }
         if toUtc != nil { try container.encode(toUtc, forKey: .toUtc) }
     }
@@ -17067,6 +17452,187 @@ public class DeleteAiProjectTrigger : DeleteTrigger, IReturn
 }
 
 /**
+* Starts a browser sign-in for the Norbix CLI (OAuth device authorization, RFC 8628): a device code for polling and a user code the person confirms on the dashboard.
+*/
+// @Route("/{version}/auth/device/start", "POST")
+// @Api(Description="Starts a browser sign-in for the Norbix CLI (OAuth device authorization, RFC 8628): a device code for polling and a user code the person confirms on the dashboard.")
+public class AuthDeviceStartRequest : RequestBase, IReturn
+{
+    public typealias Return = AuthDeviceStartResponse
+
+    /**
+    * Who asks, shown on the dashboard, e.g. "norbix-cli". 1–80 printable characters.
+    */
+    // @ApiMember(Description="Who asks, shown on the dashboard, e.g. \"norbix-cli\". 1–80 printable characters.", IsRequired=true)
+    public var clientName:String?
+
+    /**
+    * The computer name, shown on the dashboard and part of the AI service user's name (cleaned, at most 40 characters).
+    */
+    // @ApiMember(Description="The computer name, shown on the dashboard and part of the AI service user's name (cleaned, at most 40 characters).")
+    public var deviceName:String?
+
+    /**
+    * The project the CLI wants to work in. It must be a project of the account of the person who allows the sign-in.
+    */
+    // @ApiMember(Description="The project the CLI wants to work in. It must be a project of the account of the person who allows the sign-in.")
+    public var projectId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case clientName
+        case deviceName
+        case projectId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        clientName = try container.decodeIfPresent(String.self, forKey: .clientName)
+        deviceName = try container.decodeIfPresent(String.self, forKey: .deviceName)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if clientName != nil { try container.encode(clientName, forKey: .clientName) }
+        if deviceName != nil { try container.encode(deviceName, forKey: .deviceName) }
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+    }
+}
+
+/**
+* Polls a CLI browser sign-in (RFC 8628). Always HTTP 200: an error name (authorization_pending, slow_down, access_denied, expired_token, invalid_grant, invalid_request) or the tokens, once.
+*/
+// @Route("/{version}/auth/device/token", "POST")
+// @Api(Description="Polls a CLI browser sign-in (RFC 8628). Always HTTP 200: an error name (authorization_pending, slow_down, access_denied, expired_token, invalid_grant, invalid_request) or the tokens, once.")
+public class AuthDeviceTokenRequest : RequestBase, IReturn
+{
+    public typealias Return = AuthDeviceTokenResponse
+
+    /**
+    * The deviceCode from POST /auth/device/start.
+    */
+    // @ApiMember(Description="The deviceCode from POST /auth/device/start.", IsRequired=true)
+    public var deviceCode:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case deviceCode
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        deviceCode = try container.decodeIfPresent(String.self, forKey: .deviceCode)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if deviceCode != nil { try container.encode(deviceCode, forKey: .deviceCode) }
+    }
+}
+
+/**
+* The dashboard screen for a CLI browser sign-in: the client and computer that asked, and the roles the signed-in person may give.
+*/
+// @Route("/{version}/auth/device/consent", "GET")
+// @Api(Description="The dashboard screen for a CLI browser sign-in: the client and computer that asked, and the roles the signed-in person may give.")
+public class AuthDeviceConsentRequest : RequestBase, IReturn
+{
+    public typealias Return = AuthDeviceConsentResponse
+
+    /**
+    * The code the terminal shows, XXXX-XXXX (case, spaces and the dash do not matter).
+    */
+    // @ApiMember(Description="The code the terminal shows, XXXX-XXXX (case, spaces and the dash do not matter).", IsRequired=true)
+    public var userCode:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case userCode
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        userCode = try container.decodeIfPresent(String.self, forKey: .userCode)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if userCode != nil { try container.encode(userCode, forKey: .userCode) }
+    }
+}
+
+/**
+* The signed-in person's decision on a CLI browser sign-in: allow with Membership roles, or deny.
+*/
+// @Route("/{version}/auth/device/consent", "POST")
+// @Api(Description="The signed-in person's decision on a CLI browser sign-in: allow with Membership roles, or deny.")
+public class AuthDeviceConsentDecisionRequest : RequestBase, IReturn
+{
+    public typealias Return = AuthDeviceConsentDecisionResponse
+
+    /**
+    * The code the terminal shows, XXXX-XXXX.
+    */
+    // @ApiMember(Description="The code the terminal shows, XXXX-XXXX.", IsRequired=true)
+    public var userCode:String?
+
+    /**
+    * allow | deny.
+    */
+    // @ApiMember(Description="allow | deny.", IsRequired=true)
+    public var decision:String?
+
+    /**
+    * For allow: account role ids (acc_…_nr_…) to give.
+    */
+    // @ApiMember(Description="For allow: account role ids (acc_…_nr_…) to give.")
+    public var accountRoleIds:[String]?
+
+    /**
+    * For allow: project roles to give, [{ projectId, roleIds: [pr_…_nr_…] }].
+    */
+    // @ApiMember(Description="For allow: project roles to give, [{ projectId, roleIds: [pr_…_nr_…] }].")
+    public var projectRoles:[AiProjectRoleIdsDto]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case userCode
+        case decision
+        case accountRoleIds
+        case projectRoles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        userCode = try container.decodeIfPresent(String.self, forKey: .userCode)
+        decision = try container.decodeIfPresent(String.self, forKey: .decision)
+        accountRoleIds = try container.decodeIfPresent([String].self, forKey: .accountRoleIds) ?? []
+        projectRoles = try container.decodeIfPresent([AiProjectRoleIdsDto].self, forKey: .projectRoles) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if userCode != nil { try container.encode(userCode, forKey: .userCode) }
+        if decision != nil { try container.encode(decision, forKey: .decision) }
+        if accountRoleIds != nil { try container.encode(accountRoleIds, forKey: .accountRoleIds) }
+        if projectRoles != nil { try container.encode(projectRoles, forKey: .projectRoles) }
+    }
+}
+
+/**
 * OAuth protected-resource metadata (RFC 9728) for the Hub MCP endpoint.
 */
 // @Route("/.well-known/oauth-protected-resource", "GET")
@@ -17112,10 +17678,10 @@ public class OAuthRegisterRequest : IReturn, Codable
 }
 
 /**
-* OAuth authorization endpoint: sign-in hint or the consent page (HTML).
+* OAuth authorization endpoint: checks the request and redirects to the dashboard consent screen.
 */
 // @Route("/{version}/oauth/authorize", "GET")
-// @Api(Description="OAuth authorization endpoint: sign-in hint or the consent page (HTML).")
+// @Api(Description="OAuth authorization endpoint: checks the request and redirects to the dashboard consent screen.")
 public class OAuthAuthorizeRequest : IReturn, Codable
 {
     public typealias Return = String
@@ -17126,17 +17692,233 @@ public class OAuthAuthorizeRequest : IReturn, Codable
 }
 
 /**
-* OAuth authorization endpoint: the person's decision from the consent page.
+* The dashboard consent screen for an AI tool: the client, where it returns to, and the roles the signed-in person may give.
 */
-// @Route("/{version}/oauth/authorize", "POST")
-// @Api(Description="OAuth authorization endpoint: the person's decision from the consent page.")
-public class OAuthAuthorizeDecisionRequest : IReturn, Codable
+// @Route("/{version}/oauth/consent", "GET")
+// @Api(Description="The dashboard consent screen for an AI tool: the client, where it returns to, and the roles the signed-in person may give.")
+public class OAuthConsentRequest : RequestBase, IReturn
 {
-    public typealias Return = String
+    public typealias Return = OAuthConsentResponse
 
-    public var version:String?
+    /**
+    * OAuth response_type from the authorize request (must be "code").
+    */
+    // @ApiMember(Description="OAuth response_type from the authorize request (must be \"code\").")
+    public var responseType:String?
 
-    required public init(){}
+    /**
+    * OAuth client_id from the authorize request.
+    */
+    // @ApiMember(Description="OAuth client_id from the authorize request.")
+    public var clientId:String?
+
+    /**
+    * OAuth redirect_uri from the authorize request.
+    */
+    // @ApiMember(Description="OAuth redirect_uri from the authorize request.")
+    public var redirectUri:String?
+
+    /**
+    * PKCE code_challenge from the authorize request.
+    */
+    // @ApiMember(Description="PKCE code_challenge from the authorize request.")
+    public var codeChallenge:String?
+
+    /**
+    * PKCE code_challenge_method from the authorize request (must be "S256").
+    */
+    // @ApiMember(Description="PKCE code_challenge_method from the authorize request (must be \"S256\").")
+    public var codeChallengeMethod:String?
+
+    /**
+    * OAuth state from the authorize request; returned to the client unchanged.
+    */
+    // @ApiMember(Description="OAuth state from the authorize request; returned to the client unchanged.")
+    public var state:String?
+
+    /**
+    * OAuth resource (RFC 8707) from the authorize request.
+    */
+    // @ApiMember(Description="OAuth resource (RFC 8707) from the authorize request.")
+    public var resource:String?
+
+    /**
+    * OAuth scope from the authorize request.
+    */
+    // @ApiMember(Description="OAuth scope from the authorize request.")
+    public var scope:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case responseType
+        case clientId
+        case redirectUri
+        case codeChallenge
+        case codeChallengeMethod
+        case state
+        case resource
+        case scope
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        responseType = try container.decodeIfPresent(String.self, forKey: .responseType)
+        clientId = try container.decodeIfPresent(String.self, forKey: .clientId)
+        redirectUri = try container.decodeIfPresent(String.self, forKey: .redirectUri)
+        codeChallenge = try container.decodeIfPresent(String.self, forKey: .codeChallenge)
+        codeChallengeMethod = try container.decodeIfPresent(String.self, forKey: .codeChallengeMethod)
+        state = try container.decodeIfPresent(String.self, forKey: .state)
+        resource = try container.decodeIfPresent(String.self, forKey: .resource)
+        scope = try container.decodeIfPresent(String.self, forKey: .scope)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if responseType != nil { try container.encode(responseType, forKey: .responseType) }
+        if clientId != nil { try container.encode(clientId, forKey: .clientId) }
+        if redirectUri != nil { try container.encode(redirectUri, forKey: .redirectUri) }
+        if codeChallenge != nil { try container.encode(codeChallenge, forKey: .codeChallenge) }
+        if codeChallengeMethod != nil { try container.encode(codeChallengeMethod, forKey: .codeChallengeMethod) }
+        if state != nil { try container.encode(state, forKey: .state) }
+        if resource != nil { try container.encode(resource, forKey: .resource) }
+        if scope != nil { try container.encode(scope, forKey: .scope) }
+    }
+}
+
+/**
+* The signed-in person's decision on the consent screen: allow with roles, or deny. Returns the address to send the browser to.
+*/
+// @Route("/{version}/oauth/consent", "POST")
+// @Api(Description="The signed-in person's decision on the consent screen: allow with roles, or deny. Returns the address to send the browser to.")
+public class OAuthConsentDecisionRequest : RequestBase, IReturn
+{
+    public typealias Return = OAuthConsentDecisionResponse
+
+    /**
+    * OAuth response_type from the authorize request (must be "code").
+    */
+    // @ApiMember(Description="OAuth response_type from the authorize request (must be \"code\").")
+    public var responseType:String?
+
+    /**
+    * OAuth client_id from the authorize request.
+    */
+    // @ApiMember(Description="OAuth client_id from the authorize request.")
+    public var clientId:String?
+
+    /**
+    * OAuth redirect_uri from the authorize request.
+    */
+    // @ApiMember(Description="OAuth redirect_uri from the authorize request.")
+    public var redirectUri:String?
+
+    /**
+    * PKCE code_challenge from the authorize request.
+    */
+    // @ApiMember(Description="PKCE code_challenge from the authorize request.")
+    public var codeChallenge:String?
+
+    /**
+    * PKCE code_challenge_method from the authorize request (must be "S256").
+    */
+    // @ApiMember(Description="PKCE code_challenge_method from the authorize request (must be \"S256\").")
+    public var codeChallengeMethod:String?
+
+    /**
+    * OAuth state from the authorize request; returned to the client unchanged.
+    */
+    // @ApiMember(Description="OAuth state from the authorize request; returned to the client unchanged.")
+    public var state:String?
+
+    /**
+    * OAuth resource (RFC 8707) from the authorize request.
+    */
+    // @ApiMember(Description="OAuth resource (RFC 8707) from the authorize request.")
+    public var resource:String?
+
+    /**
+    * OAuth scope from the authorize request.
+    */
+    // @ApiMember(Description="OAuth scope from the authorize request.")
+    public var scope:String?
+
+    /**
+    * The consentTicket from GET /oauth/consent.
+    */
+    // @ApiMember(Description="The consentTicket from GET /oauth/consent.", IsRequired=true)
+    public var consentTicket:String?
+
+    /**
+    * allow | deny.
+    */
+    // @ApiMember(Description="allow | deny.", IsRequired=true)
+    public var decision:String?
+
+    /**
+    * For allow: account role ids (acc_…_nr_…) to give.
+    */
+    // @ApiMember(Description="For allow: account role ids (acc_…_nr_…) to give.")
+    public var accountRoleIds:[String]?
+
+    /**
+    * For allow: project roles to give, [{ projectId, roleIds: [pr_…_nr_…] }].
+    */
+    // @ApiMember(Description="For allow: project roles to give, [{ projectId, roleIds: [pr_…_nr_…] }].")
+    public var projectRoles:[AiProjectRoleIdsDto]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case responseType
+        case clientId
+        case redirectUri
+        case codeChallenge
+        case codeChallengeMethod
+        case state
+        case resource
+        case scope
+        case consentTicket
+        case decision
+        case accountRoleIds
+        case projectRoles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        responseType = try container.decodeIfPresent(String.self, forKey: .responseType)
+        clientId = try container.decodeIfPresent(String.self, forKey: .clientId)
+        redirectUri = try container.decodeIfPresent(String.self, forKey: .redirectUri)
+        codeChallenge = try container.decodeIfPresent(String.self, forKey: .codeChallenge)
+        codeChallengeMethod = try container.decodeIfPresent(String.self, forKey: .codeChallengeMethod)
+        state = try container.decodeIfPresent(String.self, forKey: .state)
+        resource = try container.decodeIfPresent(String.self, forKey: .resource)
+        scope = try container.decodeIfPresent(String.self, forKey: .scope)
+        consentTicket = try container.decodeIfPresent(String.self, forKey: .consentTicket)
+        decision = try container.decodeIfPresent(String.self, forKey: .decision)
+        accountRoleIds = try container.decodeIfPresent([String].self, forKey: .accountRoleIds) ?? []
+        projectRoles = try container.decodeIfPresent([AiProjectRoleIdsDto].self, forKey: .projectRoles) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if responseType != nil { try container.encode(responseType, forKey: .responseType) }
+        if clientId != nil { try container.encode(clientId, forKey: .clientId) }
+        if redirectUri != nil { try container.encode(redirectUri, forKey: .redirectUri) }
+        if codeChallenge != nil { try container.encode(codeChallenge, forKey: .codeChallenge) }
+        if codeChallengeMethod != nil { try container.encode(codeChallengeMethod, forKey: .codeChallengeMethod) }
+        if state != nil { try container.encode(state, forKey: .state) }
+        if resource != nil { try container.encode(resource, forKey: .resource) }
+        if scope != nil { try container.encode(scope, forKey: .scope) }
+        if consentTicket != nil { try container.encode(consentTicket, forKey: .consentTicket) }
+        if decision != nil { try container.encode(decision, forKey: .decision) }
+        if accountRoleIds != nil { try container.encode(accountRoleIds, forKey: .accountRoleIds) }
+        if projectRoles != nil { try container.encode(projectRoles, forKey: .projectRoles) }
+    }
 }
 
 /**
@@ -17804,6 +18586,7 @@ public class UpdateWebhookIntegrationExtraHeadersRequest : CodeMashRequestBase, 
 // @Route("/{version}/webhooks/{source}/{integrationInstanceId}", "POST")
 public class ReceiveWebhook : IReturnVoid, Codable
 {
+    public var version:String?
     public var source:String?
     public var integrationInstanceId:String?
     public var requestStream:Data?
@@ -18156,6 +18939,44 @@ public class GetSchedulerTasks : CodeMashListPaginationRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if type != nil { try container.encode(type, forKey: .type) }
         if enabled != nil { try container.encode(enabled, forKey: .enabled) }
+    }
+}
+
+/**
+* Gets the latest runs of a scheduled task
+*/
+// @Route("/{version}/scheduler/tasks/{id}/runs", "GET")
+// @Api(Description="Gets the latest runs of a scheduled task")
+public class GetSchedulerTaskRuns : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetSchedulerTaskRunsResponse
+
+    public var id:String?
+    /**
+    * How many runs to return, newest first: 1-50. Default 10.
+    */
+    // @ApiMember(DataType="integer", Description="How many runs to return, newest first: 1-50. Default 10.", Name="take", ParameterType="query")
+    public var take:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+        case take
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        take = try container.decodeIfPresent(Int.self, forKey: .take)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+        if take != nil { try container.encode(take, forKey: .take) }
     }
 }
 
@@ -19864,6 +20685,7 @@ public class EchoResponse : Codable
     public var installationDomain:String?
     public var licensingDocsUrl:String?
     public var agent:EchoAgentDto?
+    public var hostingPlatform:EchoHostingPlatformDto?
 
     required public init(){}
 }
@@ -19963,14 +20785,31 @@ public class GetAccountStatusResponse : ResponseBase
 // @DataContract
 public class CreateStripeCheckoutSessionResponse : IdResponse
 {
+    // @DataMember
+    public var trialIncluded:Bool?
+
+    // @DataMember
+    public var noTrialReason:String?
+
     required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case trialIncluded
+        case noTrialReason
+    }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        trialIncluded = try container.decodeIfPresent(Bool.self, forKey: .trialIncluded)
+        noTrialReason = try container.decodeIfPresent(String.self, forKey: .noTrialReason)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if trialIncluded != nil { try container.encode(trialIncluded, forKey: .trialIncluded) }
+        if noTrialReason != nil { try container.encode(noTrialReason, forKey: .noTrialReason) }
     }
 }
 
@@ -21521,6 +22360,29 @@ public class GetDatabaseSchemaDraftResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if item != nil { try container.encode(item, forKey: .item) }
+    }
+}
+
+public class GetDatabaseSchemaIndexStatusResponse : ResponseBase
+{
+    public var status:SchemaIndexStatusDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case status
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        status = try container.decodeIfPresent(SchemaIndexStatusDto.self, forKey: .status)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if status != nil { try container.encode(status, forKey: .status) }
     }
 }
 
@@ -23605,23 +24467,27 @@ public class GetCodeIntegrationResponse : ResponseBase
 
 public class GetCodeIntegrationsResponse : ResponseBase
 {
+    public var defaultIntegrationId:String?
     public var list:PaginatedResponse<CodeIntegrationListProjection>?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case defaultIntegrationId
         case list
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        defaultIntegrationId = try container.decodeIfPresent(String.self, forKey: .defaultIntegrationId)
         list = try container.decodeIfPresent(PaginatedResponse<CodeIntegrationListProjection>.self, forKey: .list)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if defaultIntegrationId != nil { try container.encode(defaultIntegrationId, forKey: .defaultIntegrationId) }
         if list != nil { try container.encode(list, forKey: .list) }
     }
 }
@@ -23648,6 +24514,137 @@ public class TestCodeIntegrationResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if items != nil { try container.encode(items, forKey: .items) }
+    }
+}
+
+public class GetCodeFunctionsResponse : ResponseBase
+{
+    public var list:PaginatedResponse<CodeFunctionDescriptorDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case list
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        list = try container.decodeIfPresent(PaginatedResponse<CodeFunctionDescriptorDto>.self, forKey: .list)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class GetCodeFunctionEventSampleResponse : ResponseBase
+{
+    public var sample:CodeFunctionEventDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case sample
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        sample = try container.decodeIfPresent(CodeFunctionEventDto.self, forKey: .sample)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if sample != nil { try container.encode(sample, forKey: .sample) }
+    }
+}
+
+public class GetCodeFunctionQualifiersResponse : ResponseBase
+{
+    public var qualifiers:IReadOnlyList<CodeFunctionQualifierDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case qualifiers
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        qualifiers = try container.decodeIfPresent(IReadOnlyList<CodeFunctionQualifierDto>.self, forKey: .qualifiers)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if qualifiers != nil { try container.encode(qualifiers, forKey: .qualifiers) }
+    }
+}
+
+public class GetCodeFunctionRunsResponse : ResponseBase
+{
+    public var runs:[CodeFunctionRunDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case runs
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        runs = try container.decodeIfPresent([CodeFunctionRunDto].self, forKey: .runs) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if runs.count > 0 { try container.encode(runs, forKey: .runs) }
+    }
+}
+
+public class InvokeCodeFunctionResponse : ResponseBase
+{
+    public var statusCode:Int?
+    public var output:String?
+    public var durationMs:Int?
+    public var requestId:String?
+    public var logs:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case statusCode
+        case output
+        case durationMs
+        case requestId
+        case logs
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        statusCode = try container.decodeIfPresent(Int.self, forKey: .statusCode)
+        output = try container.decodeIfPresent(String.self, forKey: .output)
+        durationMs = try container.decodeIfPresent(Int.self, forKey: .durationMs)
+        requestId = try container.decodeIfPresent(String.self, forKey: .requestId)
+        logs = try container.decodeIfPresent(String.self, forKey: .logs)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if statusCode != nil { try container.encode(statusCode, forKey: .statusCode) }
+        if output != nil { try container.encode(output, forKey: .output) }
+        if durationMs != nil { try container.encode(durationMs, forKey: .durationMs) }
+        if requestId != nil { try container.encode(requestId, forKey: .requestId) }
+        if logs != nil { try container.encode(logs, forKey: .logs) }
     }
 }
 
@@ -24965,6 +25962,246 @@ public class GetAiTriggerResponse : GetTriggerResponse
     }
 }
 
+public class AuthDeviceStartResponse : ResponseBase
+{
+    public var deviceCode:String?
+    public var userCode:String?
+    public var verificationUri:String?
+    public var verificationUriComplete:String?
+    public var expiresIn:Int?
+    public var interval:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case deviceCode
+        case userCode
+        case verificationUri
+        case verificationUriComplete
+        case expiresIn
+        case interval
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        deviceCode = try container.decodeIfPresent(String.self, forKey: .deviceCode)
+        userCode = try container.decodeIfPresent(String.self, forKey: .userCode)
+        verificationUri = try container.decodeIfPresent(String.self, forKey: .verificationUri)
+        verificationUriComplete = try container.decodeIfPresent(String.self, forKey: .verificationUriComplete)
+        expiresIn = try container.decodeIfPresent(Int.self, forKey: .expiresIn)
+        interval = try container.decodeIfPresent(Int.self, forKey: .interval)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if deviceCode != nil { try container.encode(deviceCode, forKey: .deviceCode) }
+        if userCode != nil { try container.encode(userCode, forKey: .userCode) }
+        if verificationUri != nil { try container.encode(verificationUri, forKey: .verificationUri) }
+        if verificationUriComplete != nil { try container.encode(verificationUriComplete, forKey: .verificationUriComplete) }
+        if expiresIn != nil { try container.encode(expiresIn, forKey: .expiresIn) }
+        if interval != nil { try container.encode(interval, forKey: .interval) }
+    }
+}
+
+public class AuthDeviceTokenResponse : ResponseBase
+{
+    public var error:String?
+    public var errorDescription:String?
+    public var errorCode:String?
+    public var reason:String?
+    public var bearerToken:String?
+    public var refreshToken:String?
+    public var expiresIn:Int?
+    public var clientId:String?
+    public var userId:String?
+    public var userName:String?
+    public var displayName:String?
+    public var accountId:String?
+    public var projectId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case error
+        case errorDescription
+        case errorCode
+        case reason
+        case bearerToken
+        case refreshToken
+        case expiresIn
+        case clientId
+        case userId
+        case userName
+        case displayName
+        case accountId
+        case projectId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        error = try container.decodeIfPresent(String.self, forKey: .error)
+        errorDescription = try container.decodeIfPresent(String.self, forKey: .errorDescription)
+        errorCode = try container.decodeIfPresent(String.self, forKey: .errorCode)
+        reason = try container.decodeIfPresent(String.self, forKey: .reason)
+        bearerToken = try container.decodeIfPresent(String.self, forKey: .bearerToken)
+        refreshToken = try container.decodeIfPresent(String.self, forKey: .refreshToken)
+        expiresIn = try container.decodeIfPresent(Int.self, forKey: .expiresIn)
+        clientId = try container.decodeIfPresent(String.self, forKey: .clientId)
+        userId = try container.decodeIfPresent(String.self, forKey: .userId)
+        userName = try container.decodeIfPresent(String.self, forKey: .userName)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        accountId = try container.decodeIfPresent(String.self, forKey: .accountId)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if error != nil { try container.encode(error, forKey: .error) }
+        if errorDescription != nil { try container.encode(errorDescription, forKey: .errorDescription) }
+        if errorCode != nil { try container.encode(errorCode, forKey: .errorCode) }
+        if reason != nil { try container.encode(reason, forKey: .reason) }
+        if bearerToken != nil { try container.encode(bearerToken, forKey: .bearerToken) }
+        if refreshToken != nil { try container.encode(refreshToken, forKey: .refreshToken) }
+        if expiresIn != nil { try container.encode(expiresIn, forKey: .expiresIn) }
+        if clientId != nil { try container.encode(clientId, forKey: .clientId) }
+        if userId != nil { try container.encode(userId, forKey: .userId) }
+        if userName != nil { try container.encode(userName, forKey: .userName) }
+        if displayName != nil { try container.encode(displayName, forKey: .displayName) }
+        if accountId != nil { try container.encode(accountId, forKey: .accountId) }
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+    }
+}
+
+public class AuthDeviceConsentResponse : ResponseBase
+{
+    public var clientName:String?
+    public var deviceName:String?
+    public var userCode:String?
+    public var projectId:String?
+    public var accountRoles:[AiRoleDto] = []
+    public var projects:[AiProjectRolesDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case clientName
+        case deviceName
+        case userCode
+        case projectId
+        case accountRoles
+        case projects
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        clientName = try container.decodeIfPresent(String.self, forKey: .clientName)
+        deviceName = try container.decodeIfPresent(String.self, forKey: .deviceName)
+        userCode = try container.decodeIfPresent(String.self, forKey: .userCode)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+        accountRoles = try container.decodeIfPresent([AiRoleDto].self, forKey: .accountRoles) ?? []
+        projects = try container.decodeIfPresent([AiProjectRolesDto].self, forKey: .projects) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if clientName != nil { try container.encode(clientName, forKey: .clientName) }
+        if deviceName != nil { try container.encode(deviceName, forKey: .deviceName) }
+        if userCode != nil { try container.encode(userCode, forKey: .userCode) }
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+        if accountRoles.count > 0 { try container.encode(accountRoles, forKey: .accountRoles) }
+        if projects.count > 0 { try container.encode(projects, forKey: .projects) }
+    }
+}
+
+public class AuthDeviceConsentDecisionResponse : ResponseBase
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public class OAuthConsentResponse : ResponseBase
+{
+    public var clientName:String?
+    public var redirectHost:String?
+    public var clientHost:String?
+    public var redirectIsLoopback:Bool?
+    public var consentTicket:String?
+    public var accountRoles:[AiRoleDto] = []
+    public var projects:[AiProjectRolesDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case clientName
+        case redirectHost
+        case clientHost
+        case redirectIsLoopback
+        case consentTicket
+        case accountRoles
+        case projects
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        clientName = try container.decodeIfPresent(String.self, forKey: .clientName)
+        redirectHost = try container.decodeIfPresent(String.self, forKey: .redirectHost)
+        clientHost = try container.decodeIfPresent(String.self, forKey: .clientHost)
+        redirectIsLoopback = try container.decodeIfPresent(Bool.self, forKey: .redirectIsLoopback)
+        consentTicket = try container.decodeIfPresent(String.self, forKey: .consentTicket)
+        accountRoles = try container.decodeIfPresent([AiRoleDto].self, forKey: .accountRoles) ?? []
+        projects = try container.decodeIfPresent([AiProjectRolesDto].self, forKey: .projects) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if clientName != nil { try container.encode(clientName, forKey: .clientName) }
+        if redirectHost != nil { try container.encode(redirectHost, forKey: .redirectHost) }
+        if clientHost != nil { try container.encode(clientHost, forKey: .clientHost) }
+        if redirectIsLoopback != nil { try container.encode(redirectIsLoopback, forKey: .redirectIsLoopback) }
+        if consentTicket != nil { try container.encode(consentTicket, forKey: .consentTicket) }
+        if accountRoles.count > 0 { try container.encode(accountRoles, forKey: .accountRoles) }
+        if projects.count > 0 { try container.encode(projects, forKey: .projects) }
+    }
+}
+
+public class OAuthConsentDecisionResponse : ResponseBase
+{
+    public var redirectUrl:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case redirectUrl
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        redirectUrl = try container.decodeIfPresent(String.self, forKey: .redirectUrl)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if redirectUrl != nil { try container.encode(redirectUrl, forKey: .redirectUrl) }
+    }
+}
+
 public class GetEmbeddingIntegrationResponse : ResponseBase
 {
     public var item:EmbeddingIntegrationDto?
@@ -25340,6 +26577,33 @@ public class GetSchedulerTasksResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class GetSchedulerTaskRunsResponse : ResponseBase
+{
+    public var logsEnabled:Bool?
+    public var runs:[SchedulerTaskRunDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case logsEnabled
+        case runs
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        logsEnabled = try container.decodeIfPresent(Bool.self, forKey: .logsEnabled)
+        runs = try container.decodeIfPresent([SchedulerTaskRunDto].self, forKey: .runs) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if logsEnabled != nil { try container.encode(logsEnabled, forKey: .logsEnabled) }
+        if runs.count > 0 { try container.encode(runs, forKey: .runs) }
     }
 }
 
@@ -27739,8 +29003,22 @@ public class GoogleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
 
 public class EdgeWebPushIntegrationRequest : PushIntegrationRequest
 {
+    /**
+    * VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.
+    */
+    // @ApiMember(Description="VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.", IsRequired=true)
     public var vapidPublicKey:String?
+
+    /**
+    * VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.
+    */
+    // @ApiMember(Description="VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.", IsRequired=true)
     public var vapidPrivateKey:String?
+
+    /**
+    * Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.
+    */
+    // @ApiMember(Description="Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.")
     public var subject:String?
 
     required public init(){ super.init() }
@@ -27773,9 +29051,28 @@ public class EdgeWebPushIntegrationRequest : PushIntegrationRequest
 
 public class ChromePluginPushIntegrationRequest : PushIntegrationRequest
 {
+    /**
+    * The extension's Chrome id: 32 lower-case letters a–p, as shown on chrome://extensions.
+    */
+    // @ApiMember(Description="The extension's Chrome id: 32 lower-case letters a–p, as shown on chrome://extensions.", IsRequired=true)
     public var extensionId:String?
+
+    /**
+    * VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.
+    */
+    // @ApiMember(Description="VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.", IsRequired=true)
     public var vapidPublicKey:String?
+
+    /**
+    * VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.
+    */
+    // @ApiMember(Description="VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.", IsRequired=true)
     public var vapidPrivateKey:String?
+
+    /**
+    * Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.
+    */
+    // @ApiMember(Description="Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.")
     public var subject:String?
 
     required public init(){ super.init() }
@@ -27845,8 +29142,22 @@ public class SafariPushIntegrationRequest : PushIntegrationRequest
 
 public class ChromeWebPushIntegrationRequest : PushIntegrationRequest
 {
+    /**
+    * VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.
+    */
+    // @ApiMember(Description="VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.", IsRequired=true)
     public var vapidPublicKey:String?
+
+    /**
+    * VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.
+    */
+    // @ApiMember(Description="VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.", IsRequired=true)
     public var vapidPrivateKey:String?
+
+    /**
+    * Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.
+    */
+    // @ApiMember(Description="Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.")
     public var subject:String?
 
     required public init(){ super.init() }
@@ -27879,8 +29190,22 @@ public class ChromeWebPushIntegrationRequest : PushIntegrationRequest
 
 public class FirefoxWebPushIntegrationRequest : PushIntegrationRequest
 {
+    /**
+    * VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.
+    */
+    // @ApiMember(Description="VAPID public key (URL-safe Base-64, 65 bytes), generated together with the private key — e.g. `npx web-push generate-vapid-keys`. The browser subscribes with it as applicationServerKey.", IsRequired=true)
     public var vapidPublicKey:String?
+
+    /**
+    * VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.
+    */
+    // @ApiMember(Description="VAPID private key (URL-safe Base-64, 32 bytes). Stored as a secret.", IsRequired=true)
     public var vapidPrivateKey:String?
+
+    /**
+    * Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.
+    */
+    // @ApiMember(Description="Contact e-mail the browser push services can reach you at, e.g. admin@example.com. An e-mail address only (no URL); it is sent as mailto:.")
     public var subject:String?
 
     required public init(){ super.init() }
@@ -28741,30 +30066,66 @@ public class TriggerActionPushDto : TriggerActionDto
 public class TriggerActionCodeDto : TriggerActionDto
 {
     // @DataMember
-    public var functionId:String?
+    public var functionRef:FunctionRefDto?
+
+    // @DataMember
+    public var runAsUserId:String?
+
+    // @DataMember
+    public var invocationType:CodeInvocationType?
+
+    // @DataMember
+    public var config:String?
 
     // @DataMember
     public var deliverySettings:CodeDeliverySettingsDto?
 
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var activationCode:String?
+
+    // @DataMember
+    public var meta:[String:String]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
-        case functionId
+        case functionRef
+        case runAsUserId
+        case invocationType
+        case config
         case deliverySettings
+        case functionId
+        case activationCode
+        case meta
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
+        functionRef = try container.decodeIfPresent(FunctionRefDto.self, forKey: .functionRef)
+        runAsUserId = try container.decodeIfPresent(String.self, forKey: .runAsUserId)
+        invocationType = try container.decodeIfPresent(CodeInvocationType.self, forKey: .invocationType)
+        config = try container.decodeIfPresent(String.self, forKey: .config)
         deliverySettings = try container.decodeIfPresent(CodeDeliverySettingsDto.self, forKey: .deliverySettings)
+        functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
+        activationCode = try container.decodeIfPresent(String.self, forKey: .activationCode)
+        meta = try container.decodeIfPresent([String:String].self, forKey: .meta) ?? [:]
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
-        if functionId != nil { try container.encode(functionId, forKey: .functionId) }
+        if functionRef != nil { try container.encode(functionRef, forKey: .functionRef) }
+        if runAsUserId != nil { try container.encode(runAsUserId, forKey: .runAsUserId) }
+        if invocationType != nil { try container.encode(invocationType, forKey: .invocationType) }
+        if config != nil { try container.encode(config, forKey: .config) }
         if deliverySettings != nil { try container.encode(deliverySettings, forKey: .deliverySettings) }
+        if functionId != nil { try container.encode(functionId, forKey: .functionId) }
+        if activationCode != nil { try container.encode(activationCode, forKey: .activationCode) }
+        if meta != nil { try container.encode(meta, forKey: .meta) }
     }
 }
 
@@ -31333,12 +32694,16 @@ public class AppleApnsPushIntegrationDto : PushIntegrationDto
 {
     public var teamId:String?
     public var appBundleId:String?
+    public var keyId:String?
+    public var isProduction:Bool?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case teamId
         case appBundleId
+        case keyId
+        case isProduction
     }
 
     required public init(from decoder: Decoder) throws {
@@ -31346,6 +32711,8 @@ public class AppleApnsPushIntegrationDto : PushIntegrationDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         teamId = try container.decodeIfPresent(String.self, forKey: .teamId)
         appBundleId = try container.decodeIfPresent(String.self, forKey: .appBundleId)
+        keyId = try container.decodeIfPresent(String.self, forKey: .keyId)
+        isProduction = try container.decodeIfPresent(Bool.self, forKey: .isProduction)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -31353,6 +32720,8 @@ public class AppleApnsPushIntegrationDto : PushIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if teamId != nil { try container.encode(teamId, forKey: .teamId) }
         if appBundleId != nil { try container.encode(appBundleId, forKey: .appBundleId) }
+        if keyId != nil { try container.encode(keyId, forKey: .keyId) }
+        if isProduction != nil { try container.encode(isProduction, forKey: .isProduction) }
     }
 }
 
@@ -31720,6 +33089,15 @@ public class SchedulerTaskDto : Codable
 
     // @DataMember
     public var updatedAtUnix:Int?
+
+    // @DataMember
+    public var isFailing:Bool?
+
+    // @DataMember
+    public var lastFailureReason:String?
+
+    // @DataMember
+    public var lastFailedAtUnix:Int?
 
     required public init(){}
 }
@@ -32391,8211 +33769,6 @@ public class ConversationSnapshotEntryWireDto : AiChatEntryWireDto
     }
 }
 
-// @DataContract(Namespace="http://codemash.io/types/")
-public class RequestBase : ICultureBasedRequest, IVersionBasedRequest, IHasCorrelationIdRequest, Codable
-{
-    /**
-    * Specify culture code when your response from the API should be localised. E.g.: en
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Specify culture code when your response from the API should be localised. E.g.: en", Name="CultureCode", ParameterType="header")
-    public var cultureCode:String?
-
-    /**
-    * TimeZone
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="TimeZone", Name="TimeZoneId", ParameterType="header")
-    public var timeZoneId:String?
-
-    /**
-    * The CodeMash API version used to fetch data from the API. If not specified, the last version will be used.  E.g.: v3
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="The CodeMash API version used to fetch data from the API. If not specified, the last version will be used.  E.g.: v3", IsRequired=true, Name="version", ParameterType="path")
-    public var version:String?
-
-    /**
-    * CorrelationId for each request
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="CorrelationId for each request", Name="CorrelationId", ParameterType="header")
-    public var correlationId:String?
-
-    required public init(){}
-}
-
-public protocol ICultureBasedRequest
-{
-    var cultureCode:String? { get set }
-
-}
-
-public protocol IVersionBasedRequest
-{
-    var version:String? { get set }
-
-}
-
-public protocol IHasCorrelationIdRequest
-{
-    var correlationId:String? { get set }
-
-}
-
-public enum TriggerType : String, Codable
-{
-    case Membership
-    case Schema
-    case Files
-    case Payments
-    case Ai
-}
-
-// @DataContract(Namespace="http://codemash.io/types/")
-public class CodeMashRequestBase : RequestBase, IHasProjectId, IHasEnv
-{
-    /**
-    * ID of your project. Can be passed in a header as norbix-project-id.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="ID of your project. Can be passed in a header as norbix-project-id.", IsRequired=true, Name="norbix-project-id", ParameterType="header")
-    public var projectId:String?
-
-    /**
-    * Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.", Name="norbix-env", ParameterType="header")
-    public var env:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case projectId
-        case env
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
-        env = try container.decodeIfPresent(String.self, forKey: .env)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
-        if env != nil { try container.encode(env, forKey: .env) }
-    }
-}
-
-public protocol IHasProjectId
-{
-    var projectId:String? { get set }
-
-}
-
-public protocol IHasEnv
-{
-    var env:String? { get set }
-
-}
-
-public enum SubscriptionType : String, Codable
-{
-    case ManagedService
-    case License
-}
-
-public protocol IHasAccountId
-{
-    var accountId:String? { get set }
-
-}
-
-// @DataContract
-public class GroupDefinitionDto : TagDefinitionBaseDto
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-public enum CommunicationChannel : String, Codable
-{
-    case Transactional
-    case Marketing
-    case System
-}
-
-// @DataContract
-public class TagDefinitionDto : TagDefinitionBaseDto
-{
-    // @DataMember
-    public var defaultDelivery:[DeliveryChannel:Bool] = [:]
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case defaultDelivery
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        defaultDelivery = try container.decodeIfPresent([DeliveryChannel:Bool].self, forKey: .defaultDelivery) ?? [:]
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if defaultDelivery.count > 0 { try container.encode(defaultDelivery, forKey: .defaultDelivery) }
-    }
-}
-
-public class DatabaseIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:DatabaseProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiPlanDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var allowedAssistantIds:[String] = []
-
-    // @DataMember
-    public var allowedModels:[AiPlanModelDto] = []
-
-    // @DataMember
-    public var quotaUnit:AiPlanQuotaUnit?
-
-    // @DataMember
-    public var monthlyQuota:Int?
-
-    // @DataMember
-    public var features:AiPlanFeaturesDto?
-
-    // @DataMember
-    public var quotaReachedMessage:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiPlanRoleAssignmentDto : Codable
-{
-    // @DataMember
-    public var roleId:String?
-
-    // @DataMember
-    public var planId:String?
-
-    required public init(){}
-}
-
-public class ProjectAiAssistantRequestBase : CodeMashRequestBase
-{
-    /**
-    * Name shown to end users. Required, at most 100 characters, unique in the project.
-    */
-    // @ApiMember(Description="Name shown to end users. Required, at most 100 characters, unique in the project.")
-    public var name:String?
-
-    /**
-    * First message end users see. Public. At most 2 000 characters.
-    */
-    // @ApiMember(Description="First message end users see. Public. At most 2 000 characters.")
-    public var welcomeMessage:String?
-
-    /**
-    * Instructions for the model. Never shown to end users. At most 20 000 characters.
-    */
-    // @ApiMember(Description="Instructions for the model. Never shown to end users. At most 20 000 characters.")
-    public var systemPrompt:String?
-
-    /**
-    * Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences), own:knowledge (search_knowledge — the user's own and the project-wide knowledge). Any other name is refused.
-    */
-    // @ApiMember(Description="Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences), own:knowledge (search_knowledge — the user's own and the project-wide knowledge). Any other name is refused.")
-    public var toolsets:[String]?
-
-    /**
-    * The assistant's own LLM integration id (int_…). Empty = the project's default LLM.
-    */
-    // @ApiMember(Description="The assistant's own LLM integration id (int_…). Empty = the project's default LLM.")
-    public var llmIntegrationId:String?
-
-    /**
-    * Model name. Empty = the integration's default model.
-    */
-    // @ApiMember(Description="Model name. Empty = the integration's default model.")
-    public var model:String?
-
-    /**
-    * True to let the assistant remember facts about the end user across chats.
-    */
-    // @ApiMember(Description="True to let the assistant remember facts about the end user across chats.")
-    public var memoryEnabled:Bool?
-
-    /**
-    * Knowledge the assistant retrieves from before each answer and cites as [n]: record (records of schemas with embed on), file (uploaded files, when the project embeds them), message (the user's earlier chats, assistants with memory). Empty = no automatic retrieval.
-    */
-    // @ApiMember(Description="Knowledge the assistant retrieves from before each answer and cites as [n]: record (records of schemas with embed on), file (uploaded files, when the project embeds them), message (the user's earlier chats, assistants with memory). Empty = no automatic retrieval.")
-    public var ragSourceIds:[String]?
-
-    /**
-    * Best relevance (0–1) below which the answer says the knowledge does not match strongly. Empty = 0.5; 0 = never.
-    */
-    // @ApiMember(Description="Best relevance (0–1) below which the answer says the knowledge does not match strongly. Empty = 0.5; 0 = never.")
-    public var weakMatchThreshold:Double?
-
-    /**
-    * AI plan (quota) id. Optional.
-    */
-    // @ApiMember(Description="AI plan (quota) id. Optional.")
-    public var planId:String?
-
-    /**
-    * True to make this the project's default assistant; the previous default stops being default.
-    */
-    // @ApiMember(Description="True to make this the project's default assistant; the previous default stops being default.")
-    public var isDefault:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case name
-        case welcomeMessage
-        case systemPrompt
-        case toolsets
-        case llmIntegrationId
-        case model
-        case memoryEnabled
-        case ragSourceIds
-        case weakMatchThreshold
-        case planId
-        case isDefault
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decodeIfPresent(String.self, forKey: .name)
-        welcomeMessage = try container.decodeIfPresent(String.self, forKey: .welcomeMessage)
-        systemPrompt = try container.decodeIfPresent(String.self, forKey: .systemPrompt)
-        toolsets = try container.decodeIfPresent([String].self, forKey: .toolsets) ?? []
-        llmIntegrationId = try container.decodeIfPresent(String.self, forKey: .llmIntegrationId)
-        model = try container.decodeIfPresent(String.self, forKey: .model)
-        memoryEnabled = try container.decodeIfPresent(Bool.self, forKey: .memoryEnabled)
-        ragSourceIds = try container.decodeIfPresent([String].self, forKey: .ragSourceIds) ?? []
-        weakMatchThreshold = try container.decodeIfPresent(Double.self, forKey: .weakMatchThreshold)
-        planId = try container.decodeIfPresent(String.self, forKey: .planId)
-        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if name != nil { try container.encode(name, forKey: .name) }
-        if welcomeMessage != nil { try container.encode(welcomeMessage, forKey: .welcomeMessage) }
-        if systemPrompt != nil { try container.encode(systemPrompt, forKey: .systemPrompt) }
-        if toolsets != nil { try container.encode(toolsets, forKey: .toolsets) }
-        if llmIntegrationId != nil { try container.encode(llmIntegrationId, forKey: .llmIntegrationId) }
-        if model != nil { try container.encode(model, forKey: .model) }
-        if memoryEnabled != nil { try container.encode(memoryEnabled, forKey: .memoryEnabled) }
-        if ragSourceIds != nil { try container.encode(ragSourceIds, forKey: .ragSourceIds) }
-        if weakMatchThreshold != nil { try container.encode(weakMatchThreshold, forKey: .weakMatchThreshold) }
-        if planId != nil { try container.encode(planId, forKey: .planId) }
-        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
-    }
-}
-
-// @DataContract
-public class FileResourceRefDto : Codable
-{
-    // @DataMember(Order=1)
-    public var resource:FileResourceDto?
-
-    // @DataMember(Order=2)
-    public var integrationId:String?
-
-    // @DataMember(Order=3)
-    public var provider:FileProvider?
-
-    // @DataMember(Order=4)
-    public var path:String?
-
-    // @DataMember(Order=5)
-    public var publicUrl:String?
-
-    // @DataMember(Order=6)
-    public var isPublic:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiScopeDto : Codable
-{
-    // @DataMember
-    public var reach:String?
-
-    // @DataMember
-    public var projectId:String?
-
-    // @DataMember
-    public var rights:String?
-
-    // @DataMember
-    public var envs:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class DeleteTrigger : CodeMashRequestBase
-{
-    // @DataMember
-    public var triggerId:String?
-
-    // @DataMember
-    public var triggerType:TriggerType?
-
-    // @DataMember
-    public var schemaId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case triggerId
-        case triggerType
-        case schemaId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
-        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
-        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
-        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
-        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
-    }
-}
-
-// @DataContract
-public class DisableTrigger : CodeMashRequestBase
-{
-    // @DataMember
-    public var triggerId:String?
-
-    // @DataMember
-    public var triggerType:TriggerType?
-
-    // @DataMember
-    public var schemaId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case triggerId
-        case triggerType
-        case schemaId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
-        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
-        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
-        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
-        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
-    }
-}
-
-// @DataContract
-public class EnableTrigger : CodeMashRequestBase
-{
-    // @DataMember
-    public var triggerId:String?
-
-    // @DataMember
-    public var triggerType:TriggerType?
-
-    // @DataMember
-    public var schemaId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case triggerId
-        case triggerType
-        case schemaId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
-        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
-        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
-        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
-        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
-    }
-}
-
-public class GetTrigger : CodeMashRequestBase
-{
-    public var id:String?
-    public var schemaId:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case id
-        case schemaId
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        id = try container.decodeIfPresent(String.self, forKey: .id)
-        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if id != nil { try container.encode(id, forKey: .id) }
-        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
-    }
-}
-
-public class SaveTriggerRequest : Codable
-{
-    public var type:TriggerType?
-    public var triggerId:String?
-    public var name:String?
-    public var Description:String?
-    public var isEnabled:Bool?
-    public var preExecuteCode:String?
-    public var action:TriggerActionDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SaveTrigger : CodeMashRequestBase
-{
-    // @DataMember
-    public var trigger:SaveTriggerRequest?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case trigger
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        trigger = try container.decodeIfPresent(SaveTriggerRequest.self, forKey: .trigger)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if trigger != nil { try container.encode(trigger, forKey: .trigger) }
-    }
-}
-
-public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHasEnv
-{
-    /**
-    * ID of your project. Can be passed in a header as norbix-project-id.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="ID of your project. Can be passed in a header as norbix-project-id.", IsRequired=true, Name="norbix-project-id", ParameterType="header")
-    public var projectId:String?
-
-    /**
-    * Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.", Name="norbix-env", ParameterType="header")
-    public var env:String?
-
-    /**
-    * Cursor token — fetch the page AFTER this item.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Cursor token — fetch the page AFTER this item.", Name="startingAfter", ParameterType="query")
-    public var startingAfter:String?
-
-    /**
-    * Cursor token — fetch the page BEFORE this item.
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Cursor token — fetch the page BEFORE this item.", Name="endingBefore", ParameterType="query")
-    public var endingBefore:String?
-
-    /**
-    * Amount of records to return.
-    */
-    // @DataMember
-    // @ApiMember(DataType="integer", Description="Amount of records to return.", Format="int32", Name="pageSize", ParameterType="query")
-    public var pageSize:Int?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case projectId
-        case env
-        case startingAfter
-        case endingBefore
-        case pageSize
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
-        env = try container.decodeIfPresent(String.self, forKey: .env)
-        startingAfter = try container.decodeIfPresent(String.self, forKey: .startingAfter)
-        endingBefore = try container.decodeIfPresent(String.self, forKey: .endingBefore)
-        pageSize = try container.decodeIfPresent(Int.self, forKey: .pageSize)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
-        if env != nil { try container.encode(env, forKey: .env) }
-        if startingAfter != nil { try container.encode(startingAfter, forKey: .startingAfter) }
-        if endingBefore != nil { try container.encode(endingBefore, forKey: .endingBefore) }
-        if pageSize != nil { try container.encode(pageSize, forKey: .pageSize) }
-    }
-}
-
-public class MembershipIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:MembershipProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public class CredentialsSettingsModeDto : Codable
-{
-    public var name:String?
-    public var logoutUrl:String?
-
-    required public init(){}
-}
-
-public class PagingArgs : Codable
-{
-    public var cursorArgs:CursorArgs?
-    public var pageSize:Int?
-    public var startingAfter:String?
-    public var endingBefore:String?
-
-    required public init(){}
-}
-
-public class SchemaSettingsDto : Codable
-{
-    // @DataMember
-    public var softDelete:Bool?
-
-    // @DataMember
-    public var hasRecordOwner:Bool?
-
-    // @DataMember
-    public var Description:String?
-
-    required public init(){}
-}
-
-public class SchemaEmbedSettingsDto : Codable
-{
-    // @DataMember
-    public var enabled:Bool?
-
-    // @DataMember
-    public var fields:[String] = []
-
-    // @DataMember
-    public var embeddingIntegrationId:String?
-
-    // @DataMember
-    public var perUser:Bool?
-
-    required public init(){}
-}
-
-public class SchemaListSettingsDto : Codable
-{
-    // @DataMember
-    public var columns:[SchemaListColumnDto] = []
-
-    // @DataMember
-    public var defaultSort:SchemaListSortDto?
-
-    required public init(){}
-}
-
-public class ImportColumnMappingDto : Codable
-{
-    // @DataMember
-    public var csvColumnIndex:Int?
-
-    // @DataMember
-    public var csvHeader:String?
-
-    // @DataMember
-    public var propertyName:String?
-
-    // @DataMember
-    public var dontImportOnError:Bool?
-
-    required public init(){}
-}
-
-public class FilesIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:FileProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public class EmailValidationIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:EmailValidationProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class EmailMessageTranslationDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var content:EmailMessageContentDto?
-
-    // @DataMember
-    public var staticAttachments:[FileResourceRefDto]?
-
-    required public init(){}
-}
-
-public class SaveEmailTemplate : CodeMashRequestBase
-{
-    /**
-    * The display name of the email template.
-    */
-    // @ApiMember(Description="The display name of the email template.", IsRequired=true)
-    public var templateName:String?
-
-    /**
-    * Optional free-text description of what the template is used for.
-    */
-    // @ApiMember(Description="Optional free-text description of what the template is used for.")
-    public var Description:String?
-
-    /**
-    * The communication channel the template is intended for (e.g. Transactional, Marketing).
-    */
-    // @ApiMember(Description="The communication channel the template is intended for (e.g. Transactional, Marketing).")
-    public var communicationChannel:CommunicationChannel?
-
-    /**
-    * Optional tags to organize/filter the template by.
-    */
-    // @ApiMember(Description="Optional tags to organize/filter the template by.")
-    public var tags:[String]?
-
-    /**
-    * Optional static file attachments to send with every email using this template.
-    */
-    // @DataMember
-    // @ApiMember(Description="Optional static file attachments to send with every email using this template.")
-    public var staticAttachments:[FileResourceRefDto]?
-
-    /**
-    * The per-language content translations (subject/body) for this template.
-    */
-    // @ApiMember(Description="The per-language content translations (subject/body) for this template.", IsRequired=true)
-    public var translations:[EmailMessageTranslationDto] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case templateName
-        case Description
-        case communicationChannel
-        case tags
-        case staticAttachments
-        case translations
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
-        Description = try container.decodeIfPresent(String.self, forKey: .Description)
-        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
-        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
-        staticAttachments = try container.decodeIfPresent([FileResourceRefDto].self, forKey: .staticAttachments) ?? []
-        translations = try container.decodeIfPresent([EmailMessageTranslationDto].self, forKey: .translations) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
-        if Description != nil { try container.encode(Description, forKey: .Description) }
-        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
-        if tags != nil { try container.encode(tags, forKey: .tags) }
-        if staticAttachments != nil { try container.encode(staticAttachments, forKey: .staticAttachments) }
-        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
-    }
-}
-
-// @DataContract
-public class TokenMappingDto : Codable
-{
-    // @DataMember
-    public var key:String?
-
-    // @DataMember
-    public var value:String?
-
-    // @DataMember
-    public var resolver:TokenMappingResolverType?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TranslationDto : Codable
-{
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var content:String?
-
-    required public init(){}
-}
-
-public class EmailIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:EmailProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var emailAddress:String?
-    public var emailSenderName:String?
-
-    required public init(){}
-}
-
-public class EmailCampaignRequest : Codable
-{
-    public var source:EmailCampaignRecipientsSourceTypes?
-    public var templateId:String?
-    public var integrationId:String?
-    public var validationIntegrationId:String?
-    public var language:String?
-    public var initiatorId:String?
-    public var notes:String?
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    // @DataMember
-    public var campaignTime:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SmsMessageTranslationDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var content:SmsMessageContentDto?
-
-    required public init(){}
-}
-
-public class SaveSmsTemplate : CodeMashRequestBase
-{
-    /**
-    * Display name for the SMS template.
-    */
-    // @ApiMember(Description="Display name for the SMS template.", IsRequired=true)
-    public var templateName:String?
-
-    /**
-    * Optional free-text description of the template's purpose.
-    */
-    // @ApiMember(Description="Optional free-text description of the template's purpose.")
-    public var Description:String?
-
-    /**
-    * Whether this template is Transactional or Marketing SMS.
-    */
-    // @ApiMember(Description="Whether this template is Transactional or Marketing SMS.", IsRequired=true)
-    public var communicationChannel:CommunicationChannel?
-
-    /**
-    * Optional tags to organize/filter templates.
-    */
-    // @ApiMember(Description="Optional tags to organize/filter templates.")
-    public var tags:[String]?
-
-    /**
-    * The template's per-language translations (each with its own SMS body).
-    */
-    // @ApiMember(Description="The template's per-language translations (each with its own SMS body).", IsRequired=true)
-    public var translations:[SmsMessageTranslationDto] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case templateName
-        case Description
-        case communicationChannel
-        case tags
-        case translations
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
-        Description = try container.decodeIfPresent(String.self, forKey: .Description)
-        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
-        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
-        translations = try container.decodeIfPresent([SmsMessageTranslationDto].self, forKey: .translations) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
-        if Description != nil { try container.encode(Description, forKey: .Description) }
-        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
-        if tags != nil { try container.encode(tags, forKey: .tags) }
-        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
-    }
-}
-
-public class SmsIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:SmsProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public enum SmsCampaignRecipientsSourceTypes : String, Codable
-{
-    case AllUsers
-    case SpecifiedUsers
-    case AccountUsers
-    case PhoneNumbers
-    case Collection
-}
-
-public enum MarketplaceCategory : String, Codable
-{
-    case Other
-    case Crm
-    case Erp
-    case Marketing
-    case Communication
-    case Productivity
-    case Storage
-    case Analytics
-    case Identity
-    case Payments
-    case DevTools
-    case Ai
-    case Files
-    case Database
-    case Calendar
-}
-
-public enum MarketplaceTransport : String, Codable
-{
-    case Mcp
-    case Rest
-    case Code
-    case Internal
-    case Sdk
-}
-
-// @DataContract
-public class MarketplaceTokenMappingDto : Codable
-{
-    // @DataMember
-    public var token:String?
-
-    // @DataMember
-    public var resolver:MarketplaceTokenResolverKind?
-
-    // @DataMember
-    public var value:String?
-
-    // @DataMember
-    public var secretKeys:[String]?
-
-    // @DataMember
-    public var format:MarketplaceSecretValueFormat?
-
-    required public init(){}
-}
-
-public class CodeIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:CodeProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushMessageTranslationDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var content:PushMessageContentDto?
-
-    required public init(){}
-}
-
-public class SavePushTemplate : CodeMashRequestBase
-{
-    /**
-    * The template's display name.
-    */
-    // @ApiMember(Description="The template's display name.", IsRequired=true)
-    public var templateName:String?
-
-    /**
-    * Optional free-text description of the template's purpose.
-    */
-    // @ApiMember(Description="Optional free-text description of the template's purpose.")
-    public var Description:String?
-
-    /**
-    * Whether the template is Transactional or Marketing.
-    */
-    // @ApiMember(Description="Whether the template is Transactional or Marketing.")
-    public var communicationChannel:CommunicationChannel?
-
-    /**
-    * Optional tags for organizing/filtering templates.
-    */
-    // @ApiMember(Description="Optional tags for organizing/filtering templates.")
-    public var tags:[String]?
-
-    /**
-    * The per-locale translations (title/body/subtitle) that make up the template content.
-    */
-    // @ApiMember(Description="The per-locale translations (title/body/subtitle) that make up the template content.", IsRequired=true)
-    public var translations:[PushMessageTranslationDto] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case templateName
-        case Description
-        case communicationChannel
-        case tags
-        case translations
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
-        Description = try container.decodeIfPresent(String.self, forKey: .Description)
-        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
-        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
-        translations = try container.decodeIfPresent([PushMessageTranslationDto].self, forKey: .translations) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
-        if Description != nil { try container.encode(Description, forKey: .Description) }
-        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
-        if tags != nil { try container.encode(tags, forKey: .tags) }
-        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
-    }
-}
-
-public class PushIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:PushProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushDeviceDto : Codable
-{
-    // @DataMember
-    public var deviceId:String?
-
-    // @DataMember
-    public var deviceOs:String?
-
-    // @DataMember
-    public var token:String?
-
-    // @DataMember
-    public var brand:String?
-
-    // @DataMember
-    public var manufacturer:String?
-
-    // @DataMember
-    public var modelName:String?
-
-    // @DataMember
-    public var deviceName:String?
-
-    // @DataMember
-    public var deviceType:DeviceType?
-
-    // @DataMember
-    public var osName:String?
-
-    // @DataMember
-    public var osVersion:String?
-
-    // @DataMember
-    public var platformApiLevel:Int?
-
-    required public init(){}
-}
-
-public class PushCampaignRequest : Codable
-{
-    public var source:PushCampaignRecipientsSourceTypes?
-    public var templateId:String?
-    public var integrationId:String?
-    public var language:String?
-    public var initiatorId:String?
-    public var notes:String?
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    // @DataMember
-    public var campaignTime:Int?
-
-    required public init(){}
-}
-
-public class PaymentIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:PaymentGatewayPlatform?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public class LoggingIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:LoggingProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public class ChatScreenContextDto : Codable
-{
-    public var kind:String?
-    public var viewId:String?
-
-    required public init(){}
-}
-
-public class EmbeddingIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:EmbeddingProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var endpoint:String?
-    public var model:String?
-    public var dimension:Int?
-    public var apiKey:String?
-
-    required public init(){}
-}
-
-public class LlmIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:LlmProvider?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var endpoint:String?
-    public var defaultModel:String?
-    public var isDefault:Bool?
-    public var models:[LlmModelOptionRequest]?
-
-    required public init(){}
-}
-
-public class McpIntegrationRequest : Codable
-{
-    public var integrationId:String?
-    public var provider:McpProvider?
-    public var transport:McpTransport?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var name:String?
-    public var category:String?
-    public var Description:String?
-    public var icon:String?
-
-    required public init(){}
-}
-
-public enum SchedulerTaskType : String, Codable
-{
-    case EmailCampaign
-    case PushCampaign
-    case SmsCampaign
-    case CodeFunctionalCall
-    case WebhookCall
-}
-
-public class SchedulerTaskRequest : Codable
-{
-    public var type:SchedulerTaskType?
-
-    required public init(){}
-}
-
-public class ResourceRefDto : Codable
-{
-    public var projectId:String?
-    public var integrationId:String?
-    public var kind:ResourceKindDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CaseResolutionDto : Codable
-{
-    // @DataMember
-    public var problem:String?
-
-    // @DataMember
-    public var symptoms:[String] = []
-
-    // @DataMember
-    public var rootCause:String?
-
-    // @DataMember
-    public var fix:CaseResolutionFixKind?
-
-    // @DataMember
-    public var fixDetail:String?
-
-    // @DataMember
-    public var affectedVersions:[String]?
-
-    required public init(){}
-}
-
-// @DataContract
-public enum CodeMashRelease : String, Codable
-{
-    case NotSet
-    case Community
-    case ManagedService
-    case Enterprise
-}
-
-public enum CodeMashRuntime : String, Codable
-{
-    case Development
-    case CI
-    case Staging
-    case Production
-}
-
-// @DataContract
-public class EchoLicenseDto : Codable
-{
-    // @DataMember(Name="domain")
-    public var domain:String?
-
-    // @DataMember(Name="accountId")
-    public var accountId:String?
-
-    // @DataMember(Name="email")
-    public var email:String?
-
-    // @DataMember(Name="release")
-    public var release:String?
-
-    // @DataMember(Name="expire")
-    public var expire:Int?
-
-    // @DataMember(Name="isTrial")
-    public var isTrial:Bool?
-
-    // @DataMember(Name="cap")
-    public var cap:Int?
-
-    required public init(){}
-}
-
-public class EchoRegionDto : Codable
-{
-    public var code:String?
-    public var displayName:String?
-    public var apiUrl:String?
-    public var hubUrl:String?
-
-    required public init(){}
-}
-
-public class EchoAgentDto : Codable
-{
-    public var mcpUrl:String?
-    public var oAuthMetadataUrl:String?
-    public var installationType:String?
-    public var onboardingDocsUrl:String?
-    public var toolsUrl:String?
-
-    required public init(){}
-}
-
-public class PublicBrandDto : Codable
-{
-    public var displayName:String?
-    public var mainColor:String?
-    public var accentColor:String?
-    public var logoUrl:String?
-    public var iconUrl:String?
-
-    required public init(){}
-}
-
-public class PublicAuthDto : Codable
-{
-    public var socialProviders:[String] = []
-    public var passkey:Bool?
-    public var methods:[String]?
-    public var passwordPolicy:PublicPasswordPolicyDto?
-
-    required public init(){}
-}
-
-public class PublicAiChatDto : Codable
-{
-    public var enabled:Bool?
-    public var assistants:[PublicAiAssistantDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class TriggerAttentionDto : Codable
-{
-    // @DataMember
-    public var triggerId:String?
-
-    // @DataMember
-    public var triggerType:TriggerType?
-
-    // @DataMember
-    public var reason:String?
-
-    // @DataMember
-    public var atUtc:Date?
-
-    required public init(){}
-}
-
-public class CodeMashResponseStatus : Codable
-{
-    public var isSuccess:Bool?
-    public var errors:[ErrorDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ResponseBase : Codable
-{
-    // @DataMember
-    public var responseStatus:CodeMashResponseStatus?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AccountOwnerDto : Codable
-{
-    // @DataMember
-    public var email:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var billingEmail:String?
-
-    // @DataMember
-    public var operationsEmail:String?
-
-    // @DataMember
-    public var securityEmail:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AccountStatusDto : Codable
-{
-    // @DataMember
-    public var accountId:String?
-
-    // @DataMember
-    public var accountIdAsGuid:String?
-
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var loggedInUserId:String?
-
-    // @DataMember
-    public var loggedInUserEmail:String?
-
-    // @DataMember
-    public var status:AccountStatus?
-
-    // @DataMember
-    public var projectCap:Int?
-
-    // @DataMember
-    public var permissions:[String] = []
-
-    // @DataMember
-    public var roles:[String] = []
-
-    // @DataMember
-    public var allowedProjects:[String]?
-
-    // @DataMember
-    public var trialWasIssued:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class UsageBillingDto : Codable
-{
-    // @DataMember
-    public var accountId:String?
-
-    // @DataMember
-    public var atlas:[String:UsageBillingPeriodDto] = [:]
-
-    // @DataMember
-    public var ingestionFailures:[UsageBillingIngestionFailureDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class PromotionResultDto : Codable
-{
-    // @DataMember
-    public var contentMirrored:[PromotionItemDto] = []
-
-    // @DataMember
-    public var contentDeleted:[PromotionItemDto] = []
-
-    // @DataMember
-    public var integrationsSeeded:[PromotionItemDto] = []
-
-    // @DataMember
-    public var integrationsToProvision:[PromotionItemDto] = []
-
-    // @DataMember
-    public var integrationsSkipped:[PromotionItemDto] = []
-
-    // @DataMember
-    public var blockers:[PromotionBlockerDto] = []
-
-    // @DataMember
-    public var fromVersion:Int?
-
-    // @DataMember
-    public var wasDryRun:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectEnvironmentsDto : Codable
-{
-    // @DataMember
-    public var environments:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectDto : IHasViewId, IBindableContract, Codable
-{
-    // @DataMember
-    public var accountViewId:String?
-
-    // @DataMember
-    public var projectStatus:ProjectStatus?
-
-    // @DataMember
-    public var isActive:Bool?
-
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var uniqueName:String?
-
-    // @DataMember
-    public var hostLabel:String?
-
-    // @DataMember
-    public var apiHost:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var marketingUrl:String?
-
-    // @DataMember
-    public var canonicalAdminUrl:String?
-
-    // @DataMember
-    public var adminUrl:String?
-
-    // @DataMember
-    public var effectiveAdminUrl:String?
-
-    // @DataMember
-    public var defaultLanguage:String?
-
-    // @DataMember
-    public var languages:[String] = []
-
-    // @DataMember
-    public var primaryRegion:ProjectRegionDto?
-
-    // @DataMember
-    public var additionalRegions:[ProjectRegionDto]?
-
-    // @DataMember
-    public var isMultiRegionEligible:Bool?
-
-    // @DataMember
-    public var brand:ProjectBrandDto?
-
-    // @DataMember
-    public var notificationSettings:NotificationSettingsDto?
-
-    // @DataMember
-    public var allowedOrigins:[String]?
-
-    // @DataMember
-    public var exposeBrandToAdminPortal:Bool?
-
-    // @DataMember
-    public var exposeAuthToAdminPortal:Bool?
-
-    // @DataMember
-    public var adminPortalEnabled:Bool?
-
-    // @DataMember
-    public var adminPortalServiceUserId:String?
-
-    // @DataMember
-    public var membershipAuthenticationFlows:[AuthenticationFlowSummaryDto]?
-
-    // @DataMember
-    public var exposeLegalToAdminPortal:Bool?
-
-    // @DataMember
-    public var aiChat:ProjectAiSettingsDto?
-
-    // @DataMember
-    public var legalTermsMarkdown:String?
-
-    // @DataMember
-    public var legalPrivacyMarkdown:String?
-
-    // @DataMember
-    public var environments:[String] = []
-
-    // @DataMember
-    public var environmentRanks:[String:Int] = [:]
-
-    // @DataMember
-    public var database:DatabaseDto?
-
-    // @DataMember
-    public var email:EmailDto?
-
-    // @DataMember
-    public var ai:AiDto?
-
-    // @DataMember
-    public var membership:MembershipDto?
-
-    // @DataMember
-    public var logging:LoggingDto?
-
-    // @DataMember
-    public var serverEvents:ServerEventsDto?
-
-    // @DataMember
-    public var push:PushDto?
-
-    // @DataMember
-    public var scheduler:SchedulerDto?
-
-    // @DataMember
-    public var code:CodeDto?
-
-    // @DataMember
-    public var files:FilesDto?
-
-    // @DataMember
-    public var payments:PaymentsDto?
-
-    // @DataMember
-    public var sms:SmsDto?
-
-    // @DataMember
-    public var databaseEnabled:Bool?
-
-    // @DataMember
-    public var emailEnabled:Bool?
-
-    // @DataMember
-    public var membershipEnabled:Bool?
-
-    // @DataMember
-    public var loggingEnabled:Bool?
-
-    // @DataMember
-    public var serverEventsEnabled:Bool?
-
-    // @DataMember
-    public var pushEnabled:Bool?
-
-    // @DataMember
-    public var schedulerEnabled:Bool?
-
-    // @DataMember
-    public var codeEnabled:Bool?
-
-    // @DataMember
-    public var filesEnabled:Bool?
-
-    // @DataMember
-    public var paymentsEnabled:Bool?
-
-    // @DataMember
-    public var smsEnabled:Bool?
-
-    // @DataMember
-    public var defaultLlmIntegrationViewId:String?
-
-    // @DataMember
-    public var connections:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectListItemDto : Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var isActive:Bool?
-
-    // @DataMember
-    public var projectStatus:ProjectStatus?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var uniqueName:String?
-
-    // @DataMember
-    public var primaryRegion:ProjectRegionDto?
-
-    // @DataMember
-    public var additionalRegions:[ProjectRegionDto]?
-
-    required public init(){}
-}
-
-public class ProjectRegionDto : Codable
-{
-    public var id:String?
-    public var continent:Continent?
-    public var name:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiCreditPackCheckoutDto : Codable
-{
-    // @DataMember
-    public var url:String?
-
-    // @DataMember
-    public var sessionId:String?
-
-    // @DataMember
-    public var pack:String?
-
-    // @DataMember
-    public var credits:Int?
-
-    // @DataMember
-    public var priceEuroCents:Int?
-
-    // @DataMember
-    public var purchaseId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectAiPlansDto : Codable
-{
-    // @DataMember
-    public var plans:[AiPlanDto] = []
-
-    // @DataMember
-    public var roles:[AiPlanRoleAssignmentDto] = []
-
-    // @DataMember
-    public var defaultPlanId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiUserPlansDto : Codable
-{
-    // @DataMember
-    public var users:[AiUserPlanAssignmentDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectAiSettingsDto : Codable
-{
-    // @DataMember
-    public var enabled:Bool?
-
-    // @DataMember
-    public var defaultLlmIntegrationId:String?
-
-    // @DataMember
-    public var defaultModel:String?
-
-    // @DataMember
-    public var assistants:[AiAssistantDto] = []
-
-    // @DataMember
-    public var embedFiles:Bool?
-
-    // @DataMember
-    public var plans:[AiPlanDto] = []
-
-    // @DataMember
-    public var planRoleAssignments:[AiPlanRoleAssignmentDto] = []
-
-    // @DataMember
-    public var defaultPlanId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectAiUsageDto : Codable
-{
-    // @DataMember
-    public var period:String?
-
-    // @DataMember
-    public var totals:AiUsageGroupDto?
-
-    // @DataMember
-    public var assistants:[AiUsageGroupDto] = []
-
-    // @DataMember
-    public var topUsers:[AiUsageGroupDto] = []
-
-    // @DataMember
-    public var models:[AiUsageGroupDto] = []
-
-    // @DataMember
-    public var wallet:ProjectAiWalletDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TemplateLanguageGapDto : Codable
-{
-    // @DataMember
-    public var module:ApplicationModule?
-
-    // @DataMember
-    public var templateId:String?
-
-    // @DataMember
-    public var templateName:String?
-
-    // @DataMember
-    public var missingLanguages:[String] = []
-
-    required public init(){}
-}
-
-public class PaginatedResponse<TViewModelProjection : Codable> : Codable
-{
-    public var items:IList<TViewModelProjection>?
-    public var hasMore:Bool?
-    public var hasPrevious:Bool?
-    public var startingAfter:String?
-    public var endingBefore:String?
-
-    required public init(){}
-}
-
-public class AuthDto : IBindableContract, Codable
-{
-    public var id:String?
-    public var type:AuthType?
-    public var email:String?
-    public var userName:String?
-    public var registration:RegistrationDto?
-    public var login:LoginDto?
-    public var generalInfo:UserGeneralInfoDto?
-    public var roles:[String]?
-    public var pushDevices:[String]?
-    public var tags:[String]?
-    public var status:AuthStatus?
-    public var createdOn:Date?
-    public var modifiedOn:Date?
-
-    required public init(){}
-}
-
-public class AccountPasswordPolicyDto : Codable
-{
-    public var minLength:Int?
-    public var maxLength:Int?
-    public var minNumbers:Int?
-    public var maxNumbers:Int?
-    public var minUpper:Int?
-    public var maxUpper:Int?
-    public var minLower:Int?
-    public var maxLower:Int?
-    public var minSpecial:Int?
-    public var maxSpecial:Int?
-    public var allowedSpecial:String?
-
-    required public init(){}
-}
-
-public class PolicyItemDto : Codable
-{
-    public var id:String?
-    public var name:String?
-    public var Description:String?
-    public var isSystem:Bool?
-    public var permissions:[PermissionDto]?
-
-    required public init(){}
-}
-
-public class AccountTeamRoleDto : Codable
-{
-    public var id:String?
-    public var name:String?
-    public var Description:String?
-    public var isSystem:Bool?
-    public var policies:[String]?
-
-    required public init(){}
-}
-
-public class AccountPasskeyListItemDto : Codable
-{
-    public var credentialId:String?
-    public var friendlyName:String?
-    public var registeredOnUtc:Date?
-    public var lastUsedOnUtc:Date?
-    public var isRevoked:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class LicenseDomainDnsStatusDto : Codable
-{
-    // @DataMember
-    public var domain:String?
-
-    // @DataMember
-    public var allRequiredResolved:Bool?
-
-    // @DataMember
-    public var records:[LicenseDomainDnsRecordDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class LicenseDomainVerificationChallengeDto : Codable
-{
-    // @DataMember
-    public var domain:String?
-
-    // @DataMember
-    public var txtHost:String?
-
-    // @DataMember
-    public var txtValue:String?
-
-    // @DataMember
-    public var expiresAtUtc:Date?
-
-    // @DataMember
-    public var verified:Bool?
-
-    // @DataMember
-    public var verifiedAtUtc:Date?
-
-    // @DataMember
-    public var skipped:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class LicenseDomainVerificationStatusDto : Codable
-{
-    // @DataMember
-    public var domain:String?
-
-    // @DataMember
-    public var verified:Bool?
-
-    // @DataMember
-    public var skipped:Bool?
-
-    // @DataMember
-    public var txtHost:String?
-
-    // @DataMember
-    public var expectedTxtValue:String?
-
-    // @DataMember
-    public var observedTxtValue:String?
-
-    // @DataMember
-    public var expiresAtUtc:Date?
-
-    // @DataMember
-    public var verifiedAtUtc:Date?
-
-    // @DataMember
-    public var message:String?
-
-    required public init(){}
-}
-
-public class LicenseDto : CodeMashSubscriptionDto
-{
-    public var isEnterprise:Bool?
-    public var projectCap:Int?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case isEnterprise
-        case projectCap
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        isEnterprise = try container.decodeIfPresent(Bool.self, forKey: .isEnterprise)
-        projectCap = try container.decodeIfPresent(Int.self, forKey: .projectCap)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if isEnterprise != nil { try container.encode(isEnterprise, forKey: .isEnterprise) }
-        if projectCap != nil { try container.encode(projectCap, forKey: .projectCap) }
-    }
-}
-
-// @DataContract
-public class LicenseHeartbeatVerdictDto : Codable
-{
-    // @DataMember(Name="status")
-    public var status:String?
-
-    // @DataMember(Name="proofToken")
-    public var proofToken:String?
-
-    // @DataMember(Name="serverTimeUtc")
-    public var serverTimeUtc:Date?
-
-    // @DataMember(Name="graceUntilUtc")
-    public var graceUntilUtc:Date?
-
-    // @DataMember(Name="installationId")
-    public var installationId:String?
-
-    // @DataMember(Name="licenseAccountId")
-    public var licenseAccountId:String?
-
-    // @DataMember(Name="domain")
-    public var domain:String?
-
-    // @DataMember(Name="signature")
-    public var signature:String?
-
-    // @DataMember(Name="message")
-    public var message:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class InstallationLicenseStatusDto : Codable
-{
-    // @DataMember(Name="storedMode")
-    public var storedMode:String?
-
-    // @DataMember(Name="effectiveMode")
-    public var effectiveMode:String?
-
-    // @DataMember(Name="isProduction")
-    public var isProduction:Bool?
-
-    // @DataMember(Name="graceDaysLeft")
-    public var graceDaysLeft:Int?
-
-    // @DataMember(Name="graceUntilUtc")
-    public var graceUntilUtc:Date?
-
-    // @DataMember(Name="lastProvenAtUtc")
-    public var lastProvenAtUtc:Date?
-
-    // @DataMember(Name="lastHeartbeatAtUtc")
-    public var lastHeartbeatAtUtc:Date?
-
-    // @DataMember(Name="installationDomain")
-    public var installationDomain:String?
-
-    // @DataMember(Name="licensedDomain")
-    public var licensedDomain:String?
-
-    // @DataMember(Name="hostKind")
-    public var hostKind:String?
-
-    // @DataMember(Name="isTrialLicense")
-    public var isTrialLicense:Bool?
-
-    // @DataMember(Name="licenseExpireUtc")
-    public var licenseExpireUtc:Date?
-
-    // @DataMember(Name="message")
-    public var message:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiServiceUserDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var scope:AiScopeDto?
-
-    // @DataMember
-    public var createdAt:Date?
-
-    // @DataMember
-    public var keys:[AiServiceUserKeyDto] = []
-
-    required public init(){}
-}
-
-public class ServiceUserApiKeyDto : Codable
-{
-    public var id:Int?
-    public var name:String?
-    public var visibleKey:String?
-    public var scopes:[String] = []
-    public var createdDate:Date?
-    public var expiryDate:Date?
-    public var cancelledDate:Date?
-    public var active:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipTriggerDto : TriggerDto
-{
-    // @DataMember
-    public var when:MembershipTriggerType?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case when
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        when = try container.decodeIfPresent(MembershipTriggerType.self, forKey: .when)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if when != nil { try container.encode(when, forKey: .when) }
-    }
-}
-
-public class GetTriggerResponse : ResponseBase
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-// @DataContract
-public class MembershipTriggerProjectionList : TriggerProjectionList
-{
-    // @DataMember
-    public var type:MembershipTriggerType?
-
-    // @DataMember
-    public var destinationIds:[String]?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case type
-        case destinationIds
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decodeIfPresent(MembershipTriggerType.self, forKey: .type)
-        destinationIds = try container.decodeIfPresent([String].self, forKey: .destinationIds) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if type != nil { try container.encode(type, forKey: .type) }
-        if destinationIds != nil { try container.encode(destinationIds, forKey: .destinationIds) }
-    }
-}
-
-public class RoleItemDto : Codable
-{
-    public var id:String?
-    public var name:String?
-    public var displayName:String?
-    public var Description:String?
-    public var isSystem:Bool?
-    public var attachedPolicies:[String]?
-
-    required public init(){}
-}
-
-public class RoleListProjectionDto : Codable
-{
-    public var viewId:String?
-    public var name:String?
-    public var displayName:String?
-    public var isSystem:Bool?
-    public var policyCount:Int?
-
-    required public init(){}
-}
-
-public class PasskeySettingsDto : Codable
-{
-    public var enabled:Bool?
-    public var codeTtlMinutes:Int?
-    public var maxCredentialsPerUser:Int?
-    public var recoveryCodeCount:Int?
-    public var generateRecoveryCodesAtSignup:Bool?
-    public var authenticatorAttachment:String?
-    public var allowMagicLinkRecovery:Bool?
-    public var refreshTokenTtlDays:Int?
-    public var rpId:String?
-
-    required public init(){}
-}
-
-public class MembershipIntegrationDto : IntegrationDto
-{
-    public var provider:MembershipProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(MembershipProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class MembershipIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:MembershipProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(MembershipProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class MembershipAuthorizationViewDto : Codable
-{
-    // @DataMember
-    public var emailPreferences:MembershipEmailPreferencesDto?
-
-    // @DataMember
-    public var userRegistersAsRole:String?
-
-    // @DataMember
-    public var guestRegistersAsRole:String?
-
-    // @DataMember
-    public var allowedRegisterRoles:[String]?
-
-    // @DataMember
-    public var allowedProviderRegisterRoles:[String]?
-
-    // @DataMember
-    public var resetPasswordTokenExpiration:Int?
-
-    // @DataMember
-    public var invitationExpiration:Int?
-
-    // @DataMember
-    public var emailVerificationExpiration:Int?
-
-    // @DataMember
-    public var deactivationExpiration:Int?
-
-    // @DataMember
-    public var defaultSubscribeToNews:Bool?
-
-    // @DataMember
-    public var passwordComplexity:PasswordComplexityDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipAuthenticationViewDto : Codable
-{
-    // @DataMember
-    public var credentialsSettings:MembershipCredentialsSettingsDto?
-
-    // @DataMember
-    public var flows:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class SchemaTriggerDto : TriggerDto
-{
-    // @DataMember
-    public var schemaId:String?
-
-    // @DataMember
-    public var when:SchemaTriggerType?
-
-    // @DataMember
-    public var configurationCode:String?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case schemaId
-        case when
-        case configurationCode
-        case env
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
-        when = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .when)
-        configurationCode = try container.decodeIfPresent(String.self, forKey: .configurationCode)
-        env = try container.decodeIfPresent(String.self, forKey: .env)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
-        if when != nil { try container.encode(when, forKey: .when) }
-        if configurationCode != nil { try container.encode(configurationCode, forKey: .configurationCode) }
-        if env != nil { try container.encode(env, forKey: .env) }
-    }
-}
-
-// @DataContract
-public class SchemaTriggerProjectionList : TriggerProjectionList
-{
-    // @DataMember
-    public var type:SchemaTriggerType?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case type
-        case env
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .type)
-        env = try container.decodeIfPresent(String.self, forKey: .env)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if type != nil { try container.encode(type, forKey: .type) }
-        if env != nil { try container.encode(env, forKey: .env) }
-    }
-}
-
-public class TaxonomyDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var slug:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var termsMetaDataSchema:DataSchemaDto?
-
-    // @DataMember
-    public var termsMetaVisualSchema:VisualSchemaDto?
-
-    // @DataMember
-    public var dependencies:[String]?
-
-    required public init(){}
-}
-
-public class TaxonomyListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var taxonomyName:String?
-
-    // @DataMember
-    public var taxonomySlug:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var dependencies:[String]?
-
-    // @DataMember
-    public var parentName:String?
-
-    // @DataMember
-    public var dependencyRefs:[TaxonomyRef]?
-
-    required public init(){}
-}
-
-public class TaxonomyTreeDto : Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var taxonomyName:String?
-
-    // @DataMember
-    public var taxonomySlug:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var children:[TaxonomyTreeDto]?
-
-    // @DataMember
-    public var terms:[TermTreeDto]?
-
-    required public init(){}
-}
-
-public class TermDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var taxonomyId:String?
-
-    // @DataMember
-    public var taxonomyName:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var order:Int?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var names:[String:String]?
-
-    // @DataMember
-    public var slug:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var descriptions:[String:String]?
-
-    // @DataMember
-    public var multiParents:[TermMultiParentDto]?
-
-    // @DataMember
-    public var meta:String?
-
-    required public init(){}
-}
-
-public class TermTreeDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var taxonomyId:String?
-
-    // @DataMember
-    public var taxonomyName:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var order:Int?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var names:[String:String]?
-
-    // @DataMember
-    public var slug:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var descriptions:[String:String]?
-
-    // @DataMember
-    public var multiParents:[TermMultiParentDto]?
-
-    // @DataMember
-    public var meta:String?
-
-    // @DataMember
-    public var children:[TermTreeDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AppliedTaxonomyDto : Codable
-{
-    // @DataMember
-    public var catalogId:String?
-
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var slug:String?
-
-    // @DataMember
-    public var title:String?
-
-    // @DataMember
-    public var action:String?
-
-    // @DataMember
-    public var termsCreated:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AppliedCollectionDto : Codable
-{
-    // @DataMember
-    public var entity:String?
-
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var title:String?
-
-    // @DataMember
-    public var action:String?
-
-    // @DataMember
-    public var published:Bool?
-
-    // @DataMember
-    public var linkedFields:[String] = []
-
-    required public init(){}
-}
-
-public class SchemaDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var schemaName:String?
-
-    // @DataMember
-    public var schemaSlug:String?
-
-    // @DataMember
-    public var version:Int?
-
-    // @DataMember
-    public var metaSchemaVersion:Int?
-
-    // @DataMember
-    public var dataSchema:DataSchemaDto?
-
-    // @DataMember
-    public var visualSchema:VisualSchemaDto?
-
-    // @DataMember
-    public var publishedAt:Date?
-
-    // @DataMember
-    public var settings:SchemaSettingsDto?
-
-    // @DataMember
-    public var embed:SchemaEmbedSettingsDto?
-
-    // @DataMember
-    public var triggers:[TriggerDto]?
-
-    required public init(){}
-}
-
-public class SchemaListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var schemaName:String?
-
-    // @DataMember
-    public var schemaTitle:String?
-
-    // @DataMember
-    public var latestVersion:Int?
-
-    // @DataMember
-    public var hasDraft:Bool?
-
-    // @DataMember
-    public var metaSchemaVersion:Int?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){}
-}
-
-public class SchemaDraftDto : Codable
-{
-    // @DataMember
-    public var dataSchema:DataSchemaDto?
-
-    // @DataMember
-    public var visualSchema:VisualSchemaDto?
-
-    // @DataMember
-    public var updatedAt:Date?
-
-    required public init(){}
-}
-
-public class SchemaDiffDto : Codable
-{
-    // @DataMember
-    public var fromVersion:Int?
-
-    // @DataMember
-    public var toVersion:Int?
-
-    // @DataMember
-    public var added:[String] = []
-
-    // @DataMember
-    public var removed:[String] = []
-
-    // @DataMember
-    public var typeChanged:[String] = []
-
-    // @DataMember
-    public var validatorTightened:[String] = []
-
-    required public init(){}
-}
-
-public class SchemaVersionSummaryDto : Codable
-{
-    // @DataMember
-    public var version:Int?
-
-    // @DataMember
-    public var metaSchemaVersion:Int?
-
-    // @DataMember
-    public var publishedAt:Date?
-
-    required public init(){}
-}
-
-public class CollectionIndexDto : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var keys:[CollectionIndexKeyDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class SeedCollectionRecordsResultDto : Codable
-{
-    // @DataMember
-    public var insertOrder:[String] = []
-
-    // @DataMember
-    public var report:[SeedCollectionReportItemDto] = []
-
-    required public init(){}
-}
-
-public class DatabaseIntegrationDto : IntegrationDto
-{
-    public var provider:DatabaseProvider?
-    public var isSystemOwned:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case isSystemOwned
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
-        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
-    }
-}
-
-public class DatabaseIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:DatabaseProvider?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case env
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
-        env = try container.decodeIfPresent(String.self, forKey: .env)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if env != nil { try container.encode(env, forKey: .env) }
-    }
-}
-
-// @DataContract
-public class FlexTierDto : Codable
-{
-    // @DataMember
-    public var code:String?
-
-    // @DataMember
-    public var step:Int?
-
-    // @DataMember
-    public var displayName:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class IntegrationTestResultItemDto : Codable
-{
-    // @DataMember
-    public var operation:String?
-
-    // @DataMember
-    public var result:String?
-
-    // @DataMember
-    public var errors:IReadOnlyList<String>?
-
-    required public init(){}
-}
-
-public class CollectionImportDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var schema:SchemaRefDto?
-
-    // @DataMember
-    public var file:FileResourceRefDto?
-
-    // @DataMember
-    public var errorFile:FileResourceRefDto?
-
-    // @DataMember
-    public var delimiter:String?
-
-    // @DataMember
-    public var hasHeader:Bool?
-
-    // @DataMember
-    public var status:String?
-
-    // @DataMember
-    public var totalRows:Int?
-
-    // @DataMember
-    public var totalImported:Int?
-
-    // @DataMember
-    public var totalErrors:Int?
-
-    // @DataMember
-    public var failureReason:String?
-
-    // @DataMember
-    public var mapping:[ImportColumnMappingDto]?
-
-    // @DataMember
-    public var createdOn:Date?
-
-    // @DataMember
-    public var startedOn:Date?
-
-    // @DataMember
-    public var completedOn:Date?
-
-    required public init(){}
-}
-
-public class ImportUploadTargetDto : Codable
-{
-    // @DataMember
-    public var url:String?
-
-    // @DataMember
-    public var contentType:String?
-
-    // @DataMember
-    public var file:FileResourceRefDto?
-
-    required public init(){}
-}
-
-public class ImportFileAnalysisDto : Codable
-{
-    // @DataMember
-    public var file:FileResourceRefDto?
-
-    // @DataMember
-    public var columns:[ImportFileColumnDto] = []
-
-    // @DataMember
-    public var sampleRowCount:Int?
-
-    required public init(){}
-}
-
-public class MongoDbAggregateListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var schemaViewId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class FilesTriggerDto : TriggerDto
-{
-    // @DataMember
-    public var when:FilesTriggerType?
-
-    // @DataMember
-    public var folder:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case when
-        case folder
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        when = try container.decodeIfPresent(FilesTriggerType.self, forKey: .when)
-        folder = try container.decodeIfPresent(String.self, forKey: .folder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if when != nil { try container.encode(when, forKey: .when) }
-        if folder != nil { try container.encode(folder, forKey: .folder) }
-    }
-}
-
-// @DataContract
-public class FilesTriggerProjectionList : TriggerProjectionList
-{
-    // @DataMember
-    public var type:FilesTriggerType?
-
-    // @DataMember
-    public var folder:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case type
-        case folder
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decodeIfPresent(FilesTriggerType.self, forKey: .type)
-        folder = try container.decodeIfPresent(String.self, forKey: .folder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if type != nil { try container.encode(type, forKey: .type) }
-        if folder != nil { try container.encode(folder, forKey: .folder) }
-    }
-}
-
-public class FilesIntegrationDto : IntegrationDto
-{
-    public var provider:FileProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(FileProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class FilesIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:FileProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(FileProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public enum FileProvider : String, Codable
-{
-    case Local
-    case AwsS3
-    case AzureBlobStorage
-    case GoogleCloudStorage
-    case Ftp
-    case AppleICloud
-    case DropBox
-    case GoogleDrive
-}
-
-// @DataContract
-public class PublicFolderDto : Codable
-{
-    // @DataMember(Order=1)
-    public var path:String?
-
-    // @DataMember(Order=2)
-    public var publicId:String?
-
-    // @DataMember(Order=3)
-    public var publicUrl:String?
-
-    // @DataMember(Order=4)
-    public var inherited:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class NotificationModuleDisableDependenciesDto : Codable
-{
-    // @DataMember
-    public var triggers:[NotificationModuleDependencyItemDto] = []
-
-    // @DataMember
-    public var schedulerTasks:[NotificationModuleDependencyItemDto] = []
-
-    // @DataMember
-    public var inFlightCampaigns:[NotificationModuleDependencyItemDto] = []
-
-    // @DataMember
-    public var membershipSettings:[NotificationModuleDependencyItemDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class TestEmailValidationItemDto : Codable
-{
-    // @DataMember
-    public var address:String?
-
-    // @DataMember
-    public var verdict:String?
-
-    // @DataMember
-    public var reason:String?
-
-    // @DataMember
-    public var score:Double?
-
-    required public init(){}
-}
-
-public class EmailTemplateListProjection : TemplateListProjection
-{
-    public var hasAttachments:Bool?
-    public var languages:IReadOnlyList<String>?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case hasAttachments
-        case languages
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        hasAttachments = try container.decodeIfPresent(Bool.self, forKey: .hasAttachments)
-        languages = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .languages)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if hasAttachments != nil { try container.encode(hasAttachments, forKey: .hasAttachments) }
-        if languages != nil { try container.encode(languages, forKey: .languages) }
-    }
-}
-
-// @DataContract
-public class HtmlFromMjmlResponse : Codable
-{
-    // @DataMember(Name="html")
-    public var html:String?
-
-    // @DataMember(Name="errors")
-    public var errors:[MjmlParseError] = []
-
-    required public init(){}
-}
-
-public class SystemEmailTemplateListProjection : EmailTemplateListProjection
-{
-    required public init(){ super.init() }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-    }
-}
-
-// @DataContract
-public class EmailSignatureDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var translations:[TranslationDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class ListItemWithTranslationsProjection : ListItemProjection
-{
-    // @DataMember
-    public var translations:[String] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case translations
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        translations = try container.decodeIfPresent([String].self, forKey: .translations) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
-    }
-}
-
-public class EmailSettings : IBindableContract, Codable
-{
-    public var signatures:IList<EmailSignatureDto>?
-    public var footers:IList<EmailFooterDto>?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DomainHealthRecordItemDto : Codable
-{
-    // @DataMember
-    public var record:String?
-
-    // @DataMember
-    public var value:String?
-
-    required public init(){}
-}
-
-public class EmailIntegrationDto : IntegrationDto
-{
-    public var provider:EmailProvider?
-    public var emailAddress:String?
-    public var emailSenderName:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case emailAddress
-        case emailSenderName
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(EmailProvider.self, forKey: .provider)
-        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress)
-        emailSenderName = try container.decodeIfPresent(String.self, forKey: .emailSenderName)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if emailAddress != nil { try container.encode(emailAddress, forKey: .emailAddress) }
-        if emailSenderName != nil { try container.encode(emailSenderName, forKey: .emailSenderName) }
-    }
-}
-
-public class EmailIntegrationListProjection : IntegrationListProjection
-{
-    public var emailProvider:EmailProvider?
-    public var senderEmailAddress:String?
-    public var senderDisplayName:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case emailProvider
-        case senderEmailAddress
-        case senderDisplayName
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        emailProvider = try container.decodeIfPresent(EmailProvider.self, forKey: .emailProvider)
-        senderEmailAddress = try container.decodeIfPresent(String.self, forKey: .senderEmailAddress)
-        senderDisplayName = try container.decodeIfPresent(String.self, forKey: .senderDisplayName)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if emailProvider != nil { try container.encode(emailProvider, forKey: .emailProvider) }
-        if senderEmailAddress != nil { try container.encode(senderEmailAddress, forKey: .senderEmailAddress) }
-        if senderDisplayName != nil { try container.encode(senderDisplayName, forKey: .senderDisplayName) }
-    }
-}
-
-// @DataContract
-public class EmailFooterDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var translations:[TranslationDto] = []
-
-    required public init(){}
-}
-
-public class EmailLinkPreferencesDto : Codable
-{
-    public var emailAddress:String?
-    public var unsubscribedFromMarketing:Bool?
-    public var blockReasons:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class EmailCampaignDto : CampaignDto
-{
-    // @DataMember
-    public var deliverySettings:EmailCampaignDeliverySettingsDto?
-
-    // @DataMember
-    public var template:EmailTemplateDto?
-
-    // @DataMember
-    public var validationIntegrationId:String?
-
-    // @DataMember
-    public var templateIsSystem:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case deliverySettings
-        case template
-        case validationIntegrationId
-        case templateIsSystem
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        deliverySettings = try container.decodeIfPresent(EmailCampaignDeliverySettingsDto.self, forKey: .deliverySettings)
-        template = try container.decodeIfPresent(EmailTemplateDto.self, forKey: .template)
-        validationIntegrationId = try container.decodeIfPresent(String.self, forKey: .validationIntegrationId)
-        templateIsSystem = try container.decodeIfPresent(Bool.self, forKey: .templateIsSystem)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if deliverySettings != nil { try container.encode(deliverySettings, forKey: .deliverySettings) }
-        if template != nil { try container.encode(template, forKey: .template) }
-        if validationIntegrationId != nil { try container.encode(validationIntegrationId, forKey: .validationIntegrationId) }
-        if templateIsSystem != nil { try container.encode(templateIsSystem, forKey: .templateIsSystem) }
-    }
-}
-
-// @DataContract
-public class EmailCampaignListProjection : Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var templateName:String?
-
-    // @DataMember
-    public var templateId:String?
-
-    // @DataMember
-    public var integrationId:String?
-
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var strategy:String?
-
-    // @DataMember
-    public var latestStatus:CampaignStatus?
-
-    // @DataMember
-    public var createdOn:Date?
-
-    required public init(){}
-}
-
-// @DataContract
-public class EmailCampaignBatchDto : CampaignBatchDto
-{
-    // @DataMember
-    public var recipients:EmailRecipientsDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(EmailRecipientsDto.self, forKey: .recipients)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-    }
-}
-
-// @DataContract
-public class EmailCampaignBatchNotificationDto : CampaignBatchNotificationDto
-{
-    // @DataMember
-    public var subject:String?
-
-    // @DataMember
-    public var recipients:EmailRecipientsDto?
-
-    // @DataMember
-    public var content:EmailMessageContentDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case subject
-        case recipients
-        case content
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        subject = try container.decodeIfPresent(String.self, forKey: .subject)
-        recipients = try container.decodeIfPresent(EmailRecipientsDto.self, forKey: .recipients)
-        content = try container.decodeIfPresent(EmailMessageContentDto.self, forKey: .content)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if subject != nil { try container.encode(subject, forKey: .subject) }
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-        if content != nil { try container.encode(content, forKey: .content) }
-    }
-}
-
-public class BatchStatusChangeEntryDto : Codable
-{
-    public var time:Date?
-    public var status:CampaignBatchStatus?
-    public var errors:[ErrorDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CampaignStatsDto : Codable
-{
-    // @DataMember
-    public var batches:Int?
-
-    // @DataMember
-    public var sent:Int?
-
-    // @DataMember
-    public var failed:Int?
-
-    // @DataMember
-    public var successRate:Double?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SmsTemplateListProjection : TemplateListProjection
-{
-    // @DataMember
-    public var languages:[String] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case languages
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        languages = try container.decodeIfPresent([String].self, forKey: .languages) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if languages.count > 0 { try container.encode(languages, forKey: .languages) }
-    }
-}
-
-public class SmsSettings : IBindableContract, Codable
-{
-    required public init(){}
-}
-
-public class SmsIntegrationDto : IntegrationDto
-{
-    public var provider:SmsProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(SmsProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class SmsIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:SmsProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(SmsProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class SmsCampaignDto : CampaignDto
-{
-    // @DataMember
-    public var recipients:SmsCampaignDeliverySettingsDto?
-
-    // @DataMember
-    public var template:SmsTemplateDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-        case template
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(SmsCampaignDeliverySettingsDto.self, forKey: .recipients)
-        template = try container.decodeIfPresent(SmsTemplateDto.self, forKey: .template)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-        if template != nil { try container.encode(template, forKey: .template) }
-    }
-}
-
-// @DataContract
-public class SmsCampaignBatchDto : CampaignBatchDto
-{
-    // @DataMember
-    public var recipients:SmsRecipientsDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(SmsRecipientsDto.self, forKey: .recipients)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-    }
-}
-
-// @DataContract
-public class SmsCampaignBatchNotificationDto : CampaignBatchNotificationDto
-{
-    // @DataMember
-    public var recipients:SmsRecipientsDto?
-
-    // @DataMember
-    public var content:SmsMessageContentDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-        case content
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(SmsRecipientsDto.self, forKey: .recipients)
-        content = try container.decodeIfPresent(SmsMessageContentDto.self, forKey: .content)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-        if content != nil { try container.encode(content, forKey: .content) }
-    }
-}
-
-// @DataContract
-public class MarketplaceListingProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var slug:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var vendor:String?
-
-    // @DataMember
-    public var category:MarketplaceCategory?
-
-    // @DataMember
-    public var transport:MarketplaceTransport?
-
-    // @DataMember
-    public var iconUrl:String?
-
-    // @DataMember
-    public var isOfficial:Bool?
-
-    // @DataMember
-    public var tags:IReadOnlyList<String>?
-
-    // @DataMember
-    public var functionCount:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MarketplaceIntegrationListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var integrationName:String?
-
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var listingViewId:String?
-
-    // @DataMember
-    public var vendor:String?
-
-    // @DataMember
-    public var category:MarketplaceCategory?
-
-    // @DataMember
-    public var transport:MarketplaceTransport?
-
-    // @DataMember
-    public var lastIntegrationTestAtUtc:Date?
-
-    // @DataMember
-    public var lastIntegrationTestSucceeded:Bool?
-
-    // @DataMember
-    public var lastIntegrationTestErrors:IReadOnlyList<String>?
-
-    // @DataMember
-    public var humanDeliveryConfirmedAtUtc:Date?
-
-    // @DataMember
-    public var requiresHumanDeliveryConfirmation:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MarketplaceFunctionProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var integrationViewId:String?
-
-    // @DataMember
-    public var functionKey:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var mappingCount:Int?
-
-    required public init(){}
-}
-
-public class CodeIntegrationDto : IntegrationDto
-{
-    public var provider:CodeProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(CodeProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class CodeIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:CodeProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(CodeProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class PushTemplateListProjection : TemplateListProjection
-{
-    // @DataMember
-    public var languages:[String] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case languages
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        languages = try container.decodeIfPresent([String].self, forKey: .languages) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if languages.count > 0 { try container.encode(languages, forKey: .languages) }
-    }
-}
-
-public class PushSettings : Codable
-{
-    public var marketingTags:[TagDefinitionDto]?
-    public var transactionalTags:[TagDefinitionDto]?
-
-    required public init(){}
-}
-
-public class PushIntegrationDto : IntegrationDto
-{
-    public var provider:PushProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(PushProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class PushIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:PushProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(PushProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class PushDeviceListProjection : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var deviceOs:String?
-
-    // @DataMember
-    public var token:String?
-
-    // @DataMember
-    public var brand:String?
-
-    // @DataMember
-    public var manufacturer:String?
-
-    // @DataMember
-    public var modelName:String?
-
-    // @DataMember
-    public var deviceName:String?
-
-    // @DataMember
-    public var deviceType:String?
-
-    // @DataMember
-    public var osName:String?
-
-    // @DataMember
-    public var osVersion:String?
-
-    // @DataMember
-    public var platformApiLevel:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushAudienceCountDto : Codable
-{
-    // @DataMember
-    public var devices:Int?
-
-    // @DataMember
-    public var recipients:Int?
-
-    // @DataMember
-    public var skippedUserIds:Int?
-
-    // @DataMember
-    public var isCapped:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushCampaignDto : CampaignDto
-{
-    // @DataMember
-    public var recipients:PushCampaignDeliverySettingsDto?
-
-    // @DataMember
-    public var template:PushTemplateDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-        case template
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(PushCampaignDeliverySettingsDto.self, forKey: .recipients)
-        template = try container.decodeIfPresent(PushTemplateDto.self, forKey: .template)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-        if template != nil { try container.encode(template, forKey: .template) }
-    }
-}
-
-// @DataContract
-public class PushCampaignBatchDto : CampaignBatchDto
-{
-    // @DataMember
-    public var recipients:PushRecipientsDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case recipients
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        recipients = try container.decodeIfPresent(PushRecipientsDto.self, forKey: .recipients)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-    }
-}
-
-// @DataContract
-public class PushCampaignBatchNotificationDto : CampaignBatchNotificationDto
-{
-    // @DataMember
-    public var subject:String?
-
-    // @DataMember
-    public var recipients:PushRecipientsDto?
-
-    // @DataMember
-    public var content:PushMessageContentDto?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case subject
-        case recipients
-        case content
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        subject = try container.decodeIfPresent(String.self, forKey: .subject)
-        recipients = try container.decodeIfPresent(PushRecipientsDto.self, forKey: .recipients)
-        content = try container.decodeIfPresent(PushMessageContentDto.self, forKey: .content)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if subject != nil { try container.encode(subject, forKey: .subject) }
-        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
-        if content != nil { try container.encode(content, forKey: .content) }
-    }
-}
-
-public class PaymentsWebhookLogEntry : Codable
-{
-    public var integrationId:String?
-    public var source:String?
-    public var env:String?
-    public var eventName:String?
-    public var providerEventId:String?
-    public var statusCode:Int?
-    public var Description:String?
-    public var receivedOn:Date?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PaymentTriggerDto : TriggerDto
-{
-    // @DataMember
-    public var when:PaymentTriggerType?
-
-    // @DataMember
-    public var integrations:[String]?
-
-    // @DataMember
-    public var events:[String]?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case when
-        case integrations
-        case events
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        when = try container.decodeIfPresent(PaymentTriggerType.self, forKey: .when)
-        integrations = try container.decodeIfPresent([String].self, forKey: .integrations) ?? []
-        events = try container.decodeIfPresent([String].self, forKey: .events) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if when != nil { try container.encode(when, forKey: .when) }
-        if integrations != nil { try container.encode(integrations, forKey: .integrations) }
-        if events != nil { try container.encode(events, forKey: .events) }
-    }
-}
-
-// @DataContract
-public class PaymentTriggerProjectionList : TriggerProjectionList
-{
-    // @DataMember
-    public var type:PaymentTriggerType?
-
-    // @DataMember
-    public var integrations:[String]?
-
-    // @DataMember
-    public var events:[String]?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case type
-        case integrations
-        case events
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decodeIfPresent(PaymentTriggerType.self, forKey: .type)
-        integrations = try container.decodeIfPresent([String].self, forKey: .integrations) ?? []
-        events = try container.decodeIfPresent([String].self, forKey: .events) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if type != nil { try container.encode(type, forKey: .type) }
-        if integrations != nil { try container.encode(integrations, forKey: .integrations) }
-        if events != nil { try container.encode(events, forKey: .events) }
-    }
-}
-
-public class PaymentsIntegrationDto : IntegrationDto
-{
-    public var gatewayPlatform:PaymentGatewayPlatform?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case gatewayPlatform
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        gatewayPlatform = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .gatewayPlatform)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if gatewayPlatform != nil { try container.encode(gatewayPlatform, forKey: .gatewayPlatform) }
-    }
-}
-
-public class PaymentsIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var gatewayPlatform:PaymentGatewayPlatform?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case gatewayPlatform
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        gatewayPlatform = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .gatewayPlatform)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if gatewayPlatform != nil { try container.encode(gatewayPlatform, forKey: .gatewayPlatform) }
-    }
-}
-
-public class LoggingIntegrationDto : IntegrationDto
-{
-    public var provider:LoggingProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(LoggingProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-public class LoggingIntegrationListProjection : IntegrationListProjection
-{
-    // @DataMember
-    public var provider:LoggingProvider?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(LoggingProvider.self, forKey: .provider)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-    }
-}
-
-// @DataContract
-public class TenantLogEntryDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var timestamp:Date?
-
-    // @DataMember
-    public var module:String?
-
-    // @DataMember
-    public var level:String?
-
-    // @DataMember
-    public var eventCode:String?
-
-    // @DataMember
-    public var title:String?
-
-    // @DataMember
-    public var message:String?
-
-    // @DataMember
-    public var correlationId:String?
-
-    // @DataMember
-    public var traceId:String?
-
-    // @DataMember
-    public var spanId:String?
-
-    // @DataMember
-    public var env:String?
-
-    // @DataMember
-    public var meta:IReadOnlyDictionary<String, String>?
-
-    required public init(){}
-}
-
-public class AgentOnboardingSnippet : Codable
-{
-    public var client:String?
-    public var config:String?
-    public var auth:String?
-
-    required public init(){}
-}
-
-public class AiToolManifestItem : Codable
-{
-    public var name:String?
-    public var Description:String?
-    public var toolsets:[String] = []
-    public var requiresConfirmation:Bool?
-    public var parameters:[AiToolManifestParameter] = []
-
-    required public init(){}
-}
-
-public class ChatModelOption : Codable
-{
-    public var llmIntegrationId:String?
-    public var kind:String?
-    public var provider:String?
-    public var model:String?
-    public var label:String?
-    public var isDefault:Bool?
-    public var isAuto:Bool?
-    public var contextWindow:Int?
-
-    required public init(){}
-}
-
-public class ChatMemoryNote : Codable
-{
-    public var id:String?
-    public var kind:String?
-    public var text:String?
-    public var projectId:String?
-    public var createdAtUtc:Date?
-
-    required public init(){}
-}
-
-public class ChatSessionListItem : Codable
-{
-    public var sessionId:String?
-    public var profile:String?
-    public var projectId:String?
-    public var env:String?
-    public var title:String?
-    public var updatedAtUtc:Date?
-    public var isArchived:Bool?
-    public var isPinned:Bool?
-
-    required public init(){}
-}
-
-public class AiChatEntryWireDto : Codable
-{
-    public var kind:String?
-    public var id:String?
-    public var seq:Int?
-    public var atUtc:Date?
-    public var refEntryId:String?
-    public var workItemId:String?
-    public var feedback:String?
-    public var feedbackAtUtc:Date?
-    public var feedbackByUserAuthId:String?
-
-    required public init(){}
-}
-
-public class ScaffoldStep : Codable
-{
-    public var order:Int?
-    public var kind:String?
-    public var title:String?
-    public var tool:String?
-    public var arguments:JsonObject?
-    public var checkTool:String?
-    public var templateRef:String?
-
-    required public init(){}
-}
-
-public class ScaffoldIssue : Codable
-{
-    public var `where`:String?
-    public var code:String?
-    public var message:String?
-
-    required public init(){}
-}
-
-public class ScaffoldApplyReport : Codable
-{
-    public var completed:Bool?
-    public var projectId:String?
-    public var projectUrl:String?
-    public var summary:String?
-    public var steps:[ScaffoldStepReportWithLink] = []
-
-    required public init(){}
-}
-
-public class TemplatePreview : Codable
-{
-    public var channel:String?
-    public var ok:Bool?
-    public var parts:IReadOnlyList<TemplatePreviewPartResult>?
-    public var errors:IReadOnlyList<String>?
-
-    required public init(){}
-}
-
-public class ProjectBriefSnapshotWireDto : Codable
-{
-    public var projectId:String?
-    public var upToSeq:Int?
-    public var atUtc:Date?
-    public var requirements:[ProjectBriefRequirementWireDto] = []
-    public var decisions:[ProjectBriefDecisionWireDto] = []
-    public var openAssumptions:[ProjectBriefAssumptionWireDto] = []
-    public var summary:String?
-
-    required public init(){}
-}
-
-public class ProjectBriefEventWireDto : Codable
-{
-    public var id:String?
-    public var projectId:String?
-    public var seq:Int?
-    public var atUtc:Date?
-    public var kind:String?
-    public var requirementId:String?
-    public var supersedesEventId:String?
-    public var text:String?
-    public var confidence:Double?
-    public var sources:[ProjectBriefSourceWireDto] = []
-    public var origin:String?
-    public var satisfiedBy:[ProjectBriefSatisfiedByWireDto] = []
-
-    required public init(){}
-}
-
-public class WorkItemWireDto : Codable
-{
-    public var id:String?
-    public var projectId:String?
-    public var status:String?
-    public var goal:String?
-    public var notInScope:[String] = []
-    public var scopeRequirementIds:[String] = []
-    public var difficulty:Int?
-    public var difficultyReason:String?
-    public var planEntryRefs:[WorkItemEntryRefWireDto] = []
-    public var runRefs:[WorkItemRunRefWireDto] = []
-    public var artifacts:[WorkItemArtifactWireDto] = []
-    public var movedOut:[WorkItemMovedOutWireDto] = []
-    public var needsYou:[WorkItemNeedsYouWireDto] = []
-    public var openQuestions:[WorkItemOpenQuestionWireDto] = []
-    public var sessionIds:[String] = []
-    public var parentId:String?
-    public var children:[String] = []
-    public var summaryEntryRef:WorkItemEntryRefWireDto?
-    public var createdBy:String?
-    public var createdAtUtc:Date?
-    public var updatedAtUtc:Date?
-    public var doneVerdict:String?
-    public var doneConditions:[WorkItemDoneConditionWireDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiTriggerProjectionList : TriggerProjectionList
-{
-    // @DataMember
-    public var type:AiTriggerType?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case type
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        type = try container.decodeIfPresent(AiTriggerType.self, forKey: .type)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if type != nil { try container.encode(type, forKey: .type) }
-    }
-}
-
-// @DataContract
-public class AiTriggerDto : TriggerDto
-{
-    // @DataMember
-    public var when:AiTriggerType?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case when
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        when = try container.decodeIfPresent(AiTriggerType.self, forKey: .when)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if when != nil { try container.encode(when, forKey: .when) }
-    }
-}
-
-public class EmbeddingIntegrationDto : IntegrationDto
-{
-    public var provider:EmbeddingProvider?
-    public var model:String?
-    public var dimension:Int?
-    public var baseUrl:String?
-    public var isConfigured:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case model
-        case dimension
-        case baseUrl
-        case isConfigured
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .provider)
-        model = try container.decodeIfPresent(String.self, forKey: .model)
-        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
-        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
-        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if model != nil { try container.encode(model, forKey: .model) }
-        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
-        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
-        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
-    }
-}
-
-public class EmbeddingIntegrationListProjection : IntegrationListProjection
-{
-    public var embeddingProvider:EmbeddingProvider?
-    public var model:String?
-    public var dimension:Int?
-    public var isConfigured:Bool?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case embeddingProvider
-        case model
-        case dimension
-        case isConfigured
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        embeddingProvider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .embeddingProvider)
-        model = try container.decodeIfPresent(String.self, forKey: .model)
-        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
-        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if embeddingProvider != nil { try container.encode(embeddingProvider, forKey: .embeddingProvider) }
-        if model != nil { try container.encode(model, forKey: .model) }
-        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
-        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
-    }
-}
-
-public class LlmIntegrationDto : IntegrationDto
-{
-    public var provider:LlmProvider?
-    public var baseUrl:String?
-    public var defaultModel:String?
-    public var isConfigured:Bool?
-    public var isSystemOwned:Bool?
-    public var isDefault:Bool?
-    public var models:[LlmModelOptionDto] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case baseUrl
-        case defaultModel
-        case isConfigured
-        case isSystemOwned
-        case isDefault
-        case models
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(LlmProvider.self, forKey: .provider)
-        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
-        defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
-        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
-        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
-        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
-        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
-        if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
-        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
-        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
-        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
-        if models.count > 0 { try container.encode(models, forKey: .models) }
-    }
-}
-
-public class LlmIntegrationListProjection : IntegrationListProjection
-{
-    public var llmProvider:LlmProvider?
-    public var baseUrl:String?
-    public var defaultModel:String?
-    public var isDefault:Bool?
-    public var models:[LlmModelOptionDto] = []
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case llmProvider
-        case baseUrl
-        case defaultModel
-        case isDefault
-        case models
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        llmProvider = try container.decodeIfPresent(LlmProvider.self, forKey: .llmProvider)
-        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
-        defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
-        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
-        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if llmProvider != nil { try container.encode(llmProvider, forKey: .llmProvider) }
-        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
-        if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
-        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
-        if models.count > 0 { try container.encode(models, forKey: .models) }
-    }
-}
-
-public class McpIntegrationDto : IntegrationDto
-{
-    public var provider:McpProvider?
-    public var transport:McpTransport?
-    public var metadata:McpMetadata?
-    public var isConfigured:Bool?
-    public var isSystemOwned:Bool?
-    public var command:String?
-    public var args:[String]?
-    public var serverUrl:String?
-    public var auth:McpAuth?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case provider
-        case transport
-        case metadata
-        case isConfigured
-        case isSystemOwned
-        case command
-        case args
-        case serverUrl
-        case auth
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        provider = try container.decodeIfPresent(McpProvider.self, forKey: .provider)
-        transport = try container.decodeIfPresent(McpTransport.self, forKey: .transport)
-        metadata = try container.decodeIfPresent(McpMetadata.self, forKey: .metadata)
-        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
-        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
-        command = try container.decodeIfPresent(String.self, forKey: .command)
-        args = try container.decodeIfPresent([String].self, forKey: .args) ?? []
-        serverUrl = try container.decodeIfPresent(String.self, forKey: .serverUrl)
-        auth = try container.decodeIfPresent(McpAuth.self, forKey: .auth)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if provider != nil { try container.encode(provider, forKey: .provider) }
-        if transport != nil { try container.encode(transport, forKey: .transport) }
-        if metadata != nil { try container.encode(metadata, forKey: .metadata) }
-        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
-        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
-        if command != nil { try container.encode(command, forKey: .command) }
-        if args != nil { try container.encode(args, forKey: .args) }
-        if serverUrl != nil { try container.encode(serverUrl, forKey: .serverUrl) }
-        if auth != nil { try container.encode(auth, forKey: .auth) }
-    }
-}
-
-public class McpIntegrationListProjection : IntegrationListProjection
-{
-    public var mcpProvider:McpProvider?
-    public var transport:McpTransport?
-    public var category:String?
-    public var Description:String?
-    public var icon:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case mcpProvider
-        case transport
-        case category
-        case Description
-        case icon
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        mcpProvider = try container.decodeIfPresent(McpProvider.self, forKey: .mcpProvider)
-        transport = try container.decodeIfPresent(McpTransport.self, forKey: .transport)
-        category = try container.decodeIfPresent(String.self, forKey: .category)
-        Description = try container.decodeIfPresent(String.self, forKey: .Description)
-        icon = try container.decodeIfPresent(String.self, forKey: .icon)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if mcpProvider != nil { try container.encode(mcpProvider, forKey: .mcpProvider) }
-        if transport != nil { try container.encode(transport, forKey: .transport) }
-        if category != nil { try container.encode(category, forKey: .category) }
-        if Description != nil { try container.encode(Description, forKey: .Description) }
-        if icon != nil { try container.encode(icon, forKey: .icon) }
-    }
-}
-
-public protocol IVirtualFile
-{
-    //virtualPathProvider:IVirtualPathProvider ignored. Swift doesn't support interface properties
-    var `extension`:String? { get set }
-    var length:Int? { get set }
-
-}
-
-// @Flags()
-public enum CacheControl : Int, Codable
-{
-    case None = 0
-    case Public = 1
-    case Private = 2
-    case MustRevalidate = 4
-    case NoCache = 8
-    case NoStore = 16
-    case NoTransform = 32
-    case ProxyRevalidate = 64
-}
-
-public protocol IContentTypeWriter
-{
-}
-
-public protocol IRequest
-{
-    var originalRequest:String? { get set }
-    //response:IResponse ignored. Swift doesn't support interface properties
-    var operationName:String? { get set }
-    var verb:String? { get set }
-    var requestAttributes:RequestAttributes? { get set }
-    //requestPreferences:IRequestPreferences ignored. Swift doesn't support interface properties
-    var dto:String? { get set }
-    var contentType:String? { get set }
-    var isLocal:Bool? { get set }
-    var userAgent:String? { get set }
-    var cookies:[String:Cookie]? { get set }
-    var responseContentType:String? { get set }
-    var hasExplicitResponseContentType:Bool? { get set }
-    var items:[String:String]? { get set }
-    var headers:NameValueCollection? { get set }
-    var queryString:NameValueCollection? { get set }
-    var formData:NameValueCollection? { get set }
-    var useBufferedStream:Bool? { get set }
-    var rawUrl:String? { get set }
-    var absoluteUri:String? { get set }
-    var userHostAddress:String? { get set }
-    var remoteIp:String? { get set }
-    var authorization:String? { get set }
-    var isSecureConnection:Bool? { get set }
-    var acceptTypes:[String]? { get set }
-    var pathInfo:String? { get set }
-    var originalPathInfo:String? { get set }
-    var inputStream:Data? { get set }
-    var contentLength:Int? { get set }
-    var files:[IHttpFile]? { get set }
-    var urlReferrer:Uri? { get set }
-    var requestAborted:CancellationToken? { get set }
-
-}
-
-// @DataContract
-public class SchedulerTaskListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var taskId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var cron:String?
-
-    // @DataMember
-    public var type:SchedulerTaskType?
-
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var viewId:String?
-
-    required public init(){}
-}
-
-public class ResolvedResourceEntry : Codable
-{
-    public var ref:ResourceRefDto?
-    public var status:ResolvedRefStatus?
-    public var resolved:String?
-    public var diagnostic:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class UserDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var projectId:String?
-
-    // @DataMember
-    public var primaryEmail:String?
-
-    // @DataMember
-    public var primaryPhone:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    // @DataMember
-    public var firstName:String?
-
-    // @DataMember
-    public var lastName:String?
-
-    // @DataMember
-    public var fullName:String?
-
-    // @DataMember
-    public var company:String?
-
-    // @DataMember
-    public var locale:String?
-
-    // @DataMember
-    public var timeZone:String?
-
-    // @DataMember
-    public var gender:String?
-
-    // @DataMember
-    public var birthDate:Int?
-
-    // @DataMember
-    public var addressLine1:String?
-
-    // @DataMember
-    public var addressLine2:String?
-
-    // @DataMember
-    public var country:String?
-
-    // @DataMember
-    public var city:String?
-
-    // @DataMember
-    public var state:String?
-
-    // @DataMember
-    public var postalCode:String?
-
-    // @DataMember
-    public var tags:[String]?
-
-    // @DataMember
-    public var roles:[String]?
-
-    // @DataMember
-    public var lifecycle:String?
-
-    // @DataMember
-    public var sourceOfCreation:String?
-
-    // @DataMember
-    public var mergedIntoContactId:String?
-
-    // @DataMember
-    public var createdOn:Date?
-
-    // @DataMember
-    public var modifiedOn:Date?
-
-    // @DataMember
-    public var auths:[AuthDto]?
-
-    // @DataMember
-    public var marketingPreferences:[String:ChannelSubscriptionStateDto]?
-
-    required public init(){}
-}
-
-public class ProjectComplianceDto : Codable
-{
-    public var regimes:[String] = []
-    public var consentPurposes:[ConsentPurposeDto] = []
-    public var retentionWindows:[RetentionWindowDto] = []
-
-    required public init(){}
-}
-
-public class LegalHoldDto : Codable
-{
-    public var id:String?
-    public var subjectKind:String?
-    public var subjectId:String?
-    public var reason:String?
-    public var placedAt:Date?
-    public var placedBy:String?
-    public var releasedAt:Date?
-    public var releasedBy:String?
-
-    required public init(){}
-}
-
-public class DsarRequestDto : Codable
-{
-    public var id:String?
-    public var subjectKind:String?
-    public var subjectId:String?
-    public var status:String?
-    public var receivedAt:Date?
-    public var slaDeadline:Date?
-    public var autoApproveAt:Date?
-    public var decidedAt:Date?
-    public var decidedBy:String?
-    public var rejectionReason:String?
-
-    required public init(){}
-}
-
-public class ComplianceAuditEntryDto : Codable
-{
-    public var id:String?
-    public var timestamp:Date?
-    public var action:String?
-    public var subjectKind:String?
-    public var subjectId:String?
-    public var reason:String?
-    public var metadata:[String:String]?
-
-    required public init(){}
-}
-
-public class AccountComplianceDto : Codable
-{
-    public var dsarMode:String?
-    public var dsarDelayDays:Int?
-    public var autoForwardAdvisories:Bool?
-    public var securityContact:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SupportCaseDetailDto : Codable
-{
-    // @DataMember
-    public var `case`:SupportCaseDto?
-
-    // @DataMember
-    public var messages:[SupportCaseMessageDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class SupportCaseListProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var projectId:String?
-
-    // @DataMember
-    public var kind:SupportCaseKind?
-
-    // @DataMember
-    public var severity:SupportCaseSeverity?
-
-    // @DataMember
-    public var status:SupportCaseStatus?
-
-    // @DataMember
-    public var customerStatus:SupportCustomerStatus?
-
-    // @DataMember
-    public var subject:String?
-
-    // @DataMember
-    public var openedOn:Int?
-
-    // @DataMember
-    public var messageCount:Int?
-
-    // @DataMember
-    public var lastMessageOn:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticPackDescriptorDto : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var version:Int?
-
-    // @DataMember
-    public var summary:String?
-
-    // @DataMember
-    public var steps:[DiagnosticPackStepDescriptorDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticPackRunResultDto : Codable
-{
-    // @DataMember
-    public var packName:String?
-
-    // @DataMember
-    public var packVersion:Int?
-
-    // @DataMember
-    public var caseId:String?
-
-    // @DataMember
-    public var steps:[DiagnosticPackStepResultDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticEchoDto : Codable
-{
-    // @DataMember
-    public var containerName:String?
-
-    // @DataMember
-    public var isManagedService:Bool?
-
-    // @DataMember
-    public var apiVersion:String?
-
-    // @DataMember
-    public var hubVersion:String?
-
-    // @DataMember
-    public var release:String?
-
-    // @DataMember
-    public var runtime:String?
-
-    // @DataMember
-    public var hubUrl:String?
-
-    // @DataMember
-    public var apiUrl:String?
-
-    // @DataMember
-    public var licensePresent:Bool?
-
-    // @DataMember
-    public var regions:[DiagnosticEchoRegionDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticEventsPageDto : Codable
-{
-    // @DataMember
-    public var stream:String?
-
-    // @DataMember
-    public var from:Int?
-
-    // @DataMember
-    public var count:Int?
-
-    // @DataMember
-    public var hasMore:Bool?
-
-    // @DataMember
-    public var nextFrom:Int?
-
-    // @DataMember
-    public var items:[DiagnosticEventItemDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticLogsResponse : Codable
-{
-    // @DataMember
-    public var list:PaginatedResponse<TenantLogEntryDto>?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticRedisInspectDto : Codable
-{
-    // @DataMember
-    public var keyPattern:String?
-
-    // @DataMember
-    public var cacheKey:String?
-
-    // @DataMember
-    public var isList:Bool?
-
-    // @DataMember
-    public var item:[String:String]?
-
-    // @DataMember
-    public var listItems:[DiagnosticRedisListItemDto]?
-
-    // @DataMember
-    public var hasMore:Bool?
-
-    // @DataMember
-    public var startingAfter:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticHealthCheckDto : Codable
-{
-    // @DataMember
-    public var checkId:String?
-
-    // @DataMember
-    public var isHealthy:Bool?
-
-    // @DataMember
-    public var statusCode:Int?
-
-    // @DataMember
-    public var detail:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public enum EmailProvider : String, Codable
-{
-    case Smtp
-    case SendGrid
-    case MailGun
-    case AwsSes
-    case Fake
-}
-
-public enum SmtpPorts : Int, Codable
-{
-    case Default = 25
-    case Ssl = 465
-    case Tls = 587
-    case Fallback = 2525
-}
-
-public enum AwsIntegrationType : String, Codable
-{
-    case Iam
-    case CrossAccountRole
-}
-
-public enum MailGunRegion : String, Codable
-{
-    case Us
-    case Eu
-}
-
-public enum EmailCampaignRecipientsSourceTypes : String, Codable
-{
-    case AllUsers
-    case SpecifiedUsers
-    case AccountUsers
-    case Email
-    case Collection
-}
-
-public enum CollectionEmailCampaignRecipientField : String, Codable
-{
-    case User
-    case Email
-}
-
-public enum MembershipTriggerType : String, Codable
-{
-    case OnRegistered
-    case OnInvited
-    case OnVerified
-    case OnUpdated
-    case OnDeleted
-    case OnBlocked
-    case OnReactivated
-    case OnUserCreated
-}
-
-// @DataContract
-public class TriggerActionDto : Codable
-{
-    // @DataMember
-    public var type:TriggerActionType?
-
-    // @DataMember
-    public var integrationId:String?
-
-    required public init(){}
-}
-
-public enum SchemaTriggerType : String, Codable
-{
-    case OnInserted
-    case OnDeleted
-    case OnUpdated
-}
-
-public enum FilesTriggerType : String, Codable
-{
-    case OnFileUploaded
-    case OnFileDeleted
-}
-
-public enum PaymentTriggerType : String, Codable
-{
-    case OnOrderCreated
-    case OnOrderPaid
-    case OnWebhookCallReceived
-}
-
-public enum DatabaseProvider : String, Codable
-{
-    case MongoDbConnectionString
-    case CodeMashMongoDbAtlasFlexManaged
-}
-
-public enum AwsS3IntegrationType : String, Codable
-{
-    case Iam
-    case CrossAccountRole
-}
-
-public enum LoggingProvider : String, Codable
-{
-    case Console
-    case NorbixLogging
-    case DataDog
-    case NewRelic
-    case Sentry
-    case GrafanaLoki
-    case Axiom
-    case ElasticCloud
-    case AWSCloudWatch
-    case GCPCloudLogging
-    case AzureMonitorLogs
-    case GenericHttp
-    case Kafka
-    case AMQP
-    case Prometheus
-    case AzureOTel
-    case Splunk
-    case ElasticSearch
-    case Kibana
-    case LocalFile
-    case AWSS3
-    case AWSKinesis
-    case MongoDB
-    case InternalKafka
-}
-
-public enum AwsS3LoggingIntegrationType : String, Codable
-{
-    case Iam
-    case CrossAccountRole
-}
-
-public enum MembershipProvider : String, Codable
-{
-    case AppleSignIn
-    case GoogleSignIn
-    case Google
-    case Facebook
-    case X
-    case GitHub
-    case LinkedIn
-    case Okta
-    case Microsoft
-}
-
-public class OAuthModeConfig : Codable
-{
-    public var name:DisplayName?
-    public var callbackUrl:Uri?
-    public var logoutUrl:Uri?
-    public var failureRedirectUrl:Uri?
-    public var roleName:RoleName?
-
-    required public init(){}
-}
-
-public enum PaymentGatewayPlatform : String, Codable
-{
-    case Stripe
-    case Adyen
-    case Paddle
-    case LemonSqueezy
-    case AppleInApp
-    case GoogleInApp
-    case Shopify
-    case WooCommerce
-    case Magento
-    case PayPal
-    case Braintree
-    case AuthorizeNet
-    case CheckOutCom
-    case Mollie
-    case Worldpay
-}
-
-// @DataContract
-public enum PushProvider : String, Codable
-{
-    case AppleApns
-    case SafariWeb
-    case SafariPush
-    case AndroidFirebase
-    case ChromeWeb
-    case FirefoxWeb
-    case EdgeWeb
-    case ChromePush
-    case CodeMashIosApp
-    case CodeMashAndroidApp
-    case CodeMashSafariPlugin
-    case CodeMashSafariWeb
-    case CodeMashChromePlugin
-    case CodeMashChromeWeb
-    case Expo
-    case Fake
-}
-
-public enum CodeProvider : String, Codable
-{
-    case AwsLambda
-    case AzureFunctions
-    case GoogleCloudFunctions
-    case Pipedream
-    case Zapier
-    case CloudflareWorkers
-    case Vercel
-    case Netlify
-    case SupabaseEdge
-    case Modal
-}
-
-public enum AwsLambdaIntegrationType : String, Codable
-{
-    case Iam
-    case CrossAccountRole
-}
-
-public enum LlmProvider : String, Codable
-{
-    case OpenAI
-    case Anthropic
-    case Ollama
-    case Groq
-    case Google
-    case Mistral
-    case OpenRouter
-    case Grok
-    case NorbixHosted
-}
-
-public class LlmModelOptionRequest : Codable
-{
-    public var id:String?
-    public var displayName:String?
-
-    required public init(){}
-}
-
-public protocol ILlmApiKeyRequest
-{
-    var apiKey:String? { get set }
-
-}
-
-public enum McpProvider : String, Codable
-{
-    case Docker
-    case Obsidian
-    case GoogleCalendar
-    case Stripe
-    case GitHub
-    case MongoDb
-    case Playwright
-    case BraveSearch
-}
-
-public enum McpTransport : String, Codable
-{
-    case Sse
-    case HttpStream
-    case Stdio
-}
-
-public enum NotificationMedium : String, Codable
-{
-    case Email
-    case Sms
-    case Push
-}
-
-// @DataContract
-public class TemplateDto : IHasViewId, IHasDatabaseId, Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var templateName:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var communicationChannel:CommunicationChannel?
-
-    // @DataMember
-    public var medium:NotificationMedium?
-
-    // @DataMember
-    public var isActive:Bool?
-
-    // @DataMember
-    public var tags:[String]?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){}
-}
-
-public protocol IHasViewId
-{
-    var viewId:String? { get set }
-
-}
-
-public protocol IHasDatabaseId
-{
-    var id:String? { get set }
-
-}
-
-public protocol IBindableContract
-{
-}
-
-public protocol IHasRazorTemplateCode
-{
-}
-
-public enum SystemEmailTemplateTheme : String, Codable
-{
-    case Text
-    case Branded
-    case Creative
-}
-
-public class EmailCampaignDeliverySettingsDto : Codable
-{
-    // @DataMember
-    public var recipientsSourceType:EmailCampaignRecipientsSourceTypes?
-
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    // @DataMember
-    public var campaignTime:Int?
-
-    // @DataMember
-    public var respectTimeZoneSettings:RespectTimeZoneSettings?
-
-    required public init(){}
-}
-
-public enum TriggerActionType : String, Codable
-{
-    case Code
-    case Push
-    case Sms
-    case Email
-    case WebhookCall
-    case SseCall
-    case Marketplace
-}
-
-// @DataContract
-public class PushCampaignDeliverySettingsDto : Codable
-{
-    // @DataMember
-    public var recipientsSourceType:PushCampaignRecipientsSourceTypes?
-
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    // @DataMember
-    public var campaignTime:Int?
-
-    // @DataMember
-    public var respectTimeZoneSettings:RespectTimeZoneSettings?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CodeDeliverySettingsDto : Codable
-{
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class WebhookDeliverySettingsDto : Codable
-{
-    // @DataMember
-    public var destinationIds:[String]?
-
-    // @DataMember
-    public var eventName:String?
-
-    // @DataMember
-    public var contentType:String?
-
-    // @DataMember
-    public var includeRawPayload:Bool?
-
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SmsCampaignDeliverySettingsDto : Codable
-{
-    // @DataMember
-    public var recipientsSourceType:SmsCampaignRecipientsSourceTypes?
-
-    // @DataMember
-    public var mappedTokens:[TokenMappingDto]?
-
-    // @DataMember
-    public var campaignTime:Int?
-
-    // @DataMember
-    public var respectTimeZoneSettings:RespectTimeZoneSettings?
-
-    required public init(){}
-}
-
-// @Flags()
-public enum RespectTimeZoneSettings : Int, Codable
-{
-    case RespectToLastLoginZone = 1
-    case RespectToRegistrationZone = 2
-    case RespectToRegistrationProjectZone = 4
-}
-
-public enum PushDeviceDeliveryFamily : String, Codable
-{
-    case Ios
-    case Android
-    case Chrome
-    case Safari
-    case Expo
-}
-
-public enum PushCampaignRecipientsSourceTypes : String, Codable
-{
-    case AllUsers
-    case SpecifiedUsers
-    case Collection
-    case Devices
-    case AccountUsers
-}
-
-// @DataContract
-public class PushDeviceDeliveryTokenDto : Codable
-{
-    // @DataMember
-    public var pushDeviceToken:String?
-
-    // @DataMember
-    public var deliveryFamily:PushDeviceDeliveryFamily?
-
-    required public init(){}
-}
-
-public class LlmModelOptionDto : Codable
-{
-    public var id:String?
-    public var displayName:String?
-    public var inputCreditRate:Double?
-    public var outputCreditRate:Double?
-
-    required public init(){}
-}
-
-public class McpMetadata : Codable
-{
-    public var name:String?
-    public var category:String?
-    public var Description:String?
-    public var icon:String?
-
-    required public init(){}
-}
-
-public enum McpAuth : String, Codable
-{
-    case OAuth2
-    case ApiKey
-    case None
-}
-
-public enum IntegrationStatus : String, Codable
-{
-    case Unknown
-    case Pending
-    case Provisioning
-    case Active
-    case Failed
-    case Deprovisioning
-}
-
-public enum SmsProvider : String, Codable
-{
-    case Twilio
-    case Vonage
-    case Plivo
-    case Telnyx
-    case Bird
-    case Telesign
-    case Sinch
-    case Fake
-}
-
-public class AwsSesEmailIntegrationDto : EmailIntegrationDto
-{
-    public var region:String?
-    public var identityArn:String?
-    public var configurationSetName:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case region
-        case identityArn
-        case configurationSetName
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        region = try container.decodeIfPresent(String.self, forKey: .region)
-        identityArn = try container.decodeIfPresent(String.self, forKey: .identityArn)
-        configurationSetName = try container.decodeIfPresent(String.self, forKey: .configurationSetName)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if region != nil { try container.encode(region, forKey: .region) }
-        if identityArn != nil { try container.encode(identityArn, forKey: .identityArn) }
-        if configurationSetName != nil { try container.encode(configurationSetName, forKey: .configurationSetName) }
-    }
-}
-
-public class IntegrationDto : IHasViewId, Codable
-{
-    public var viewId:String?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var env:String?
-    public var lastIntegrationTestAtUtc:Date?
-    public var lastIntegrationTestSucceeded:Bool?
-    public var lastIntegrationTestErrors:IReadOnlyList<String>?
-    public var humanDeliveryConfirmedAtUtc:Date?
-    public var requiresHumanDeliveryConfirmation:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MarketplaceFieldDefinitionDto : Codable
-{
-    // @DataMember
-    public var key:String?
-
-    // @DataMember
-    public var label:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var documentationUrl:String?
-
-    // @DataMember
-    public var type:MarketplaceFieldType?
-
-    // @DataMember
-    public var isRequired:Bool?
-
-    // @DataMember
-    public var defaultValue:String?
-
-    // @DataMember
-    public var placeholder:String?
-
-    // @DataMember
-    public var validationPattern:String?
-
-    // @DataMember
-    public var allowedValues:IReadOnlyList<String>?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MarketplaceHttpRequestSpecDto : Codable
-{
-    // @DataMember
-    public var method:String?
-
-    // @DataMember
-    public var pathTemplate:String?
-
-    // @DataMember
-    public var parameters:IReadOnlyList<MarketplaceParameterSpecDto>?
-
-    // @DataMember
-    public var contentType:String?
-
-    required public init(){}
-}
-
-public class AiChatEntryAttachmentWireDto : Codable
-{
-    public var id:String?
-    public var name:String?
-
-    required public init(){}
-}
-
-public class AiChatEntrySourceWireDto : Codable
-{
-    public var kind:String?
-    public var requirementId:String?
-    public var sessionId:String?
-    public var entryId:String?
-    public var entrySeq:Int?
-    public var artifactId:String?
-    public var label:String?
-    public var step:Int?
-    public var number:Int?
-    public var sourceKind:String?
-    public var sourceId:String?
-    public var score:Double?
-    public var cited:Bool?
-
-    required public init(){}
-}
-
-public class AiChatQuestionWireDto : Codable
-{
-    public var id:String?
-    public var text:String?
-    public var options:[AiChatQuestionOptionWireDto] = []
-    public var `default`:String?
-    public var allowFreeText:Bool?
-
-    required public init(){}
-}
-
-public class AiChatGateResultWireDto : Codable
-{
-    public var `class`:String?
-    public var reason:String?
-    public var affectedRequirementIds:[String] = []
-
-    required public init(){}
-}
-
-public class AiChatPlanStepWireDto : Codable
-{
-    public var n:Int?
-    public var tool:String?
-    public var title:String?
-    public var goal:String?
-    public var inputs:AiChatPlanStepInputsWireDto?
-    public var dependsOn:[Int] = []
-    public var replaces:Int?
-    public var done:[AiChatPlanStepDoneCheckWireDto] = []
-    public var loop:AiChatPlanStepLoopWireDto?
-    public var difficulty:Int?
-
-    required public init(){}
-}
-
-public class AiChatStepLogLineWireDto : Codable
-{
-    public var seq:Int?
-    public var tool:String?
-    public var agent:String?
-    public var status:String?
-    public var detail:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TagTranslationDto : Codable
-{
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var content:TagDescriptionDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TagDefinitionBaseDto : Codable
-{
-    // @DataMember
-    public var tag:String?
-
-    // @DataMember
-    public var translations:[TagTranslationDto] = []
-
-    required public init(){}
-}
-
-public enum DeliveryChannel : String, Codable
-{
-    case Email
-    case Push
-    case Sms
-    case WebPush
-    case InApp
-    case ChatBot
-    case ChatPlatform
-}
-
-// @DataContract
-public class AiPlanModelDto : Codable
-{
-    // @DataMember
-    public var llmIntegrationId:String?
-
-    // @DataMember
-    public var model:String?
-
-    required public init(){}
-}
-
-public enum AiPlanQuotaUnit : String, Codable
-{
-    case None
-    case Credits
-    case Tokens
-}
-
-// @DataContract
-public class AiPlanFeaturesDto : Codable
-{
-    // @DataMember
-    public var attachments:Bool?
-
-    // @DataMember
-    public var rag:Bool?
-
-    // @DataMember
-    public var memory:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class FileResourceDto : Codable
-{
-    // @DataMember(Order=1)
-    public var id:String?
-
-    // @DataMember(Order=2)
-    public var originalFileName:String?
-
-    // @DataMember(Order=3)
-    public var `extension`:String?
-
-    // @DataMember(Order=4)
-    public var storedFileName:String?
-
-    // @DataMember(Order=5)
-    public var sizeBytes:Int?
-
-    // @DataMember(Order=6)
-    public var checksum:FileChecksumDto?
-
-    required public init(){}
-}
-
-public class CursorArgs : ICursorArgs, Codable
-{
-    public var field:String?
-    public var order:Int?
-
-    required public init(){}
-}
-
-public class SchemaListColumnDto : Codable
-{
-    // @DataMember
-    public var field:String?
-
-    required public init(){}
-}
-
-public class SchemaListSortDto : Codable
-{
-    // @DataMember
-    public var field:String?
-
-    // @DataMember
-    public var order:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public enum EmailValidationProvider : Int, Codable
-{
-    case ZeroBounce = 1
-    case NeverBounce = 2
-    case Bouncer = 3
-    case MailgunValidate = 4
-}
-
-// @DataContract
-public class EmailMessageContentDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var subject:String?
-
-    // @DataMember
-    public var body:EmailBodyDto?
-
-    // @DataMember
-    public var staticAttachments:[FileResourceRefDto]?
-
-    required public init(){}
-}
-
-public enum TokenMappingResolverType : String, Codable
-{
-    case NotSet
-    case Custom
-    case Project
-    case ProjectSocials
-    case Initiator
-    case Recipient
-    case SchemaRecord
-    case TargetUser
-    case TagDefinitions
-    case EmailSignatures
-    case Campaign
-    case Template
-    case EmailFooters
-    case Old
-    case New
-}
-
-// @DataContract
-public class SmsMessageContentDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var body:String?
-
-    required public init(){}
-}
-
-public enum MarketplaceTokenResolverKind : String, Codable
-{
-    case Static
-    case Request
-    case Project
-    case Initiator
-    case Custom
-    case IntegrationConfig
-    case IntegrationSecret
-}
-
-public enum MarketplaceSecretValueFormat : String, Codable
-{
-    case Raw
-    case Bearer
-    case Basic
-    case Prefixed
-}
-
-// @DataContract
-public class PushMessageContentDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var title:String?
-
-    // @DataMember
-    public var body:String?
-
-    required public init(){}
-}
-
-public enum DeviceType : String, Codable
-{
-    case Unknown
-    case Phone
-    case Tablet
-    case Desktop
-    case Tv
-}
-
-public enum EmbeddingProvider : String, Codable
-{
-    case Voyage
-    case OpenAI
-}
-
-public enum ResourceKindDto : String, Codable
-{
-    case Contact
-    case Document
-    case File
-    case PaymentCustomer
-    case Order
-    case Payment
-    case Product
-    case Integration
-}
-
-public enum CaseResolutionFixKind : String, Codable
-{
-    case CodeFix
-    case ConfigChange
-    case CustomerInstruction
-    case KnownLimitation
-    case Duplicate
-}
-
-public class PublicPasswordPolicyDto : Codable
-{
-    public var minLength:Int?
-    public var maxLength:Int?
-    public var minNumbers:Int?
-    public var minUpper:Int?
-    public var minLower:Int?
-    public var minSpecial:Int?
-    public var allowedSpecial:String?
-
-    required public init(){}
-}
-
-public class PublicAiAssistantDto : Codable
-{
-    public var id:String?
-    public var name:String?
-    public var welcome:String?
-
-    required public init(){}
-}
-
-public class ErrorDto : Codable
-{
-    public var message:String?
-    public var errorCode:String?
-    public var context:[String:String]?
-    public var stackTrace:[ErrorDto]?
-
-    required public init(){}
-}
-
-// @Flags()
-public enum AccountStatus : Int, Codable
-{
-    case Registered = 1
-    case PendingValidation = 2
-    case Active = 8
-    case InActive = 16
-    case Blocked = 32
-    case Unregistered = 64
-}
-
-// @DataContract
-public class UsageBillingPeriodDto : Codable
-{
-    // @DataMember
-    public var period:String?
-
-    // @DataMember
-    public var totalCents:Int?
-
-    // @DataMember
-    public var perCluster:[UsageBillingClusterChargeDto] = []
-
-    // @DataMember
-    public var recordedAtUtc:Date?
-
-    required public init(){}
-}
-
-// @DataContract
-public class UsageBillingIngestionFailureDto : Codable
-{
-    // @DataMember
-    public var reason:String?
-
-    // @DataMember
-    public var period:String?
-
-    // @DataMember
-    public var stripeEventId:String?
-
-    // @DataMember
-    public var message:String?
-
-    // @DataMember
-    public var reportedAtUtc:Date?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PromotionItemDto : Codable
-{
-    // @DataMember
-    public var type:String?
-
-    // @DataMember
-    public var id:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PromotionBlockerDto : Codable
-{
-    // @DataMember
-    public var contentType:String?
-
-    // @DataMember
-    public var contentId:String?
-
-    // @DataMember
-    public var refKind:String?
-
-    // @DataMember
-    public var unresolvedRef:String?
-
-    required public init(){}
-}
-
-public enum ProjectStatus : String, Codable
-{
-    case Active
-    case Provisioning
-    case ProvisioningFailed
-    case NoDatabase
-    case Disabled
-    case Suspended
-    case Removed
-}
-
-// @DataContract
-public class ProjectBrandDto : Codable
-{
-    // @DataMember
-    public var mainColor:String?
-
-    // @DataMember
-    public var accentColor:String?
-
-    // @DataMember
-    public var logo:FileResourceRefDto?
-
-    // @DataMember
-    public var icon:FileResourceRefDto?
-
-    required public init(){}
-}
-
-public class NotificationSettingsDto : Codable
-{
-    public var channels:[NotificationSettingsChannelDto] = []
-    public var allGroups:[GroupDefinitionDto] = []
-    public var allTags:[TagDefinitionDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class AuthenticationFlowSummaryDto : Codable
-{
-    // @DataMember
-    public var type:String?
-
-    // @DataMember
-    public var provider:String?
-
-    // @DataMember
-    public var passwordComplexity:AuthenticationFlowPasswordPolicyDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DatabaseDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var triggers:[SchemaTriggerDto]?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    required public init(){}
-}
-
-// @DataContract
-public class EmailDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    // @DataMember
-    public var defaultIntegrationViewId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var triggers:[MembershipTriggerDto]?
-
-    // @DataMember
-    public var customRoles:[RoleItemDto]?
-
-    // @DataMember
-    public var customPolicies:[PolicyItemDto]?
-
-    // @DataMember
-    public var authorization:AuthorizationDto?
-
-    // @DataMember
-    public var requireEmailValidation:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class LoggingDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var isEstablished:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ServerEventsDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    // @DataMember
-    public var marketingTags:[TagDefinitionDto]?
-
-    // @DataMember
-    public var transactionalTags:[TagDefinitionDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SchedulerDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CodeDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class FilesDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var triggers:[FilesTriggerDto]?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    required public init(){}
-}
-
-// @DataContract
-public class PaymentsDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var triggers:[PaymentTriggerDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SmsDto : Codable
-{
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var defaultIntegrationViewIds:[String:String] = [:]
-
-    required public init(){}
-}
-
-public enum Continent : String, Codable
-{
-    case Africa
-    case Antarctica
-    case Asia
-    case Europe
-    case NorthAmerica
-    case Oceania
-    case SouthAmerica
-}
-
-// @DataContract
-public class AiUserPlanAssignmentDto : Codable
-{
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var planId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiAssistantDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var welcomeMessage:String?
-
-    // @DataMember
-    public var systemPrompt:String?
-
-    // @DataMember
-    public var toolsets:[String] = []
-
-    // @DataMember
-    public var llmIntegrationId:String?
-
-    // @DataMember
-    public var model:String?
-
-    // @DataMember
-    public var memoryEnabled:Bool?
-
-    // @DataMember
-    public var ragSourceIds:[String] = []
-
-    // @DataMember
-    public var weakMatchThreshold:Double?
-
-    // @DataMember
-    public var planId:String?
-
-    // @DataMember
-    public var isDefault:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiUsageGroupDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var llmInputTokens:Int?
-
-    // @DataMember
-    public var llmOutputTokens:Int?
-
-    // @DataMember
-    public var embeddingTokens:Int?
-
-    // @DataMember
-    public var rerankCalls:Int?
-
-    // @DataMember
-    public var totalTokens:Int?
-
-    // @DataMember
-    public var chargeableTokens:Int?
-
-    // @DataMember
-    public var chargeableRerankCalls:Int?
-
-    // @DataMember
-    public var credits:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ProjectAiWalletDto : Codable
-{
-    // @DataMember
-    public var period:String?
-
-    // @DataMember
-    public var includedCredits:Int?
-
-    // @DataMember
-    public var purchasedCredits:Int?
-
-    // @DataMember
-    public var consumedCredits:Int?
-
-    // @DataMember
-    public var remainingCredits:Int?
-
-    // @DataMember
-    public var status:String?
-
-    // @DataMember
-    public var lines:[AiWalletLineDto] = []
-
-    required public init(){}
-}
-
-// @Flags()
-public enum ApplicationModule : Int, Codable
-{
-    case Account = 0
-    case Membership = 1
-    case Database = 2
-    case Files = 4
-    case Code = 8
-    case Email = 16
-    case Push = 32
-    case Payment = 64
-    case Scheduler = 128
-    case Logging = 256
-    case ServerEvents = 512
-    case Ai = 1024
-    case Sms = 2048
-    case Project = 4096
-    case Compliance = 8192
-    case Contacts = 16384
-    case Marketplace = 32768
-}
-
-public enum AuthType : String, Codable
-{
-    case Service
-    case Email
-    case UserName
-    case Phone
-    case Guest
-    case Social
-}
-
-public class RegistrationDto : Codable
-{
-    public var registrationInformation:AccessInformationDto?
-
-    required public init(){}
-}
-
-public class LoginDto : Codable
-{
-    public var needChangePasswordOnNextLogin:Bool?
-    public var lastAccessInformation:AccessInformationDto?
-
-    required public init(){}
-}
-
-public class UserGeneralInfoDto : Codable
-{
-    public var phone:String?
-    public var primaryEmail:String?
-    public var displayName:String?
-    public var firstName:String?
-    public var lastName:String?
-    public var fullName:String?
-    public var addressLine1:String?
-    public var addressLine2:String?
-    public var country:String?
-    public var city:String?
-    public var state:String?
-    public var postalCode:String?
-    public var company:String?
-    public var gender:Gender?
-    public var birthDate:Int?
-    public var timeZone:String?
-    public var language:String?
-    public var blockAllMarketingMessages:Bool?
-    public var blockedTags:[String:HashSet<String>]?
-    public var blockReasons:[MarketingBlockReason]?
-    public var extraMetadata:String?
-    public var notes:String?
-
-    required public init(){}
-}
-
-public enum AuthStatus : Int, Codable
-{
-    case Registered = 0
-    case PendingValidation = 2
-    case Active = 8
-    case Unregistered = 16
-    case Suspended = 32
-    case InActive = 64
-    case Blocked = 128
-}
-
-public class PermissionDto : Codable
-{
-    public var sid:String?
-    public var effect:PermissionEffect?
-    public var actions:[String] = []
-    public var resources:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class LicenseDomainDnsRecordDto : Codable
-{
-    // @DataMember
-    public var host:String?
-
-    // @DataMember
-    public var recordType:String?
-
-    // @DataMember
-    public var resolved:Bool?
-
-    // @DataMember
-    public var required:Bool?
-
-    required public init(){}
-}
-
-public class CodeMashSubscriptionDto : Codable
-{
-    public var viewId:String?
-    public var domain:String?
-    public var willExpireOn:Date?
-    public var issuedOn:Date?
-    public var isTrial:Bool?
-    public var subscriptionRefId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiServiceUserKeyDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var hint:String?
-
-    // @DataMember
-    public var issuedAt:Date?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TriggerDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var type:TriggerType?
-
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var thenAction:TriggerActionDto?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var isEnabled:Bool?
-
-    // @DataMember
-    public var activationCode:String?
-
-    // @DataMember
-    public var savedByAuthId:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TriggerProjectionList : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var actionType:TriggerActionType?
-
-    // @DataMember
-    public var hasPreExecuteCode:Bool?
-
-    // @DataMember
-    public var isEnabled:Bool?
-
-    required public init(){}
-}
-
-public class IntegrationListProjection : IHasViewId, Codable
-{
-    public var viewId:String?
-    public var integrationName:String?
-    public var isEnabled:Bool?
-    public var lastIntegrationTestAtUtc:Date?
-    public var lastIntegrationTestSucceeded:Bool?
-    public var lastIntegrationTestErrors:IReadOnlyList<String>?
-    public var humanDeliveryConfirmedAtUtc:Date?
-    public var requiresHumanDeliveryConfirmation:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipEmailPreferencesDto : Codable
-{
-    // @DataMember
-    public var registrationViaEmail:MembershipEmailActionSettingsDto?
-
-    // @DataMember
-    public var verificationViaEmail:MembershipEmailActionSettingsDto?
-
-    // @DataMember
-    public var passwordResetViaEmail:MembershipEmailActionSettingsDto?
-
-    // @DataMember
-    public var invitationViaEmail:MembershipEmailActionSettingsDto?
-
-    // @DataMember
-    public var deactivationViaEmail:MembershipEmailActionSettingsDto?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PasswordComplexityDto : Codable
-{
-    // @DataMember
-    public var minLength:Int?
-
-    // @DataMember
-    public var maxLength:Int?
-
-    // @DataMember
-    public var minNumbers:Int?
-
-    // @DataMember
-    public var maxNumbers:Int?
-
-    // @DataMember
-    public var minUpper:Int?
-
-    // @DataMember
-    public var maxUpper:Int?
-
-    // @DataMember
-    public var minLower:Int?
-
-    // @DataMember
-    public var maxLower:Int?
-
-    // @DataMember
-    public var minSpecial:Int?
-
-    // @DataMember
-    public var maxSpecial:Int?
-
-    // @DataMember
-    public var allowedSpecial:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipCredentialsSettingsDto : Codable
-{
-    // @DataMember
-    public var logoutUrl:String?
-
-    // @DataMember
-    public var allowUsernames:Bool?
-
-    // @DataMember
-    public var modes:[MembershipCredentialsSettingsModeDto]?
-
-    required public init(){}
-}
-
-public class DataSchemaDto : Codable
-{
-    // @DataMember
-    public var json:String?
-
-    // @DataMember
-    public var fields:[JsonSchemaFieldDto] = []
-
-    required public init(){}
-}
-
-public class VisualSchemaDto : Codable
-{
-    // @DataMember
-    public var json:String?
-
-    required public init(){}
-}
-
-public class TaxonomyRef : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var name:String?
-
-    required public init(){}
-}
-
-public class TermMultiParentDto : Codable
-{
-    // @DataMember
-    public var taxonomyId:String?
-
-    // @DataMember
-    public var parentId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var names:[String:String]?
-
-    required public init(){}
-}
-
-public class CollectionIndexKeyDto : Codable
-{
-    // @DataMember
-    public var field:String?
-
-    // @DataMember
-    public var order:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SeedCollectionReportItemDto : Codable
-{
-    // @DataMember
-    public var collectionName:String?
-
-    // @DataMember
-    public var requested:Int?
-
-    // @DataMember
-    public var inserted:Int?
-
-    // @DataMember
-    public var ids:[String] = []
-
-    // @DataMember
-    public var errors:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class SchemaRefDto : Codable
-{
-    // @DataMember(Order=1)
-    public var schemaId:String?
-
-    // @DataMember(Order=2)
-    public var schemaName:String?
-
-    // @DataMember(Order=3)
-    public var databaseIntegrationId:String?
-
-    required public init(){}
-}
-
-public class ImportFileColumnDto : Codable
-{
-    // @DataMember
-    public var index:Int?
-
-    // @DataMember
-    public var header:String?
-
-    // @DataMember
-    public var samples:[String] = []
-
-    // @DataMember
-    public var detectedType:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class NotificationModuleDependencyItemDto : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var category:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TemplateListProjection : IHasViewId, IHasDatabaseId, Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var templateName:String?
-
-    // @DataMember
-    public var isActive:Bool?
-
-    // @DataMember
-    public var type:CommunicationChannel?
-
-    // @DataMember
-    public var tags:[String]?
-
-    // @DataMember
-    public var env:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MjmlParseError : Codable
-{
-    // @DataMember(Name="line")
-    public var line:Int?
-
-    // @DataMember(Name="message")
-    public var message:String?
-
-    // @DataMember(Name="tagName")
-    public var tagName:String?
-
-    // @DataMember(Name="formattedMessage")
-    public var formattedMessage:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class ListItemProjection : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var displayName:String?
-
-    required public init(){}
-}
-
-public class CampaignStatusChangeEntryDto : Codable
-{
-    public var time:Date?
-    public var status:CampaignStatus?
-    public var errors:[ErrorDto]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CampaignDto : IHasResponsibleUserId, IHasDatabaseId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var createdOn:Date?
-
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var forceCampaignLanguage:Bool?
-
-    // @DataMember
-    public var campaignProcessingIntegrationId:String?
-
-    // @DataMember
-    public var statusHistory:[CampaignStatusChangeEntryDto] = []
-
-    // @DataMember
-    public var status:CampaignStatusChangeEntryDto?
-
-    // @DataMember
-    public var tokenMappingValues:[TokenMappingDto]?
-
-    // @DataMember
-    public var notes:String?
-
-    // @DataMember
-    public var createdById:String?
-
-    // @DataMember
-    public var timeZoneId:String?
-
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var id:String?
-
-    required public init(){}
-}
-
-public protocol IHasResponsibleUserId
-{
-    var userId:String? { get set }
-
-}
-
-public enum CampaignStatus : String, Codable
-{
-    case Pending
-    case Registered
-    case Scheduled
-    case Started
-    case Stopped
-    case Processing
-    case Completed
-    case Failed
-}
-
-// @DataContract
-public class EmailRecipientsDto : Codable
-{
-    // @DataMember
-    public var to:[EmailRecipientDto]?
-
-    // @DataMember
-    public var cc:[EmailRecipientDto]?
-
-    // @DataMember
-    public var bcc:[EmailRecipientDto]?
-
-    // @DataMember
-    public var startingAfter:String?
-
-    // @DataMember
-    public var hasMore:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CampaignBatchDto : IHasDatabaseId, Codable
-{
-    // @DataMember
-    public var campaignId:String?
-
-    // @DataMember
-    public var batchId:String?
-
-    // @DataMember
-    public var startAfter:String?
-
-    // @DataMember
-    public var statusHistory:[BatchStatusChangeEntryDto] = []
-
-    // @DataMember
-    public var id:String?
-
-    required public init(){}
-}
-
-public class NotificationStatusChangeEntryDto : Codable
-{
-    public var time:Date?
-    public var status:CampaignNotificationStatus?
-    public var sourceId:String?
-    public var errors:[ErrorDto]?
-    public var tags:[String]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class CampaignBatchNotificationDto : IHasDatabaseId, Codable
-{
-    // @DataMember
-    public var campaignId:String?
-
-    // @DataMember
-    public var batchId:String?
-
-    // @DataMember
-    public var notificationId:String?
-
-    // @DataMember
-    public var refNotificationId:String?
-
-    // @DataMember
-    public var body:String?
-
-    // @DataMember
-    public var model:[String:String]?
-
-    // @DataMember
-    public var statusHistory:[NotificationStatusChangeEntryDto] = []
-
-    // @DataMember
-    public var id:String?
-
-    required public init(){}
-}
-
-public enum CampaignBatchStatus : String, Codable
-{
-    case Registered
-    case Processing
-    case Completed
-    case Failed
-}
-
-// @DataContract
-public class SmsRecipientsDto : Codable
-{
-    // @DataMember
-    public var to:[SmsRecipientDto]?
-
-    // @DataMember
-    public var startingAfter:String?
-
-    // @DataMember
-    public var hasMore:Bool?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushRecipientsDto : Codable
-{
-    // @DataMember
-    public var to:[PushRecipientDto]?
-
-    // @DataMember
-    public var startingAfter:String?
-
-    // @DataMember
-    public var hasMore:Bool?
-
-    required public init(){}
-}
-
-public class AiToolManifestParameter : Codable
-{
-    public var name:String?
-    public var type:String?
-    public var required:Bool?
-    public var Description:String?
-
-    required public init(){}
-}
-
-public class ScaffoldStepReportWithLink : Codable
-{
-    public var order:Int?
-    public var title:String?
-    public var tool:String?
-    public var status:String?
-    public var id:String?
-    public var dashboardUrl:String?
-    public var note:String?
-    public var errors:IReadOnlyList<String>?
-
-    required public init(){}
-}
-
-public class TemplatePreviewPartResult : Codable
-{
-    public var name:String?
-    public var rendered:String?
-    public var errors:IReadOnlyList<String>?
-
-    required public init(){}
-}
-
-public class ProjectBriefRequirementWireDto : Codable
-{
-    public var id:String?
-    public var text:String?
-    public var status:String?
-    public var confidence:Double?
-    public var isAssumption:Bool?
-    public var sources:[ProjectBriefSourceWireDto] = []
-    public var satisfiedBy:[ProjectBriefSatisfiedByWireDto] = []
-    public var sinceEventId:String?
-
-    required public init(){}
-}
-
-public class ProjectBriefDecisionWireDto : Codable
-{
-    public var eventId:String?
-    public var text:String?
-    public var confidence:Double?
-    public var atUtc:Date?
-    public var sources:[ProjectBriefSourceWireDto] = []
-
-    required public init(){}
-}
-
-public class ProjectBriefAssumptionWireDto : Codable
-{
-    public var requirementId:String?
-    public var eventId:String?
-    public var text:String?
-    public var confidence:Double?
-    public var atUtc:Date?
-
-    required public init(){}
-}
-
-public class ProjectBriefSourceWireDto : Codable
-{
-    public var kind:String?
-    public var sessionId:String?
-    public var entryId:String?
-    public var entrySeq:Int?
-    public var eventId:String?
-    public var userAuthId:String?
-    public var atUtc:Date?
-    public var surface:String?
-    public var quote:String?
-    public var workItemId:String?
-
-    required public init(){}
-}
-
-public class ProjectBriefSatisfiedByWireDto : Codable
-{
-    public var artifactId:String?
-    public var tool:String?
-    public var orphaned:Bool?
-
-    required public init(){}
-}
-
-public class WorkItemEntryRefWireDto : Codable
-{
-    public var sessionId:String?
-    public var entryId:String?
-
-    required public init(){}
-}
-
-public class WorkItemRunRefWireDto : Codable
-{
-    public var sessionId:String?
-    public var planEntryId:String?
-    public var runId:String?
-
-    required public init(){}
-}
-
-public class WorkItemArtifactWireDto : Codable
-{
-    public var artifactId:String?
-    public var what:String?
-    public var step:Int?
-    public var planEntryId:String?
-    public var kind:String?
-    public var name:String?
-
-    required public init(){}
-}
-
-public class WorkItemMovedOutWireDto : Codable
-{
-    public var text:String?
-    public var reason:String?
-    public var movedTo:String?
-    public var source:String?
-    public var entryRef:WorkItemEntryRefWireDto?
-    public var atUtc:Date?
-
-    required public init(){}
-}
-
-public class WorkItemNeedsYouWireDto : Codable
-{
-    public var text:String?
-    public var kind:String?
-    public var entryRef:WorkItemEntryRefWireDto?
-    public var done:Bool?
-    public var doneAtUtc:Date?
-    public var doneByUserAuthId:String?
-
-    required public init(){}
-}
-
-public class WorkItemOpenQuestionWireDto : Codable
-{
-    public var entryRef:WorkItemEntryRefWireDto?
-    public var blocking:Bool?
-    public var text:String?
-    public var atUtc:Date?
-
-    required public init(){}
-}
-
-public class WorkItemDoneConditionWireDto : Codable
-{
-    public var condition:Int?
-    public var holds:Bool?
-    public var reason:String?
-
-    required public init(){}
-}
-
-public enum AiTriggerType : String, Codable
-{
-    case OnCreditsWarning
-    case OnCreditsExhausted
-    case OnQuotaWarning
-    case OnQuotaExhausted
-}
-
-public protocol IVirtualDirectory
-{
-}
-
-public protocol IVirtualPathProvider
-{
-    //rootDirectory:IVirtualDirectory ignored. Swift doesn't support interface properties
-    var virtualPathSeparator:String? { get set }
-    var realPathSeparator:String? { get set }
-
-}
-
-public protocol IResponse
-{
-    var originalResponse:String? { get set }
-    //request:IRequest ignored. Swift doesn't support interface properties
-    var statusCode:Int? { get set }
-    var statusDescription:String? { get set }
-    var contentType:String? { get set }
-    var outputStream:Data? { get set }
-    var dto:String? { get set }
-    var useBufferedStream:Bool? { get set }
-    var isClosed:Bool? { get set }
-    var keepAlive:Bool? { get set }
-    var hasStarted:Bool? { get set }
-    var items:[String:String]? { get set }
-
-}
-
-// @Flags()
-public enum RequestAttributes : Int, Codable
-{
-    case None = 0
-    case Localhost = 1
-    case LocalSubnet = 2
-    case External = 4
-    case Secure = 8
-    case InSecure = 16
-    case AnySecurityMode = 24
-    case HttpHead = 32
-    case HttpGet = 64
-    case HttpPost = 128
-    case HttpPut = 256
-    case HttpDelete = 512
-    case HttpPatch = 1024
-    case HttpOptions = 2048
-    case HttpOther = 4096
-    case AnyHttpMethod = 8160
-    case OneWay = 8192
-    case Reply = 16384
-    case AnyCallStyle = 24576
-    case Soap11 = 32768
-    case Soap12 = 65536
-    case Xml = 131072
-    case Json = 262144
-    case Jsv = 524288
-    case ProtoBuf = 1048576
-    case Csv = 2097152
-    case Html = 4194304
-    case Jsonl = 8388608
-    case MsgPack = 16777216
-    case FormatOther = 33554432
-    case AnyFormat = 67076096
-    case Http = 67108864
-    case MessageQueue = 134217728
-    case Tcp = 268435456
-    case Grpc = 536870912
-    case EndpointOther = 1073741824
-    case AnyEndpoint = 2080374784
-    case InProcess = -2147483648
-    case InternalNetworkAccess = -2147483645
-    case AnyNetworkAccessType = -2147483641
-    case Any = -1
-}
-
-public protocol IRequestPreferences
-{
-    var acceptsBrotli:Bool? { get set }
-    var acceptsDeflate:Bool? { get set }
-    var acceptsGzip:Bool? { get set }
-
-}
-
-public protocol IHttpFile
-{
-    var name:String? { get set }
-    var fileName:String? { get set }
-    var contentLength:Int? { get set }
-    var contentType:String? { get set }
-    var inputStream:Data? { get set }
-
-}
-
-public enum ResolvedRefStatus : String, Codable
-{
-    case Ok
-    case NotFound
-    case Unauthorized
-    case SourceError
-    case Erased
-}
-
-// @DataContract
-public class ChannelSubscriptionStateDto : Codable
-{
-    // @DataMember
-    public var unsubscribed:Bool?
-
-    // @DataMember
-    public var blockedTags:[String:[String]] = [:]
-
-    required public init(){}
-}
-
-public class ConsentPurposeDto : Codable
-{
-    public var key:String?
-    public var name:String?
-    public var channel:String?
-    public var mappedTags:[String] = []
-    public var regulatoryBasis:[String] = []
-    public var Description:String?
-    public var isDeprecated:Bool?
-
-    required public init(){}
-}
-
-public class RetentionWindowDto : Codable
-{
-    public var dataKind:String?
-    public var days:Int?
-    public var action:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SupportCaseDto : IHasViewId, Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var accountId:String?
-
-    // @DataMember
-    public var projectId:String?
-
-    // @DataMember
-    public var reporterId:String?
-
-    // @DataMember
-    public var kind:SupportCaseKind?
-
-    // @DataMember
-    public var severity:SupportCaseSeverity?
-
-    // @DataMember
-    public var status:SupportCaseStatus?
-
-    // @DataMember
-    public var customerStatus:SupportCustomerStatus?
-
-    // @DataMember
-    public var subject:String?
-
-    // @DataMember
-    public var affectedModule:String?
-
-    // @DataMember
-    public var deploymentMode:DeploymentMode?
-
-    // @DataMember
-    public var gatewayVersion:String?
-
-    // @DataMember
-    public var region:String?
-
-    // @DataMember
-    public var planTier:String?
-
-    // @DataMember
-    public var openedOn:Int?
-
-    // @DataMember
-    public var firstResponseOn:Int?
-
-    // @DataMember
-    public var resolvedOn:Int?
-
-    // @DataMember
-    public var closedOn:Int?
-
-    // @DataMember
-    public var resolution:String?
-
-    // @DataMember
-    public var messageCount:Int?
-
-    // @DataMember
-    public var lastMessageOn:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class SupportCaseMessageDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    // @DataMember
-    public var caseId:String?
-
-    // @DataMember
-    public var authorKind:SupportMessageAuthorKind?
-
-    // @DataMember
-    public var authorId:String?
-
-    // @DataMember
-    public var authorDisplayName:String?
-
-    // @DataMember
-    public var body:String?
-
-    // @DataMember
-    public var sentOn:Int?
-
-    required public init(){}
-}
-
-public enum SupportCaseKind : String, Codable
-{
-    case Question
-    case Bug
-    case Incident
-    case Billing
-    case Security
-    case FeatureRequest
-}
-
-public enum SupportCaseSeverity : Int, Codable
-{
-    case S1 = 1
-    case S2 = 2
-    case S3 = 3
-    case S4 = 4
-}
-
-public enum SupportCaseStatus : String, Codable
-{
-    case Open
-    case Triaged
-    case InProgress
-    case WaitingOnCustomer
-    case Resolved
-    case Closed
-}
-
-public enum SupportCustomerStatus : String, Codable
-{
-    case Pending
-    case Open
-    case Solved
-    case Closed
-}
-
-// @DataContract
-public class DiagnosticPackStepDescriptorDto : Codable
-{
-    // @DataMember
-    public var stepId:String?
-
-    // @DataMember
-    public var kind:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var parameters:[String:String] = [:]
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticPackStepResultDto : Codable
-{
-    // @DataMember
-    public var stepId:String?
-
-    // @DataMember
-    public var kind:String?
-
-    // @DataMember
-    public var isSuccess:Bool?
-
-    // @DataMember
-    public var result:String?
-
-    // @DataMember
-    public var errorMessage:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticEchoRegionDto : Codable
-{
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticEventItemDto : Codable
-{
-    // @DataMember
-    public var position:Int?
-
-    // @DataMember
-    public var eventType:String?
-
-    // @DataMember
-    public var payload:[String:String]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class DiagnosticRedisListItemDto : Codable
-{
-    // @DataMember
-    public var viewId:String?
-
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var status:String?
-
-    required public init(){}
-}
-
-public class DisplayName : Codable
-{
-    public var value:String?
-
-    required public init(){}
-}
-
-public class RoleName : Codable
-{
-    public var name:String?
-    public var displayName:String?
-    // @Ignore()
-    public var isAdministrator:Bool?
-
-    // @Ignore()
-    public var isAuthenticated:Bool?
-
-    // @Ignore()
-    public var isGuest:Bool?
-
-    // @Ignore()
-    public var isRootRole:Bool?
-
-    // @Ignore()
-    public var isCollaboratorRole:Bool?
-
-    // @Ignore()
-    public var isProjectSystemRole:Bool?
-
-    // @Ignore()
-    public var isAccountSystemRole:Bool?
-
-    // @Ignore()
-    public var isSystemRole:Bool?
-
-    required public init(){}
-}
-
-public enum MarketplaceFieldType : String, Codable
-{
-    case String
-    case Number
-    case Boolean
-    case Url
-    case Email
-    case Json
-    case MultilineText
-}
-
-// @DataContract
-public class MarketplaceParameterSpecDto : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var location:MarketplaceParameterLocation?
-
-    // @DataMember
-    public var valueTemplate:String?
-
-    // @DataMember
-    public var label:String?
-
-    // @DataMember
-    public var Description:String?
-
-    // @DataMember
-    public var documentationUrl:String?
-
-    // @DataMember
-    public var type:String?
-
-    // @DataMember
-    public var isRequired:Bool?
-
-    required public init(){}
-}
-
-public class AiChatQuestionOptionWireDto : Codable
-{
-    public var value:String?
-    public var label:String?
-
-    required public init(){}
-}
-
-public class AiChatPlanStepInputsWireDto : Codable
-{
-    public var artifacts:[String] = []
-    public var requirements:[String] = []
-
-    required public init(){}
-}
-
-public class AiChatPlanStepDoneCheckWireDto : Codable
-{
-    public var check:String?
-    public var argsJson:String?
-
-    required public init(){}
-}
-
-public class AiChatPlanStepLoopWireDto : Codable
-{
-    public var maxIterations:Int?
-    public var maxToolCalls:Int?
-
-    required public init(){}
-}
-
-// @DataContract
-public class TagDescriptionDto : Codable
-{
-    // @DataMember
-    public var title:String?
-
-    // @DataMember
-    public var Description:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class FileChecksumDto : Codable
-{
-    // @DataMember(Order=1)
-    public var algorithm:String?
-
-    // @DataMember(Order=2)
-    public var hash:String?
-
-    required public init(){}
-}
-
-public protocol ICursorArgs
-{
-    var field:String? { get set }
-    var order:Int? { get set }
-
-}
-
-// @DataContract
-public class EmailBodyDto : IHasRazorTemplateCode, Codable
-{
-    // @DataMember
-    public var structure:String?
-
-    // @DataMember
-    public var code:String?
-
-    // @DataMember
-    public var templateEngine:EmailTemplateEngine?
-
-    required public init(){}
-}
-
-// @DataContract
-public class UsageBillingClusterChargeDto : Codable
-{
-    // @DataMember
-    public var atlasProjectId:String?
-
-    // @DataMember
-    public var atlasClusterName:String?
-
-    // @DataMember
-    public var cents:Int?
-
-    required public init(){}
-}
-
-public class NotificationSettingsChannelDto : Codable
-{
-    public var channel:CommunicationChannel?
-    public var groups:[NotificationsSettingsGroupDto] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class AuthenticationFlowPasswordPolicyDto : Codable
-{
-    // @DataMember
-    public var minLength:Int?
-
-    // @DataMember
-    public var maxLength:Int?
-
-    // @DataMember
-    public var minNumbers:Int?
-
-    // @DataMember
-    public var minUpper:Int?
-
-    // @DataMember
-    public var minLower:Int?
-
-    // @DataMember
-    public var minSpecial:Int?
-
-    // @DataMember
-    public var allowedSpecial:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AuthorizationDto : Codable
-{
-    // @DataMember
-    public var userRegistersAsRole:String?
-
-    // @DataMember
-    public var allowedRegisterRoles:[String]?
-
-    // @DataMember
-    public var allowedProviderRegisterRoles:[String]?
-
-    required public init(){}
-}
-
-// @DataContract
-public class AiWalletLineDto : Codable
-{
-    // @DataMember
-    public var kind:String?
-
-    // @DataMember
-    public var credits:Int?
-
-    // @DataMember
-    public var reference:String?
-
-    // @DataMember
-    public var purchasedBalance:Int?
-
-    // @DataMember
-    public var includedUsed:Int?
-
-    // @DataMember
-    public var purchasedUsed:Int?
-
-    // @DataMember
-    public var atUtc:Date?
-
-    required public init(){}
-}
-
-public class AccessInformationDto : Codable
-{
-    public var ip:String?
-    public var date:Date?
-    public var timeZone:String?
-
-    required public init(){}
-}
-
-public enum Gender : String, Codable
-{
-    case Male
-    case Female
-    case Other
-}
-
-public enum MarketingBlockReason : String, Codable
-{
-    case Unspecified
-    case Unsubscribed
-    case Complaint
-    case HardBounce
-    case InvalidEmail
-    case AdminBlock
-}
-
-public enum PermissionEffect : String, Codable
-{
-    case Allow
-    case Deny
-}
-
-// @DataContract
-public class MembershipEmailActionSettingsDto : Codable
-{
-    // @DataMember
-    public var sendEmail:Bool?
-
-    // @DataMember
-    public var template:MembershipMessageTemplateDto?
-
-    // @DataMember
-    public var callback:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipCredentialsSettingsModeDto : Codable
-{
-    // @DataMember
-    public var name:String?
-
-    // @DataMember
-    public var logoutUrl:String?
-
-    required public init(){}
-}
-
-public class JsonSchemaFieldDto : Codable
-{
-    // @DataMember
-    public var fieldName:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class EmailRecipientDto : Codable
-{
-    // @DataMember
-    public var emailAddress:String?
-
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var timeZoneId:String?
-
-    // @DataMember
-    public var userTokenMappings:[TokenMappingDto]?
-
-    required public init(){}
-}
-
-public enum CampaignNotificationStatus : String, Codable
-{
-    case Completed
-    case BlockedByUserPreferenceBlockAll
-    case BlockedByUserPreferenceBlockByTag
-    case Failed
-    case Viewed
-    case Clicked
-    case BlockedByValidation
-}
-
-// @DataContract
-public class SmsRecipientDto : Codable
-{
-    // @DataMember
-    public var phoneNumber:String?
-
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var userTokenMappings:[TokenMappingDto]?
-
-    // @DataMember
-    public var timeZoneId:String?
-
-    // @DataMember
-    public var record:String?
-
-    required public init(){}
-}
-
-// @DataContract
-public class PushRecipientDto : Codable
-{
-    // @DataMember
-    public var deviceTokens:[PushDeviceDeliveryTokenDto] = []
-
-    // @DataMember
-    public var userId:String?
-
-    // @DataMember
-    public var language:String?
-
-    // @DataMember
-    public var userTokenMappings:[TokenMappingDto]?
-
-    // @DataMember
-    public var timeZoneId:String?
-
-    // @DataMember
-    public var record:String?
-
-    required public init(){}
-}
-
-public enum DeploymentMode : String, Codable
-{
-    case Managed
-    case SelfHosted
-    case Enterprise
-}
-
-public enum SupportMessageAuthorKind : String, Codable
-{
-    case Customer
-    case Staff
-    case Ai
-    case System
-}
-
-public enum MarketplaceParameterLocation : String, Codable
-{
-    case Body
-    case Header
-    case Query
-    case Path
-}
-
-public enum EmailTemplateEngine : String, Codable
-{
-    case NotSet
-    case Handlebars
-    case Mjml
-    case Liquid
-    case Razor
-    case Mustache
-}
-
-public class NotificationsSettingsGroupDto : Codable
-{
-    public var tag:String?
-    public var tags:[String] = []
-
-    required public init(){}
-}
-
-// @DataContract
-public class MembershipMessageTemplateDto : Codable
-{
-    // @DataMember
-    public var id:String?
-
-    required public init(){}
-}
-
 public class StringFieldDto : JsonSchemaFieldDto
 {
     // @DataMember
@@ -41226,6 +34399,6511 @@ public class JsonFieldDto : JsonSchemaFieldDto
     }
 }
 
+// @DataContract
+public class FunctionRefDto : Codable
+{
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var provider:CodeProvider?
+
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var qualifier:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionEventDto : Codable
+{
+    // @DataMember
+    public var specVersion:String?
+
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var eventId:String?
+
+    // @DataMember
+    public var event:String?
+
+    // @DataMember
+    public var source:CodeFunctionSource?
+
+    // @DataMember
+    public var createdOn:Date?
+
+    // @DataMember
+    public var context:CodeFunctionContextDto?
+
+    // @DataMember
+    public var data:CodeFunctionDataDto?
+
+    // @DataMember
+    public var config:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionContextDto : Codable
+{
+    // @DataMember
+    public var accountId:String?
+
+    // @DataMember
+    public var projectId:String?
+
+    // @DataMember
+    public var environment:String?
+
+    // @DataMember
+    public var region:String?
+
+    // @DataMember
+    public var hubUrl:String?
+
+    // @DataMember
+    public var apiUrl:String?
+
+    // @DataMember
+    public var echoUrl:String?
+
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var taskId:String?
+
+    // @DataMember
+    public var correlationId:String?
+
+    // @DataMember
+    public var caller:CodeFunctionCallerDto?
+
+    // @DataMember
+    public var runAs:CodeFunctionRunAsDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionCallerDto : Codable
+{
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var email:String?
+
+    // @DataMember
+    public var kind:CodeFunctionCallerKind?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionRunAsDto : Codable
+{
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var accessToken:String?
+
+    // @DataMember
+    public var expiresAt:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionDataDto : Codable
+{
+    // @DataMember
+    public var database:DatabaseRecordChangeDto?
+
+    // @DataMember
+    public var user:UserChangeDto?
+
+    // @DataMember
+    public var file:FileChangeDto?
+
+    // @DataMember
+    public var payment:PaymentFactDto?
+
+    // @DataMember
+    public var ai:AiUsageEventDto?
+
+    // @DataMember
+    public var task:ScheduledTaskInfoDto?
+
+    // @DataMember
+    public var payload:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DatabaseRecordChangeDto : Codable
+{
+    // @DataMember
+    public var collection:String?
+
+    // @DataMember
+    public var schemaId:String?
+
+    // @DataMember
+    public var schemaVersion:Int?
+
+    // @DataMember
+    public var recordId:String?
+
+    // @DataMember
+    public var old:[String:String]?
+
+    // @DataMember
+    public var `new`:[String:String]?
+
+    // @DataMember
+    public var truncated:Bool?
+
+    // @DataMember
+    public var oldRef:DocumentRefDto?
+
+    // @DataMember
+    public var newRef:DocumentRefDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class UserChangeDto : Codable
+{
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var old:[String:String]?
+
+    // @DataMember
+    public var `new`:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class FileChangeDto : Codable
+{
+    // @DataMember
+    public var old:[String:String]?
+
+    // @DataMember
+    public var `new`:[String:String]?
+
+    // @DataMember
+    public var path:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PaymentFactDto : Codable
+{
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var provider:String?
+
+    // @DataMember
+    public var providerEventId:String?
+
+    // @DataMember
+    public var eventName:String?
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var amountMinor:Int?
+
+    // @DataMember
+    public var currency:String?
+
+    // @DataMember
+    public var externalIds:[String:String]?
+
+    // @DataMember
+    public var occurredOn:Date?
+
+    // @DataMember
+    public var receivedOn:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiUsageEventDto : Codable
+{
+    // @DataMember
+    public var payload:[String:String] = [:]
+
+    // @DataMember
+    public var targetUserId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ScheduledTaskInfoDto : Codable
+{
+    // @DataMember
+    public var taskId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var firedAt:Date?
+
+    required public init(){}
+}
+
+public class FakeCodeIntegrationDto : CodeIntegrationDto
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public class FakeCodeIntegrationRequest : CodeIntegrationRequest
+{
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(CodeProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class CodeFunctionSchedulerTaskRequest : SchedulerTaskRequest
+{
+    public var functionRef:FunctionRefDto?
+    public var invocationType:CodeInvocationType?
+    public var config:String?
+    public var mappedTokens:[TokenMappingDto]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case functionRef
+        case invocationType
+        case config
+        case mappedTokens
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchedulerTaskType.self, forKey: .type)
+        functionRef = try container.decodeIfPresent(FunctionRefDto.self, forKey: .functionRef)
+        invocationType = try container.decodeIfPresent(CodeInvocationType.self, forKey: .invocationType)
+        config = try container.decodeIfPresent(String.self, forKey: .config)
+        mappedTokens = try container.decodeIfPresent([TokenMappingDto].self, forKey: .mappedTokens) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if functionRef != nil { try container.encode(functionRef, forKey: .functionRef) }
+        if invocationType != nil { try container.encode(invocationType, forKey: .invocationType) }
+        if config != nil { try container.encode(config, forKey: .config) }
+        if mappedTokens != nil { try container.encode(mappedTokens, forKey: .mappedTokens) }
+    }
+}
+
+// @DataContract(Namespace="http://codemash.io/types/")
+public class RequestBase : ICultureBasedRequest, IVersionBasedRequest, IHasCorrelationIdRequest, Codable
+{
+    /**
+    * Specify culture code when your response from the API should be localised. E.g.: en
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="Specify culture code when your response from the API should be localised. E.g.: en", Name="CultureCode", ParameterType="header")
+    public var cultureCode:String?
+
+    /**
+    * TimeZone
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="TimeZone", Name="TimeZoneId", ParameterType="header")
+    public var timeZoneId:String?
+
+    /**
+    * The CodeMash API version used to fetch data from the API. If not specified, the last version will be used.  E.g.: v3
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="The CodeMash API version used to fetch data from the API. If not specified, the last version will be used.  E.g.: v3", IsRequired=true, Name="version", ParameterType="path")
+    public var version:String?
+
+    /**
+    * CorrelationId for each request
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="CorrelationId for each request", Name="CorrelationId", ParameterType="header")
+    public var correlationId:String?
+
+    required public init(){}
+}
+
+public protocol ICultureBasedRequest
+{
+    var cultureCode:String? { get set }
+
+}
+
+public protocol IVersionBasedRequest
+{
+    var version:String? { get set }
+
+}
+
+public protocol IHasCorrelationIdRequest
+{
+    var correlationId:String? { get set }
+
+}
+
+public enum TriggerType : String, Codable
+{
+    case Membership
+    case Schema
+    case Files
+    case Payments
+    case Ai
+}
+
+// @DataContract(Namespace="http://codemash.io/types/")
+public class CodeMashRequestBase : RequestBase, IHasProjectId, IHasEnv
+{
+    /**
+    * ID of your project. Can be passed in a header as norbix-project-id.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="ID of your project. Can be passed in a header as norbix-project-id.", IsRequired=true, Name="norbix-project-id", ParameterType="header")
+    public var projectId:String?
+
+    /**
+    * Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.", Name="norbix-env", ParameterType="header")
+    public var env:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case projectId
+        case env
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+        if env != nil { try container.encode(env, forKey: .env) }
+    }
+}
+
+public protocol IHasProjectId
+{
+    var projectId:String? { get set }
+
+}
+
+public protocol IHasEnv
+{
+    var env:String? { get set }
+
+}
+
+public enum SubscriptionType : String, Codable
+{
+    case ManagedService
+    case License
+}
+
+public protocol IHasAccountId
+{
+    var accountId:String? { get set }
+
+}
+
+// @DataContract
+public class GroupDefinitionDto : TagDefinitionBaseDto
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public enum CommunicationChannel : String, Codable
+{
+    case Transactional
+    case Marketing
+    case System
+}
+
+// @DataContract
+public class TagDefinitionDto : TagDefinitionBaseDto
+{
+    // @DataMember
+    public var defaultDelivery:[DeliveryChannel:Bool] = [:]
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case defaultDelivery
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        defaultDelivery = try container.decodeIfPresent([DeliveryChannel:Bool].self, forKey: .defaultDelivery) ?? [:]
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if defaultDelivery.count > 0 { try container.encode(defaultDelivery, forKey: .defaultDelivery) }
+    }
+}
+
+public class DatabaseIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:DatabaseProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiPlanDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var allowedAssistantIds:[String] = []
+
+    // @DataMember
+    public var allowedModels:[AiPlanModelDto] = []
+
+    // @DataMember
+    public var quotaUnit:AiPlanQuotaUnit?
+
+    // @DataMember
+    public var monthlyQuota:Int?
+
+    // @DataMember
+    public var features:AiPlanFeaturesDto?
+
+    // @DataMember
+    public var quotaReachedMessage:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiPlanRoleAssignmentDto : Codable
+{
+    // @DataMember
+    public var roleId:String?
+
+    // @DataMember
+    public var planId:String?
+
+    required public init(){}
+}
+
+public class ProjectAiAssistantRequestBase : CodeMashRequestBase
+{
+    /**
+    * Name shown to end users. Required, at most 100 characters, unique in the project.
+    */
+    // @ApiMember(Description="Name shown to end users. Required, at most 100 characters, unique in the project.")
+    public var name:String?
+
+    /**
+    * First message end users see. Public. At most 2 000 characters.
+    */
+    // @ApiMember(Description="First message end users see. Public. At most 2 000 characters.")
+    public var welcomeMessage:String?
+
+    /**
+    * Instructions for the model. Never shown to end users. At most 20 000 characters.
+    */
+    // @ApiMember(Description="Instructions for the model. Never shown to end users. At most 20 000 characters.")
+    public var systemPrompt:String?
+
+    /**
+    * Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences), own:knowledge (search_knowledge — the user's own and the project-wide knowledge). Any other name is refused.
+    */
+    // @ApiMember(Description="Own-scope toolsets the assistant may use: own:records (the user's own database records), own:profile (their profile), own:preferences (their marketing preferences), own:knowledge (search_knowledge — the user's own and the project-wide knowledge). Any other name is refused.")
+    public var toolsets:[String]?
+
+    /**
+    * The assistant's own LLM integration id (int_…). Empty = the project's default LLM.
+    */
+    // @ApiMember(Description="The assistant's own LLM integration id (int_…). Empty = the project's default LLM.")
+    public var llmIntegrationId:String?
+
+    /**
+    * Model name. Empty = the integration's default model.
+    */
+    // @ApiMember(Description="Model name. Empty = the integration's default model.")
+    public var model:String?
+
+    /**
+    * True to let the assistant remember facts about the end user across chats.
+    */
+    // @ApiMember(Description="True to let the assistant remember facts about the end user across chats.")
+    public var memoryEnabled:Bool?
+
+    /**
+    * Knowledge the assistant retrieves from before each answer and cites as [n]: record (records of schemas with embed on), file (uploaded files, when the project embeds them), message (the user's earlier chats, assistants with memory). Empty = no automatic retrieval.
+    */
+    // @ApiMember(Description="Knowledge the assistant retrieves from before each answer and cites as [n]: record (records of schemas with embed on), file (uploaded files, when the project embeds them), message (the user's earlier chats, assistants with memory). Empty = no automatic retrieval.")
+    public var ragSourceIds:[String]?
+
+    /**
+    * Best relevance (0–1) below which the answer says the knowledge does not match strongly. Empty = 0.5; 0 = never.
+    */
+    // @ApiMember(Description="Best relevance (0–1) below which the answer says the knowledge does not match strongly. Empty = 0.5; 0 = never.")
+    public var weakMatchThreshold:Double?
+
+    /**
+    * AI plan (quota) id. Optional.
+    */
+    // @ApiMember(Description="AI plan (quota) id. Optional.")
+    public var planId:String?
+
+    /**
+    * True to make this the project's default assistant; the previous default stops being default.
+    */
+    // @ApiMember(Description="True to make this the project's default assistant; the previous default stops being default.")
+    public var isDefault:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case name
+        case welcomeMessage
+        case systemPrompt
+        case toolsets
+        case llmIntegrationId
+        case model
+        case memoryEnabled
+        case ragSourceIds
+        case weakMatchThreshold
+        case planId
+        case isDefault
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        welcomeMessage = try container.decodeIfPresent(String.self, forKey: .welcomeMessage)
+        systemPrompt = try container.decodeIfPresent(String.self, forKey: .systemPrompt)
+        toolsets = try container.decodeIfPresent([String].self, forKey: .toolsets) ?? []
+        llmIntegrationId = try container.decodeIfPresent(String.self, forKey: .llmIntegrationId)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        memoryEnabled = try container.decodeIfPresent(Bool.self, forKey: .memoryEnabled)
+        ragSourceIds = try container.decodeIfPresent([String].self, forKey: .ragSourceIds) ?? []
+        weakMatchThreshold = try container.decodeIfPresent(Double.self, forKey: .weakMatchThreshold)
+        planId = try container.decodeIfPresent(String.self, forKey: .planId)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if name != nil { try container.encode(name, forKey: .name) }
+        if welcomeMessage != nil { try container.encode(welcomeMessage, forKey: .welcomeMessage) }
+        if systemPrompt != nil { try container.encode(systemPrompt, forKey: .systemPrompt) }
+        if toolsets != nil { try container.encode(toolsets, forKey: .toolsets) }
+        if llmIntegrationId != nil { try container.encode(llmIntegrationId, forKey: .llmIntegrationId) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if memoryEnabled != nil { try container.encode(memoryEnabled, forKey: .memoryEnabled) }
+        if ragSourceIds != nil { try container.encode(ragSourceIds, forKey: .ragSourceIds) }
+        if weakMatchThreshold != nil { try container.encode(weakMatchThreshold, forKey: .weakMatchThreshold) }
+        if planId != nil { try container.encode(planId, forKey: .planId) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+    }
+}
+
+// @DataContract
+public class FileResourceRefDto : Codable
+{
+    // @DataMember(Order=1)
+    public var resource:FileResourceDto?
+
+    // @DataMember(Order=2)
+    public var integrationId:String?
+
+    // @DataMember(Order=3)
+    public var provider:FileProvider?
+
+    // @DataMember(Order=4)
+    public var path:String?
+
+    // @DataMember(Order=5)
+    public var publicUrl:String?
+
+    // @DataMember(Order=6)
+    public var isPublic:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiProjectRoleIdsDto : Codable
+{
+    // @DataMember
+    public var projectId:String?
+
+    // @DataMember
+    public var roleIds:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class DeleteTrigger : CodeMashRequestBase
+{
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var triggerType:TriggerType?
+
+    // @DataMember
+    public var schemaId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case triggerId
+        case triggerType
+        case schemaId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
+        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
+        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+    }
+}
+
+// @DataContract
+public class DisableTrigger : CodeMashRequestBase
+{
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var triggerType:TriggerType?
+
+    // @DataMember
+    public var schemaId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case triggerId
+        case triggerType
+        case schemaId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
+        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
+        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+    }
+}
+
+// @DataContract
+public class EnableTrigger : CodeMashRequestBase
+{
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var triggerType:TriggerType?
+
+    // @DataMember
+    public var schemaId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case triggerId
+        case triggerType
+        case schemaId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
+        triggerType = try container.decodeIfPresent(TriggerType.self, forKey: .triggerType)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
+        if triggerType != nil { try container.encode(triggerType, forKey: .triggerType) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+    }
+}
+
+public class GetTrigger : CodeMashRequestBase
+{
+    public var id:String?
+    public var schemaId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+        case schemaId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+    }
+}
+
+public class SaveTriggerRequest : Codable
+{
+    public var type:TriggerType?
+    public var triggerId:String?
+    public var name:String?
+    public var Description:String?
+    public var isEnabled:Bool?
+    public var preExecuteCode:String?
+    public var order:Int?
+    public var breakOnError:Bool?
+    public var action:TriggerActionDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SaveTrigger : CodeMashRequestBase
+{
+    // @DataMember
+    public var trigger:SaveTriggerRequest?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case trigger
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        trigger = try container.decodeIfPresent(SaveTriggerRequest.self, forKey: .trigger)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if trigger != nil { try container.encode(trigger, forKey: .trigger) }
+    }
+}
+
+public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHasEnv
+{
+    /**
+    * ID of your project. Can be passed in a header as norbix-project-id.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="ID of your project. Can be passed in a header as norbix-project-id.", IsRequired=true, Name="norbix-project-id", ParameterType="header")
+    public var projectId:String?
+
+    /**
+    * Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="Target environment for this request (e.g. TEST, STAGING). Optional — when omitted the request runs against PROD. Can be passed in a header as norbix-env.", Name="norbix-env", ParameterType="header")
+    public var env:String?
+
+    /**
+    * Cursor token — fetch the page AFTER this item.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="Cursor token — fetch the page AFTER this item.", Name="startingAfter", ParameterType="query")
+    public var startingAfter:String?
+
+    /**
+    * Cursor token — fetch the page BEFORE this item.
+    */
+    // @DataMember
+    // @ApiMember(DataType="string", Description="Cursor token — fetch the page BEFORE this item.", Name="endingBefore", ParameterType="query")
+    public var endingBefore:String?
+
+    /**
+    * Amount of records to return.
+    */
+    // @DataMember
+    // @ApiMember(DataType="integer", Description="Amount of records to return.", Format="int32", Name="pageSize", ParameterType="query")
+    public var pageSize:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case projectId
+        case env
+        case startingAfter
+        case endingBefore
+        case pageSize
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        projectId = try container.decodeIfPresent(String.self, forKey: .projectId)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+        startingAfter = try container.decodeIfPresent(String.self, forKey: .startingAfter)
+        endingBefore = try container.decodeIfPresent(String.self, forKey: .endingBefore)
+        pageSize = try container.decodeIfPresent(Int.self, forKey: .pageSize)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if projectId != nil { try container.encode(projectId, forKey: .projectId) }
+        if env != nil { try container.encode(env, forKey: .env) }
+        if startingAfter != nil { try container.encode(startingAfter, forKey: .startingAfter) }
+        if endingBefore != nil { try container.encode(endingBefore, forKey: .endingBefore) }
+        if pageSize != nil { try container.encode(pageSize, forKey: .pageSize) }
+    }
+}
+
+public class MembershipIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:MembershipProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public class CredentialsSettingsModeDto : Codable
+{
+    public var name:String?
+    public var logoutUrl:String?
+
+    required public init(){}
+}
+
+public class PagingArgs : Codable
+{
+    public var cursorArgs:CursorArgs?
+    public var pageSize:Int?
+    public var startingAfter:String?
+    public var endingBefore:String?
+
+    required public init(){}
+}
+
+public class SchemaSettingsDto : Codable
+{
+    // @DataMember
+    public var softDelete:Bool?
+
+    // @DataMember
+    public var hasRecordOwner:Bool?
+
+    // @DataMember
+    public var Description:String?
+
+    required public init(){}
+}
+
+public class SchemaEmbedSettingsDto : Codable
+{
+    // @DataMember
+    public var enabled:Bool?
+
+    // @DataMember
+    public var fields:[String] = []
+
+    // @DataMember
+    public var embeddingIntegrationId:String?
+
+    // @DataMember
+    public var perUser:Bool?
+
+    required public init(){}
+}
+
+public class SchemaListSettingsDto : Codable
+{
+    // @DataMember
+    public var columns:[SchemaListColumnDto] = []
+
+    // @DataMember
+    public var defaultSort:SchemaListSortDto?
+
+    required public init(){}
+}
+
+public class ImportColumnMappingDto : Codable
+{
+    // @DataMember
+    public var csvColumnIndex:Int?
+
+    // @DataMember
+    public var csvHeader:String?
+
+    // @DataMember
+    public var propertyName:String?
+
+    // @DataMember
+    public var dontImportOnError:Bool?
+
+    required public init(){}
+}
+
+public class FilesIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:FileProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public class EmailValidationIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:EmailValidationProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class EmailMessageTranslationDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var content:EmailMessageContentDto?
+
+    // @DataMember
+    public var staticAttachments:[FileResourceRefDto]?
+
+    required public init(){}
+}
+
+public class SaveEmailTemplate : CodeMashRequestBase
+{
+    /**
+    * The display name of the email template.
+    */
+    // @ApiMember(Description="The display name of the email template.", IsRequired=true)
+    public var templateName:String?
+
+    /**
+    * Optional free-text description of what the template is used for.
+    */
+    // @ApiMember(Description="Optional free-text description of what the template is used for.")
+    public var Description:String?
+
+    /**
+    * The communication channel the template is intended for (e.g. Transactional, Marketing).
+    */
+    // @ApiMember(Description="The communication channel the template is intended for (e.g. Transactional, Marketing).")
+    public var communicationChannel:CommunicationChannel?
+
+    /**
+    * Optional tags to organize/filter the template by.
+    */
+    // @ApiMember(Description="Optional tags to organize/filter the template by.")
+    public var tags:[String]?
+
+    /**
+    * Optional static file attachments to send with every email using this template.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional static file attachments to send with every email using this template.")
+    public var staticAttachments:[FileResourceRefDto]?
+
+    /**
+    * The per-language content translations (subject/body) for this template.
+    */
+    // @ApiMember(Description="The per-language content translations (subject/body) for this template.", IsRequired=true)
+    public var translations:[EmailMessageTranslationDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case templateName
+        case Description
+        case communicationChannel
+        case tags
+        case staticAttachments
+        case translations
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
+        Description = try container.decodeIfPresent(String.self, forKey: .Description)
+        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+        staticAttachments = try container.decodeIfPresent([FileResourceRefDto].self, forKey: .staticAttachments) ?? []
+        translations = try container.decodeIfPresent([EmailMessageTranslationDto].self, forKey: .translations) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
+        if Description != nil { try container.encode(Description, forKey: .Description) }
+        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
+        if tags != nil { try container.encode(tags, forKey: .tags) }
+        if staticAttachments != nil { try container.encode(staticAttachments, forKey: .staticAttachments) }
+        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
+    }
+}
+
+// @DataContract
+public class TokenMappingDto : Codable
+{
+    // @DataMember
+    public var key:String?
+
+    // @DataMember
+    public var value:String?
+
+    // @DataMember
+    public var resolver:TokenMappingResolverType?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TranslationDto : Codable
+{
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var content:String?
+
+    required public init(){}
+}
+
+public class EmailIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:EmailProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var emailAddress:String?
+    public var emailSenderName:String?
+
+    required public init(){}
+}
+
+public class EmailCampaignRequest : Codable
+{
+    public var source:EmailCampaignRecipientsSourceTypes?
+    public var templateId:String?
+    public var integrationId:String?
+    public var validationIntegrationId:String?
+    public var language:String?
+    public var initiatorId:String?
+    public var notes:String?
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    // @DataMember
+    public var campaignTime:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SmsMessageTranslationDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var content:SmsMessageContentDto?
+
+    required public init(){}
+}
+
+public class SaveSmsTemplate : CodeMashRequestBase
+{
+    /**
+    * Display name for the SMS template.
+    */
+    // @ApiMember(Description="Display name for the SMS template.", IsRequired=true)
+    public var templateName:String?
+
+    /**
+    * Optional free-text description of the template's purpose.
+    */
+    // @ApiMember(Description="Optional free-text description of the template's purpose.")
+    public var Description:String?
+
+    /**
+    * Whether this template is Transactional or Marketing SMS.
+    */
+    // @ApiMember(Description="Whether this template is Transactional or Marketing SMS.", IsRequired=true)
+    public var communicationChannel:CommunicationChannel?
+
+    /**
+    * Optional tags to organize/filter templates.
+    */
+    // @ApiMember(Description="Optional tags to organize/filter templates.")
+    public var tags:[String]?
+
+    /**
+    * The template's per-language translations (each with its own SMS body).
+    */
+    // @ApiMember(Description="The template's per-language translations (each with its own SMS body).", IsRequired=true)
+    public var translations:[SmsMessageTranslationDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case templateName
+        case Description
+        case communicationChannel
+        case tags
+        case translations
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
+        Description = try container.decodeIfPresent(String.self, forKey: .Description)
+        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+        translations = try container.decodeIfPresent([SmsMessageTranslationDto].self, forKey: .translations) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
+        if Description != nil { try container.encode(Description, forKey: .Description) }
+        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
+        if tags != nil { try container.encode(tags, forKey: .tags) }
+        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
+    }
+}
+
+public class SmsIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:SmsProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public enum SmsCampaignRecipientsSourceTypes : String, Codable
+{
+    case AllUsers
+    case SpecifiedUsers
+    case AccountUsers
+    case PhoneNumbers
+    case Collection
+}
+
+public enum MarketplaceCategory : String, Codable
+{
+    case Other
+    case Crm
+    case Erp
+    case Marketing
+    case Communication
+    case Productivity
+    case Storage
+    case Analytics
+    case Identity
+    case Payments
+    case DevTools
+    case Ai
+    case Files
+    case Database
+    case Calendar
+}
+
+public enum MarketplaceTransport : String, Codable
+{
+    case Mcp
+    case Rest
+    case Code
+    case Internal
+    case Sdk
+}
+
+// @DataContract
+public class MarketplaceTokenMappingDto : Codable
+{
+    // @DataMember
+    public var token:String?
+
+    // @DataMember
+    public var resolver:MarketplaceTokenResolverKind?
+
+    // @DataMember
+    public var value:String?
+
+    // @DataMember
+    public var secretKeys:[String]?
+
+    // @DataMember
+    public var format:MarketplaceSecretValueFormat?
+
+    required public init(){}
+}
+
+public class CodeIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:CodeProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public enum CodeFunctionSource : String, Codable
+{
+    case Database
+    case Membership
+    case Files
+    case Payments
+    case Ai
+    case Scheduler
+    case Manual
+}
+
+public enum CodeInvocationType : String, Codable
+{
+    case Sync
+    case Async
+}
+
+// @DataContract
+public class PushMessageTranslationDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var content:PushMessageContentDto?
+
+    required public init(){}
+}
+
+public class SavePushTemplate : CodeMashRequestBase
+{
+    /**
+    * The template's display name.
+    */
+    // @ApiMember(Description="The template's display name.", IsRequired=true)
+    public var templateName:String?
+
+    /**
+    * Optional free-text description of the template's purpose.
+    */
+    // @ApiMember(Description="Optional free-text description of the template's purpose.")
+    public var Description:String?
+
+    /**
+    * Whether the template is Transactional or Marketing.
+    */
+    // @ApiMember(Description="Whether the template is Transactional or Marketing.")
+    public var communicationChannel:CommunicationChannel?
+
+    /**
+    * Optional tags for organizing/filtering templates.
+    */
+    // @ApiMember(Description="Optional tags for organizing/filtering templates.")
+    public var tags:[String]?
+
+    /**
+    * The per-locale translations (title/body/subtitle) that make up the template content.
+    */
+    // @ApiMember(Description="The per-locale translations (title/body/subtitle) that make up the template content.", IsRequired=true)
+    public var translations:[PushMessageTranslationDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case templateName
+        case Description
+        case communicationChannel
+        case tags
+        case translations
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        templateName = try container.decodeIfPresent(String.self, forKey: .templateName)
+        Description = try container.decodeIfPresent(String.self, forKey: .Description)
+        communicationChannel = try container.decodeIfPresent(CommunicationChannel.self, forKey: .communicationChannel)
+        tags = try container.decodeIfPresent([String].self, forKey: .tags) ?? []
+        translations = try container.decodeIfPresent([PushMessageTranslationDto].self, forKey: .translations) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if templateName != nil { try container.encode(templateName, forKey: .templateName) }
+        if Description != nil { try container.encode(Description, forKey: .Description) }
+        if communicationChannel != nil { try container.encode(communicationChannel, forKey: .communicationChannel) }
+        if tags != nil { try container.encode(tags, forKey: .tags) }
+        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
+    }
+}
+
+public class PushIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:PushProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushDeviceDto : Codable
+{
+    // @DataMember
+    public var deviceId:String?
+
+    // @DataMember
+    public var deviceOs:String?
+
+    // @DataMember
+    public var token:String?
+
+    // @DataMember
+    public var brand:String?
+
+    // @DataMember
+    public var manufacturer:String?
+
+    // @DataMember
+    public var modelName:String?
+
+    // @DataMember
+    public var deviceName:String?
+
+    // @DataMember
+    public var deviceType:DeviceType?
+
+    // @DataMember
+    public var osName:String?
+
+    // @DataMember
+    public var osVersion:String?
+
+    // @DataMember
+    public var platformApiLevel:Int?
+
+    required public init(){}
+}
+
+public class PushCampaignRequest : Codable
+{
+    public var source:PushCampaignRecipientsSourceTypes?
+    public var templateId:String?
+    public var integrationId:String?
+    public var language:String?
+    public var initiatorId:String?
+    public var notes:String?
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    // @DataMember
+    public var campaignTime:Int?
+
+    required public init(){}
+}
+
+public class PaymentIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:PaymentGatewayPlatform?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public class LoggingIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:LoggingProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+public class ChatScreenContextDto : Codable
+{
+    public var kind:String?
+    public var viewId:String?
+
+    required public init(){}
+}
+
+public class EmbeddingIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:EmbeddingProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var endpoint:String?
+    public var model:String?
+    public var dimension:Int?
+    public var apiKey:String?
+
+    required public init(){}
+}
+
+public class LlmIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:LlmProvider?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var endpoint:String?
+    public var defaultModel:String?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionRequest]?
+
+    required public init(){}
+}
+
+public class McpIntegrationRequest : Codable
+{
+    public var integrationId:String?
+    public var provider:McpProvider?
+    public var transport:McpTransport?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var name:String?
+    public var category:String?
+    public var Description:String?
+    public var icon:String?
+
+    required public init(){}
+}
+
+public enum SchedulerTaskType : String, Codable
+{
+    case EmailCampaign
+    case PushCampaign
+    case SmsCampaign
+    case CodeFunctionalCall
+    case WebhookCall
+}
+
+public class SchedulerTaskRequest : Codable
+{
+    public var type:SchedulerTaskType?
+
+    required public init(){}
+}
+
+public class ResourceRefDto : Codable
+{
+    public var projectId:String?
+    public var integrationId:String?
+    public var kind:ResourceKindDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CaseResolutionDto : Codable
+{
+    // @DataMember
+    public var problem:String?
+
+    // @DataMember
+    public var symptoms:[String] = []
+
+    // @DataMember
+    public var rootCause:String?
+
+    // @DataMember
+    public var fix:CaseResolutionFixKind?
+
+    // @DataMember
+    public var fixDetail:String?
+
+    // @DataMember
+    public var affectedVersions:[String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public enum CodeMashRelease : String, Codable
+{
+    case NotSet
+    case Community
+    case ManagedService
+    case Enterprise
+}
+
+public enum CodeMashRuntime : String, Codable
+{
+    case Development
+    case CI
+    case Staging
+    case Production
+}
+
+// @DataContract
+public class EchoLicenseDto : Codable
+{
+    // @DataMember(Name="domain")
+    public var domain:String?
+
+    // @DataMember(Name="accountId")
+    public var accountId:String?
+
+    // @DataMember(Name="email")
+    public var email:String?
+
+    // @DataMember(Name="release")
+    public var release:String?
+
+    // @DataMember(Name="expire")
+    public var expire:Int?
+
+    // @DataMember(Name="isTrial")
+    public var isTrial:Bool?
+
+    // @DataMember(Name="cap")
+    public var cap:Int?
+
+    required public init(){}
+}
+
+public class EchoRegionDto : Codable
+{
+    public var code:String?
+    public var displayName:String?
+    public var apiUrl:String?
+    public var hubUrl:String?
+
+    required public init(){}
+}
+
+public class EchoAgentDto : Codable
+{
+    public var mcpUrl:String?
+    public var oAuthMetadataUrl:String?
+    public var installationType:String?
+    public var onboardingDocsUrl:String?
+    public var toolsUrl:String?
+    public var cliPackage:String?
+    public var cliInstallCommand:String?
+    public var deviceAuthorizationUrl:String?
+    public var deviceTokenUrl:String?
+    public var snippets:[EchoAgentSnippetDto] = []
+
+    required public init(){}
+}
+
+public class EchoHostingPlatformDto : Codable
+{
+    public var provider:String?
+    public var isAws:Bool?
+
+    required public init(){}
+}
+
+public class PublicBrandDto : Codable
+{
+    public var displayName:String?
+    public var mainColor:String?
+    public var accentColor:String?
+    public var logoUrl:String?
+    public var iconUrl:String?
+
+    required public init(){}
+}
+
+public class PublicAuthDto : Codable
+{
+    public var socialProviders:[String] = []
+    public var passkey:Bool?
+    public var methods:[String]?
+    public var passwordPolicy:PublicPasswordPolicyDto?
+
+    required public init(){}
+}
+
+public class PublicAiChatDto : Codable
+{
+    public var enabled:Bool?
+    public var assistants:[PublicAiAssistantDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class TriggerAttentionDto : Codable
+{
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var triggerType:TriggerType?
+
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var atUtc:Date?
+
+    required public init(){}
+}
+
+public class CodeMashResponseStatus : Codable
+{
+    public var isSuccess:Bool?
+    public var errors:[ErrorDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ResponseBase : Codable
+{
+    // @DataMember
+    public var responseStatus:CodeMashResponseStatus?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AccountOwnerDto : Codable
+{
+    // @DataMember
+    public var email:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var billingEmail:String?
+
+    // @DataMember
+    public var operationsEmail:String?
+
+    // @DataMember
+    public var securityEmail:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AccountStatusDto : Codable
+{
+    // @DataMember
+    public var accountId:String?
+
+    // @DataMember
+    public var accountIdAsGuid:String?
+
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var loggedInUserId:String?
+
+    // @DataMember
+    public var loggedInUserEmail:String?
+
+    // @DataMember
+    public var status:AccountStatus?
+
+    // @DataMember
+    public var projectCap:Int?
+
+    // @DataMember
+    public var permissions:[String] = []
+
+    // @DataMember
+    public var roles:[String] = []
+
+    // @DataMember
+    public var allowedProjects:[String]?
+
+    // @DataMember
+    public var trialWasIssued:Bool?
+
+    // @DataMember
+    public var emailVerified:Bool?
+
+    // @DataMember
+    public var joinedByInvitation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class UsageBillingDto : Codable
+{
+    // @DataMember
+    public var accountId:String?
+
+    // @DataMember
+    public var atlas:[String:UsageBillingPeriodDto] = [:]
+
+    // @DataMember
+    public var ingestionFailures:[UsageBillingIngestionFailureDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionResultDto : Codable
+{
+    // @DataMember
+    public var contentMirrored:[PromotionItemDto] = []
+
+    // @DataMember
+    public var contentDeleted:[PromotionItemDto] = []
+
+    // @DataMember
+    public var integrationsSeeded:[PromotionItemDto] = []
+
+    // @DataMember
+    public var integrationsToProvision:[PromotionItemDto] = []
+
+    // @DataMember
+    public var integrationsSkipped:[PromotionItemDto] = []
+
+    // @DataMember
+    public var blockers:[PromotionBlockerDto] = []
+
+    // @DataMember
+    public var fromVersion:Int?
+
+    // @DataMember
+    public var wasDryRun:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectEnvironmentsDto : Codable
+{
+    // @DataMember
+    public var environments:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectDto : IHasViewId, IBindableContract, Codable
+{
+    // @DataMember
+    public var accountViewId:String?
+
+    // @DataMember
+    public var projectStatus:ProjectStatus?
+
+    // @DataMember
+    public var isActive:Bool?
+
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var uniqueName:String?
+
+    // @DataMember
+    public var hostLabel:String?
+
+    // @DataMember
+    public var apiHost:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var marketingUrl:String?
+
+    // @DataMember
+    public var canonicalAdminUrl:String?
+
+    // @DataMember
+    public var adminUrl:String?
+
+    // @DataMember
+    public var effectiveAdminUrl:String?
+
+    // @DataMember
+    public var defaultLanguage:String?
+
+    // @DataMember
+    public var languages:[String] = []
+
+    // @DataMember
+    public var primaryRegion:ProjectRegionDto?
+
+    // @DataMember
+    public var additionalRegions:[ProjectRegionDto]?
+
+    // @DataMember
+    public var isMultiRegionEligible:Bool?
+
+    // @DataMember
+    public var brand:ProjectBrandDto?
+
+    // @DataMember
+    public var notificationSettings:NotificationSettingsDto?
+
+    // @DataMember
+    public var allowedOrigins:[String]?
+
+    // @DataMember
+    public var exposeBrandToAdminPortal:Bool?
+
+    // @DataMember
+    public var exposeAuthToAdminPortal:Bool?
+
+    // @DataMember
+    public var adminPortalEnabled:Bool?
+
+    // @DataMember
+    public var adminPortalServiceUserId:String?
+
+    // @DataMember
+    public var membershipAuthenticationFlows:[AuthenticationFlowSummaryDto]?
+
+    // @DataMember
+    public var exposeLegalToAdminPortal:Bool?
+
+    // @DataMember
+    public var aiChat:ProjectAiSettingsDto?
+
+    // @DataMember
+    public var legalTermsMarkdown:String?
+
+    // @DataMember
+    public var legalPrivacyMarkdown:String?
+
+    // @DataMember
+    public var environments:[String] = []
+
+    // @DataMember
+    public var environmentRanks:[String:Int] = [:]
+
+    // @DataMember
+    public var database:DatabaseDto?
+
+    // @DataMember
+    public var email:EmailDto?
+
+    // @DataMember
+    public var ai:AiDto?
+
+    // @DataMember
+    public var membership:MembershipDto?
+
+    // @DataMember
+    public var logging:LoggingDto?
+
+    // @DataMember
+    public var serverEvents:ServerEventsDto?
+
+    // @DataMember
+    public var push:PushDto?
+
+    // @DataMember
+    public var scheduler:SchedulerDto?
+
+    // @DataMember
+    public var code:CodeDto?
+
+    // @DataMember
+    public var files:FilesDto?
+
+    // @DataMember
+    public var payments:PaymentsDto?
+
+    // @DataMember
+    public var sms:SmsDto?
+
+    // @DataMember
+    public var databaseEnabled:Bool?
+
+    // @DataMember
+    public var emailEnabled:Bool?
+
+    // @DataMember
+    public var membershipEnabled:Bool?
+
+    // @DataMember
+    public var loggingEnabled:Bool?
+
+    // @DataMember
+    public var serverEventsEnabled:Bool?
+
+    // @DataMember
+    public var pushEnabled:Bool?
+
+    // @DataMember
+    public var schedulerEnabled:Bool?
+
+    // @DataMember
+    public var codeEnabled:Bool?
+
+    // @DataMember
+    public var filesEnabled:Bool?
+
+    // @DataMember
+    public var paymentsEnabled:Bool?
+
+    // @DataMember
+    public var smsEnabled:Bool?
+
+    // @DataMember
+    public var defaultLlmIntegrationViewId:String?
+
+    // @DataMember
+    public var connections:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectListItemDto : Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var isActive:Bool?
+
+    // @DataMember
+    public var projectStatus:ProjectStatus?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var uniqueName:String?
+
+    // @DataMember
+    public var primaryRegion:ProjectRegionDto?
+
+    // @DataMember
+    public var additionalRegions:[ProjectRegionDto]?
+
+    required public init(){}
+}
+
+public class ProjectRegionDto : Codable
+{
+    public var id:String?
+    public var continent:Continent?
+    public var name:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiCreditPackCheckoutDto : Codable
+{
+    // @DataMember
+    public var url:String?
+
+    // @DataMember
+    public var sessionId:String?
+
+    // @DataMember
+    public var pack:String?
+
+    // @DataMember
+    public var credits:Int?
+
+    // @DataMember
+    public var priceEuroCents:Int?
+
+    // @DataMember
+    public var purchaseId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiPlansDto : Codable
+{
+    // @DataMember
+    public var plans:[AiPlanDto] = []
+
+    // @DataMember
+    public var roles:[AiPlanRoleAssignmentDto] = []
+
+    // @DataMember
+    public var defaultPlanId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiUserPlansDto : Codable
+{
+    // @DataMember
+    public var users:[AiUserPlanAssignmentDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiSettingsDto : Codable
+{
+    // @DataMember
+    public var enabled:Bool?
+
+    // @DataMember
+    public var defaultLlmIntegrationId:String?
+
+    // @DataMember
+    public var defaultModel:String?
+
+    // @DataMember
+    public var assistants:[AiAssistantDto] = []
+
+    // @DataMember
+    public var embedFiles:Bool?
+
+    // @DataMember
+    public var plans:[AiPlanDto] = []
+
+    // @DataMember
+    public var planRoleAssignments:[AiPlanRoleAssignmentDto] = []
+
+    // @DataMember
+    public var defaultPlanId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiUsageDto : Codable
+{
+    // @DataMember
+    public var period:String?
+
+    // @DataMember
+    public var totals:AiUsageGroupDto?
+
+    // @DataMember
+    public var assistants:[AiUsageGroupDto] = []
+
+    // @DataMember
+    public var topUsers:[AiUsageGroupDto] = []
+
+    // @DataMember
+    public var models:[AiUsageGroupDto] = []
+
+    // @DataMember
+    public var wallet:ProjectAiWalletDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TemplateLanguageGapDto : Codable
+{
+    // @DataMember
+    public var module:ApplicationModule?
+
+    // @DataMember
+    public var kind:LanguageGapKind?
+
+    // @DataMember
+    public var templateId:String?
+
+    // @DataMember
+    public var templateName:String?
+
+    // @DataMember
+    public var missingLanguages:[String] = []
+
+    required public init(){}
+}
+
+public class PaginatedResponse<TViewModelProjection : Codable> : Codable
+{
+    public var items:IList<TViewModelProjection>?
+    public var hasMore:Bool?
+    public var hasPrevious:Bool?
+    public var startingAfter:String?
+    public var endingBefore:String?
+
+    required public init(){}
+}
+
+public class AuthDto : IBindableContract, Codable
+{
+    public var id:String?
+    public var type:AuthType?
+    public var email:String?
+    public var userName:String?
+    public var registration:RegistrationDto?
+    public var login:LoginDto?
+    public var generalInfo:UserGeneralInfoDto?
+    public var roles:[String]?
+    public var pushDevices:[String]?
+    public var tags:[String]?
+    public var status:AuthStatus?
+    public var createdOn:Date?
+    public var modifiedOn:Date?
+
+    required public init(){}
+}
+
+public class AccountPasswordPolicyDto : Codable
+{
+    public var minLength:Int?
+    public var maxLength:Int?
+    public var minNumbers:Int?
+    public var maxNumbers:Int?
+    public var minUpper:Int?
+    public var maxUpper:Int?
+    public var minLower:Int?
+    public var maxLower:Int?
+    public var minSpecial:Int?
+    public var maxSpecial:Int?
+    public var allowedSpecial:String?
+
+    required public init(){}
+}
+
+public class PolicyItemDto : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var Description:String?
+    public var isSystem:Bool?
+    public var version:String?
+    public var permissions:[PermissionDto]?
+
+    required public init(){}
+}
+
+public class AccountTeamRoleDto : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var Description:String?
+    public var isSystem:Bool?
+    public var policies:[String]?
+
+    required public init(){}
+}
+
+public class AccountPasskeyListItemDto : Codable
+{
+    public var credentialId:String?
+    public var friendlyName:String?
+    public var registeredOnUtc:Date?
+    public var lastUsedOnUtc:Date?
+    public var isRevoked:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class LicenseDomainDnsStatusDto : Codable
+{
+    // @DataMember
+    public var domain:String?
+
+    // @DataMember
+    public var allRequiredResolved:Bool?
+
+    // @DataMember
+    public var records:[LicenseDomainDnsRecordDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class LicenseDomainVerificationChallengeDto : Codable
+{
+    // @DataMember
+    public var domain:String?
+
+    // @DataMember
+    public var txtHost:String?
+
+    // @DataMember
+    public var txtValue:String?
+
+    // @DataMember
+    public var expiresAtUtc:Date?
+
+    // @DataMember
+    public var verified:Bool?
+
+    // @DataMember
+    public var verifiedAtUtc:Date?
+
+    // @DataMember
+    public var skipped:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class LicenseDomainVerificationStatusDto : Codable
+{
+    // @DataMember
+    public var domain:String?
+
+    // @DataMember
+    public var verified:Bool?
+
+    // @DataMember
+    public var skipped:Bool?
+
+    // @DataMember
+    public var txtHost:String?
+
+    // @DataMember
+    public var expectedTxtValue:String?
+
+    // @DataMember
+    public var observedTxtValue:String?
+
+    // @DataMember
+    public var expiresAtUtc:Date?
+
+    // @DataMember
+    public var verifiedAtUtc:Date?
+
+    // @DataMember
+    public var message:String?
+
+    required public init(){}
+}
+
+public class LicenseDto : CodeMashSubscriptionDto
+{
+    public var isEnterprise:Bool?
+    public var projectCap:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case isEnterprise
+        case projectCap
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        isEnterprise = try container.decodeIfPresent(Bool.self, forKey: .isEnterprise)
+        projectCap = try container.decodeIfPresent(Int.self, forKey: .projectCap)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if isEnterprise != nil { try container.encode(isEnterprise, forKey: .isEnterprise) }
+        if projectCap != nil { try container.encode(projectCap, forKey: .projectCap) }
+    }
+}
+
+// @DataContract
+public class LicenseHeartbeatVerdictDto : Codable
+{
+    // @DataMember(Name="status")
+    public var status:String?
+
+    // @DataMember(Name="proofToken")
+    public var proofToken:String?
+
+    // @DataMember(Name="serverTimeUtc")
+    public var serverTimeUtc:Date?
+
+    // @DataMember(Name="graceUntilUtc")
+    public var graceUntilUtc:Date?
+
+    // @DataMember(Name="installationId")
+    public var installationId:String?
+
+    // @DataMember(Name="licenseAccountId")
+    public var licenseAccountId:String?
+
+    // @DataMember(Name="domain")
+    public var domain:String?
+
+    // @DataMember(Name="signature")
+    public var signature:String?
+
+    // @DataMember(Name="message")
+    public var message:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class InstallationLicenseStatusDto : Codable
+{
+    // @DataMember(Name="storedMode")
+    public var storedMode:String?
+
+    // @DataMember(Name="effectiveMode")
+    public var effectiveMode:String?
+
+    // @DataMember(Name="isProduction")
+    public var isProduction:Bool?
+
+    // @DataMember(Name="graceDaysLeft")
+    public var graceDaysLeft:Int?
+
+    // @DataMember(Name="graceUntilUtc")
+    public var graceUntilUtc:Date?
+
+    // @DataMember(Name="lastProvenAtUtc")
+    public var lastProvenAtUtc:Date?
+
+    // @DataMember(Name="lastHeartbeatAtUtc")
+    public var lastHeartbeatAtUtc:Date?
+
+    // @DataMember(Name="installationDomain")
+    public var installationDomain:String?
+
+    // @DataMember(Name="licensedDomain")
+    public var licensedDomain:String?
+
+    // @DataMember(Name="hostKind")
+    public var hostKind:String?
+
+    // @DataMember(Name="isTrialLicense")
+    public var isTrialLicense:Bool?
+
+    // @DataMember(Name="licenseExpireUtc")
+    public var licenseExpireUtc:Date?
+
+    // @DataMember(Name="message")
+    public var message:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiServiceUserDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var accountRoles:[AiRoleDto] = []
+
+    // @DataMember
+    public var projects:[AiProjectRolesDto] = []
+
+    // @DataMember
+    public var createdAt:Date?
+
+    // @DataMember
+    public var keys:[AiServiceUserKeyDto] = []
+
+    required public init(){}
+}
+
+public class ServiceUserApiKeyDto : Codable
+{
+    public var id:Int?
+    public var name:String?
+    public var visibleKey:String?
+    public var scopes:[String] = []
+    public var createdDate:Date?
+    public var expiryDate:Date?
+    public var cancelledDate:Date?
+    public var active:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipTriggerDto : TriggerDto
+{
+    // @DataMember
+    public var when:MembershipTriggerType?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case when
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        when = try container.decodeIfPresent(MembershipTriggerType.self, forKey: .when)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if when != nil { try container.encode(when, forKey: .when) }
+    }
+}
+
+public class GetTriggerResponse : ResponseBase
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+// @DataContract
+public class MembershipTriggerProjectionList : TriggerProjectionList
+{
+    // @DataMember
+    public var type:MembershipTriggerType?
+
+    // @DataMember
+    public var destinationIds:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case destinationIds
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(MembershipTriggerType.self, forKey: .type)
+        destinationIds = try container.decodeIfPresent([String].self, forKey: .destinationIds) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if destinationIds != nil { try container.encode(destinationIds, forKey: .destinationIds) }
+    }
+}
+
+public class RoleItemDto : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var displayName:String?
+    public var Description:String?
+    public var isSystem:Bool?
+    public var attachedPolicies:[String]?
+
+    required public init(){}
+}
+
+public class RoleListProjectionDto : Codable
+{
+    public var viewId:String?
+    public var name:String?
+    public var displayName:String?
+    public var isSystem:Bool?
+    public var policyCount:Int?
+
+    required public init(){}
+}
+
+public class PasskeySettingsDto : Codable
+{
+    public var enabled:Bool?
+    public var codeTtlMinutes:Int?
+    public var maxCredentialsPerUser:Int?
+    public var recoveryCodeCount:Int?
+    public var generateRecoveryCodesAtSignup:Bool?
+    public var authenticatorAttachment:String?
+    public var allowMagicLinkRecovery:Bool?
+    public var refreshTokenTtlDays:Int?
+    public var rpId:String?
+
+    required public init(){}
+}
+
+public class MembershipIntegrationDto : IntegrationDto
+{
+    public var provider:MembershipProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(MembershipProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class MembershipIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:MembershipProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(MembershipProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+// @DataContract
+public class MembershipAuthorizationViewDto : Codable
+{
+    // @DataMember
+    public var emailPreferences:MembershipEmailPreferencesDto?
+
+    // @DataMember
+    public var userRegistersAsRole:String?
+
+    // @DataMember
+    public var guestRegistersAsRole:String?
+
+    // @DataMember
+    public var allowedRegisterRoles:[String]?
+
+    // @DataMember
+    public var allowedProviderRegisterRoles:[String]?
+
+    // @DataMember
+    public var resetPasswordTokenExpiration:Int?
+
+    // @DataMember
+    public var invitationExpiration:Int?
+
+    // @DataMember
+    public var emailVerificationExpiration:Int?
+
+    // @DataMember
+    public var deactivationExpiration:Int?
+
+    // @DataMember
+    public var defaultSubscribeToNews:Bool?
+
+    // @DataMember
+    public var passwordComplexity:PasswordComplexityDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipAuthenticationViewDto : Codable
+{
+    // @DataMember
+    public var credentialsSettings:MembershipCredentialsSettingsDto?
+
+    // @DataMember
+    public var flows:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class SchemaTriggerDto : TriggerDto
+{
+    // @DataMember
+    public var schemaId:String?
+
+    // @DataMember
+    public var when:SchemaTriggerType?
+
+    // @DataMember
+    public var configurationCode:String?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case schemaId
+        case when
+        case configurationCode
+        case env
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+        when = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .when)
+        configurationCode = try container.decodeIfPresent(String.self, forKey: .configurationCode)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+        if when != nil { try container.encode(when, forKey: .when) }
+        if configurationCode != nil { try container.encode(configurationCode, forKey: .configurationCode) }
+        if env != nil { try container.encode(env, forKey: .env) }
+    }
+}
+
+// @DataContract
+public class SchemaTriggerProjectionList : TriggerProjectionList
+{
+    // @DataMember
+    public var type:SchemaTriggerType?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case env
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchemaTriggerType.self, forKey: .type)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if env != nil { try container.encode(env, forKey: .env) }
+    }
+}
+
+public class TaxonomyDto : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var slug:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var termsMetaDataSchema:DataSchemaDto?
+
+    // @DataMember
+    public var termsMetaVisualSchema:VisualSchemaDto?
+
+    // @DataMember
+    public var dependencies:[String]?
+
+    required public init(){}
+}
+
+public class TaxonomyListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var taxonomyName:String?
+
+    // @DataMember
+    public var taxonomySlug:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var dependencies:[String]?
+
+    // @DataMember
+    public var parentName:String?
+
+    // @DataMember
+    public var dependencyRefs:[TaxonomyRef]?
+
+    required public init(){}
+}
+
+public class TaxonomyTreeDto : Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var taxonomyName:String?
+
+    // @DataMember
+    public var taxonomySlug:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var children:[TaxonomyTreeDto]?
+
+    // @DataMember
+    public var terms:[TermTreeDto]?
+
+    required public init(){}
+}
+
+public class TermDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var taxonomyId:String?
+
+    // @DataMember
+    public var taxonomyName:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var order:Int?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var names:[String:String]?
+
+    // @DataMember
+    public var slug:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var descriptions:[String:String]?
+
+    // @DataMember
+    public var multiParents:[TermMultiParentDto]?
+
+    // @DataMember
+    public var meta:String?
+
+    required public init(){}
+}
+
+public class TermTreeDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var taxonomyId:String?
+
+    // @DataMember
+    public var taxonomyName:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var order:Int?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var names:[String:String]?
+
+    // @DataMember
+    public var slug:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var descriptions:[String:String]?
+
+    // @DataMember
+    public var multiParents:[TermMultiParentDto]?
+
+    // @DataMember
+    public var meta:String?
+
+    // @DataMember
+    public var children:[TermTreeDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AppliedTaxonomyDto : Codable
+{
+    // @DataMember
+    public var catalogId:String?
+
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var slug:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var action:String?
+
+    // @DataMember
+    public var termsCreated:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AppliedCollectionDto : Codable
+{
+    // @DataMember
+    public var entity:String?
+
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var action:String?
+
+    // @DataMember
+    public var published:Bool?
+
+    // @DataMember
+    public var linkedFields:[String] = []
+
+    required public init(){}
+}
+
+public class SchemaDto : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var schemaName:String?
+
+    // @DataMember
+    public var schemaSlug:String?
+
+    // @DataMember
+    public var version:Int?
+
+    // @DataMember
+    public var metaSchemaVersion:Int?
+
+    // @DataMember
+    public var dataSchema:DataSchemaDto?
+
+    // @DataMember
+    public var visualSchema:VisualSchemaDto?
+
+    // @DataMember
+    public var publishedAt:Date?
+
+    // @DataMember
+    public var settings:SchemaSettingsDto?
+
+    // @DataMember
+    public var embed:SchemaEmbedSettingsDto?
+
+    // @DataMember
+    public var triggers:[TriggerDto]?
+
+    required public init(){}
+}
+
+public class SchemaListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var schemaName:String?
+
+    // @DataMember
+    public var schemaTitle:String?
+
+    // @DataMember
+    public var latestVersion:Int?
+
+    // @DataMember
+    public var hasDraft:Bool?
+
+    // @DataMember
+    public var metaSchemaVersion:Int?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){}
+}
+
+public class SchemaDraftDto : Codable
+{
+    // @DataMember
+    public var dataSchema:DataSchemaDto?
+
+    // @DataMember
+    public var visualSchema:VisualSchemaDto?
+
+    // @DataMember
+    public var updatedAt:Date?
+
+    required public init(){}
+}
+
+public class SchemaIndexStatusDto : Codable
+{
+    // @DataMember
+    public var schemaId:String?
+
+    // @DataMember
+    public var env:String?
+
+    // @DataMember
+    public var collection:String?
+
+    // @DataMember
+    public var state:String?
+
+    // @DataMember
+    public var integrations:[SchemaIndexIntegrationStatusDto] = []
+
+    // @DataMember
+    public var lastRunUtc:Date?
+
+    required public init(){}
+}
+
+public class SchemaDiffDto : Codable
+{
+    // @DataMember
+    public var fromVersion:Int?
+
+    // @DataMember
+    public var toVersion:Int?
+
+    // @DataMember
+    public var added:[String] = []
+
+    // @DataMember
+    public var removed:[String] = []
+
+    // @DataMember
+    public var typeChanged:[String] = []
+
+    // @DataMember
+    public var validatorTightened:[String] = []
+
+    required public init(){}
+}
+
+public class SchemaVersionSummaryDto : Codable
+{
+    // @DataMember
+    public var version:Int?
+
+    // @DataMember
+    public var metaSchemaVersion:Int?
+
+    // @DataMember
+    public var publishedAt:Date?
+
+    required public init(){}
+}
+
+public class CollectionIndexDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var keys:[CollectionIndexKeyDto] = []
+
+    // @DataMember
+    public var createdByNorbix:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SeedCollectionRecordsResultDto : Codable
+{
+    // @DataMember
+    public var insertOrder:[String] = []
+
+    // @DataMember
+    public var report:[SeedCollectionReportItemDto] = []
+
+    required public init(){}
+}
+
+public class DatabaseIntegrationDto : IntegrationDto
+{
+    public var provider:DatabaseProvider?
+    public var isSystemOwned:Bool?
+    public var canManageIndexes:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case isSystemOwned
+        case canManageIndexes
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
+        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
+        canManageIndexes = try container.decodeIfPresent(Bool.self, forKey: .canManageIndexes)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
+        if canManageIndexes != nil { try container.encode(canManageIndexes, forKey: .canManageIndexes) }
+    }
+}
+
+public class DatabaseIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:DatabaseProvider?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case env
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(DatabaseProvider.self, forKey: .provider)
+        env = try container.decodeIfPresent(String.self, forKey: .env)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if env != nil { try container.encode(env, forKey: .env) }
+    }
+}
+
+// @DataContract
+public class FlexTierDto : Codable
+{
+    // @DataMember
+    public var code:String?
+
+    // @DataMember
+    public var step:Int?
+
+    // @DataMember
+    public var displayName:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class IntegrationTestResultItemDto : Codable
+{
+    // @DataMember
+    public var operation:String?
+
+    // @DataMember
+    public var result:String?
+
+    // @DataMember
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+public class CollectionImportDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var schema:SchemaRefDto?
+
+    // @DataMember
+    public var file:FileResourceRefDto?
+
+    // @DataMember
+    public var errorFile:FileResourceRefDto?
+
+    // @DataMember
+    public var delimiter:String?
+
+    // @DataMember
+    public var hasHeader:Bool?
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var totalRows:Int?
+
+    // @DataMember
+    public var totalImported:Int?
+
+    // @DataMember
+    public var totalErrors:Int?
+
+    // @DataMember
+    public var failureReason:String?
+
+    // @DataMember
+    public var mapping:[ImportColumnMappingDto]?
+
+    // @DataMember
+    public var createdOn:Date?
+
+    // @DataMember
+    public var startedOn:Date?
+
+    // @DataMember
+    public var completedOn:Date?
+
+    required public init(){}
+}
+
+public class ImportUploadTargetDto : Codable
+{
+    // @DataMember
+    public var url:String?
+
+    // @DataMember
+    public var contentType:String?
+
+    // @DataMember
+    public var file:FileResourceRefDto?
+
+    required public init(){}
+}
+
+public class ImportFileAnalysisDto : Codable
+{
+    // @DataMember
+    public var file:FileResourceRefDto?
+
+    // @DataMember
+    public var columns:[ImportFileColumnDto] = []
+
+    // @DataMember
+    public var sampleRowCount:Int?
+
+    required public init(){}
+}
+
+public class MongoDbAggregateListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var schemaViewId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class FilesTriggerDto : TriggerDto
+{
+    // @DataMember
+    public var when:FilesTriggerType?
+
+    // @DataMember
+    public var folder:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case when
+        case folder
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        when = try container.decodeIfPresent(FilesTriggerType.self, forKey: .when)
+        folder = try container.decodeIfPresent(String.self, forKey: .folder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if when != nil { try container.encode(when, forKey: .when) }
+        if folder != nil { try container.encode(folder, forKey: .folder) }
+    }
+}
+
+// @DataContract
+public class FilesTriggerProjectionList : TriggerProjectionList
+{
+    // @DataMember
+    public var type:FilesTriggerType?
+
+    // @DataMember
+    public var folder:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case folder
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(FilesTriggerType.self, forKey: .type)
+        folder = try container.decodeIfPresent(String.self, forKey: .folder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if folder != nil { try container.encode(folder, forKey: .folder) }
+    }
+}
+
+public class FilesIntegrationDto : IntegrationDto
+{
+    public var provider:FileProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(FileProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class FilesIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:FileProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(FileProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public enum FileProvider : String, Codable
+{
+    case Local
+    case AwsS3
+    case AzureBlobStorage
+    case GoogleCloudStorage
+    case Ftp
+    case AppleICloud
+    case DropBox
+    case GoogleDrive
+}
+
+// @DataContract
+public class PublicFolderDto : Codable
+{
+    // @DataMember(Order=1)
+    public var path:String?
+
+    // @DataMember(Order=2)
+    public var publicId:String?
+
+    // @DataMember(Order=3)
+    public var publicUrl:String?
+
+    // @DataMember(Order=4)
+    public var inherited:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class NotificationModuleDisableDependenciesDto : Codable
+{
+    // @DataMember
+    public var triggers:[NotificationModuleDependencyItemDto] = []
+
+    // @DataMember
+    public var schedulerTasks:[NotificationModuleDependencyItemDto] = []
+
+    // @DataMember
+    public var inFlightCampaigns:[NotificationModuleDependencyItemDto] = []
+
+    // @DataMember
+    public var membershipSettings:[NotificationModuleDependencyItemDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class TestEmailValidationItemDto : Codable
+{
+    // @DataMember
+    public var address:String?
+
+    // @DataMember
+    public var verdict:String?
+
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var score:Double?
+
+    required public init(){}
+}
+
+public class EmailTemplateListProjection : TemplateListProjection
+{
+    public var hasAttachments:Bool?
+    public var languages:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case hasAttachments
+        case languages
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        hasAttachments = try container.decodeIfPresent(Bool.self, forKey: .hasAttachments)
+        languages = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .languages)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if hasAttachments != nil { try container.encode(hasAttachments, forKey: .hasAttachments) }
+        if languages != nil { try container.encode(languages, forKey: .languages) }
+    }
+}
+
+// @DataContract
+public class HtmlFromMjmlResponse : Codable
+{
+    // @DataMember(Name="html")
+    public var html:String?
+
+    // @DataMember(Name="errors")
+    public var errors:[MjmlParseError] = []
+
+    required public init(){}
+}
+
+public class SystemEmailTemplateListProjection : EmailTemplateListProjection
+{
+    // @DataMember
+    public var imagePreview:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var theme:SystemEmailTemplateTheme?
+
+    // @DataMember
+    public var systemTags:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case imagePreview
+        case Description
+        case theme
+        case systemTags
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        imagePreview = try container.decodeIfPresent(String.self, forKey: .imagePreview)
+        Description = try container.decodeIfPresent(String.self, forKey: .Description)
+        theme = try container.decodeIfPresent(SystemEmailTemplateTheme.self, forKey: .theme)
+        systemTags = try container.decodeIfPresent([String].self, forKey: .systemTags) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if imagePreview != nil { try container.encode(imagePreview, forKey: .imagePreview) }
+        if Description != nil { try container.encode(Description, forKey: .Description) }
+        if theme != nil { try container.encode(theme, forKey: .theme) }
+        if systemTags != nil { try container.encode(systemTags, forKey: .systemTags) }
+    }
+}
+
+// @DataContract
+public class EmailSignatureDto : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var translations:[TranslationDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class ListItemWithTranslationsProjection : ListItemProjection
+{
+    // @DataMember
+    public var translations:[String] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case translations
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        translations = try container.decodeIfPresent([String].self, forKey: .translations) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if translations.count > 0 { try container.encode(translations, forKey: .translations) }
+    }
+}
+
+public class EmailSettings : IBindableContract, Codable
+{
+    public var signatures:IList<EmailSignatureDto>?
+    public var footers:IList<EmailFooterDto>?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DomainHealthRecordItemDto : Codable
+{
+    // @DataMember
+    public var record:String?
+
+    // @DataMember
+    public var value:String?
+
+    required public init(){}
+}
+
+public class EmailIntegrationDto : IntegrationDto
+{
+    public var provider:EmailProvider?
+    public var emailAddress:String?
+    public var emailSenderName:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case emailAddress
+        case emailSenderName
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(EmailProvider.self, forKey: .provider)
+        emailAddress = try container.decodeIfPresent(String.self, forKey: .emailAddress)
+        emailSenderName = try container.decodeIfPresent(String.self, forKey: .emailSenderName)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if emailAddress != nil { try container.encode(emailAddress, forKey: .emailAddress) }
+        if emailSenderName != nil { try container.encode(emailSenderName, forKey: .emailSenderName) }
+    }
+}
+
+public class EmailIntegrationListProjection : IntegrationListProjection
+{
+    public var emailProvider:EmailProvider?
+    public var senderEmailAddress:String?
+    public var senderDisplayName:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case emailProvider
+        case senderEmailAddress
+        case senderDisplayName
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        emailProvider = try container.decodeIfPresent(EmailProvider.self, forKey: .emailProvider)
+        senderEmailAddress = try container.decodeIfPresent(String.self, forKey: .senderEmailAddress)
+        senderDisplayName = try container.decodeIfPresent(String.self, forKey: .senderDisplayName)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if emailProvider != nil { try container.encode(emailProvider, forKey: .emailProvider) }
+        if senderEmailAddress != nil { try container.encode(senderEmailAddress, forKey: .senderEmailAddress) }
+        if senderDisplayName != nil { try container.encode(senderDisplayName, forKey: .senderDisplayName) }
+    }
+}
+
+// @DataContract
+public class EmailFooterDto : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var translations:[TranslationDto] = []
+
+    required public init(){}
+}
+
+public class EmailLinkPreferencesDto : Codable
+{
+    public var emailAddress:String?
+    public var unsubscribedFromMarketing:Bool?
+    public var blockReasons:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class EmailCampaignDto : CampaignDto
+{
+    // @DataMember
+    public var deliverySettings:EmailCampaignDeliverySettingsDto?
+
+    // @DataMember
+    public var template:EmailTemplateDto?
+
+    // @DataMember
+    public var validationIntegrationId:String?
+
+    // @DataMember
+    public var templateIsSystem:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case deliverySettings
+        case template
+        case validationIntegrationId
+        case templateIsSystem
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        deliverySettings = try container.decodeIfPresent(EmailCampaignDeliverySettingsDto.self, forKey: .deliverySettings)
+        template = try container.decodeIfPresent(EmailTemplateDto.self, forKey: .template)
+        validationIntegrationId = try container.decodeIfPresent(String.self, forKey: .validationIntegrationId)
+        templateIsSystem = try container.decodeIfPresent(Bool.self, forKey: .templateIsSystem)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if deliverySettings != nil { try container.encode(deliverySettings, forKey: .deliverySettings) }
+        if template != nil { try container.encode(template, forKey: .template) }
+        if validationIntegrationId != nil { try container.encode(validationIntegrationId, forKey: .validationIntegrationId) }
+        if templateIsSystem != nil { try container.encode(templateIsSystem, forKey: .templateIsSystem) }
+    }
+}
+
+// @DataContract
+public class EmailCampaignListProjection : Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var templateName:String?
+
+    // @DataMember
+    public var templateId:String?
+
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var strategy:String?
+
+    // @DataMember
+    public var latestStatus:CampaignStatus?
+
+    // @DataMember
+    public var createdOn:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class EmailCampaignBatchDto : CampaignBatchDto
+{
+    // @DataMember
+    public var recipients:EmailRecipientsDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(EmailRecipientsDto.self, forKey: .recipients)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+    }
+}
+
+// @DataContract
+public class EmailCampaignBatchNotificationDto : CampaignBatchNotificationDto
+{
+    // @DataMember
+    public var subject:String?
+
+    // @DataMember
+    public var recipients:EmailRecipientsDto?
+
+    // @DataMember
+    public var content:EmailMessageContentDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case subject
+        case recipients
+        case content
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        recipients = try container.decodeIfPresent(EmailRecipientsDto.self, forKey: .recipients)
+        content = try container.decodeIfPresent(EmailMessageContentDto.self, forKey: .content)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if subject != nil { try container.encode(subject, forKey: .subject) }
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+        if content != nil { try container.encode(content, forKey: .content) }
+    }
+}
+
+public class BatchStatusChangeEntryDto : Codable
+{
+    public var time:Date?
+    public var status:CampaignBatchStatus?
+    public var errors:[ErrorDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CampaignStatsDto : Codable
+{
+    // @DataMember
+    public var batches:Int?
+
+    // @DataMember
+    public var sent:Int?
+
+    // @DataMember
+    public var failed:Int?
+
+    // @DataMember
+    public var successRate:Double?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SmsTemplateListProjection : TemplateListProjection
+{
+    // @DataMember
+    public var languages:[String] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case languages
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        languages = try container.decodeIfPresent([String].self, forKey: .languages) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if languages.count > 0 { try container.encode(languages, forKey: .languages) }
+    }
+}
+
+public class SmsSettings : IBindableContract, Codable
+{
+    required public init(){}
+}
+
+public class SmsIntegrationDto : IntegrationDto
+{
+    public var provider:SmsProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(SmsProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class SmsIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:SmsProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(SmsProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+// @DataContract
+public class SmsCampaignDto : CampaignDto
+{
+    // @DataMember
+    public var recipients:SmsCampaignDeliverySettingsDto?
+
+    // @DataMember
+    public var template:SmsTemplateDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+        case template
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(SmsCampaignDeliverySettingsDto.self, forKey: .recipients)
+        template = try container.decodeIfPresent(SmsTemplateDto.self, forKey: .template)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+        if template != nil { try container.encode(template, forKey: .template) }
+    }
+}
+
+// @DataContract
+public class SmsCampaignBatchDto : CampaignBatchDto
+{
+    // @DataMember
+    public var recipients:SmsRecipientsDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(SmsRecipientsDto.self, forKey: .recipients)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+    }
+}
+
+// @DataContract
+public class SmsCampaignBatchNotificationDto : CampaignBatchNotificationDto
+{
+    // @DataMember
+    public var recipients:SmsRecipientsDto?
+
+    // @DataMember
+    public var content:SmsMessageContentDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+        case content
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(SmsRecipientsDto.self, forKey: .recipients)
+        content = try container.decodeIfPresent(SmsMessageContentDto.self, forKey: .content)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+        if content != nil { try container.encode(content, forKey: .content) }
+    }
+}
+
+// @DataContract
+public class MarketplaceListingProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var slug:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var vendor:String?
+
+    // @DataMember
+    public var category:MarketplaceCategory?
+
+    // @DataMember
+    public var transport:MarketplaceTransport?
+
+    // @DataMember
+    public var iconUrl:String?
+
+    // @DataMember
+    public var isOfficial:Bool?
+
+    // @DataMember
+    public var tags:IReadOnlyList<String>?
+
+    // @DataMember
+    public var functionCount:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceIntegrationListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var integrationName:String?
+
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var listingViewId:String?
+
+    // @DataMember
+    public var vendor:String?
+
+    // @DataMember
+    public var category:MarketplaceCategory?
+
+    // @DataMember
+    public var transport:MarketplaceTransport?
+
+    // @DataMember
+    public var lastIntegrationTestAtUtc:Date?
+
+    // @DataMember
+    public var lastIntegrationTestSucceeded:Bool?
+
+    // @DataMember
+    public var lastIntegrationTestErrors:IReadOnlyList<String>?
+
+    // @DataMember
+    public var humanDeliveryConfirmedAtUtc:Date?
+
+    // @DataMember
+    public var requiresHumanDeliveryConfirmation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceFunctionProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var integrationViewId:String?
+
+    // @DataMember
+    public var functionKey:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var mappingCount:Int?
+
+    required public init(){}
+}
+
+public class CodeIntegrationDto : IntegrationDto
+{
+    public var provider:CodeProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(CodeProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class CodeIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:CodeProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(CodeProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+// @DataContract
+public class CodeFunctionDescriptorDto : Codable
+{
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var runtime:String?
+
+    // @DataMember
+    public var region:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var lastModified:Date?
+
+    // @DataMember
+    public var tags:[String:String]?
+
+    // @DataMember
+    public var arn:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionQualifierDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var kind:CodeFunctionQualifierKindDto?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var targetVersion:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeFunctionRunDto : Codable
+{
+    // @DataMember
+    public var firedAt:Date?
+
+    // @DataMember
+    public var event:String?
+
+    // @DataMember
+    public var source:String?
+
+    // @DataMember
+    public var succeeded:Bool?
+
+    // @DataMember
+    public var statusCode:Int?
+
+    // @DataMember
+    public var durationMs:Int?
+
+    // @DataMember
+    public var error:String?
+
+    // @DataMember
+    public var requestId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushTemplateListProjection : TemplateListProjection
+{
+    // @DataMember
+    public var languages:[String] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case languages
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        languages = try container.decodeIfPresent([String].self, forKey: .languages) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if languages.count > 0 { try container.encode(languages, forKey: .languages) }
+    }
+}
+
+public class PushSettings : Codable
+{
+    public var marketingTags:[TagDefinitionDto]?
+    public var transactionalTags:[TagDefinitionDto]?
+
+    required public init(){}
+}
+
+public class PushIntegrationDto : IntegrationDto
+{
+    public var provider:PushProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(PushProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class PushIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:PushProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(PushProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+// @DataContract
+public class PushDeviceListProjection : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var deviceOs:String?
+
+    // @DataMember
+    public var token:String?
+
+    // @DataMember
+    public var brand:String?
+
+    // @DataMember
+    public var manufacturer:String?
+
+    // @DataMember
+    public var modelName:String?
+
+    // @DataMember
+    public var deviceName:String?
+
+    // @DataMember
+    public var deviceType:String?
+
+    // @DataMember
+    public var osName:String?
+
+    // @DataMember
+    public var osVersion:String?
+
+    // @DataMember
+    public var platformApiLevel:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushAudienceCountDto : Codable
+{
+    // @DataMember
+    public var devices:Int?
+
+    // @DataMember
+    public var recipients:Int?
+
+    // @DataMember
+    public var skippedUserIds:Int?
+
+    // @DataMember
+    public var isCapped:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushCampaignDto : CampaignDto
+{
+    // @DataMember
+    public var recipients:PushCampaignDeliverySettingsDto?
+
+    // @DataMember
+    public var template:PushTemplateDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+        case template
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(PushCampaignDeliverySettingsDto.self, forKey: .recipients)
+        template = try container.decodeIfPresent(PushTemplateDto.self, forKey: .template)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+        if template != nil { try container.encode(template, forKey: .template) }
+    }
+}
+
+// @DataContract
+public class PushCampaignBatchDto : CampaignBatchDto
+{
+    // @DataMember
+    public var recipients:PushRecipientsDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case recipients
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        recipients = try container.decodeIfPresent(PushRecipientsDto.self, forKey: .recipients)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+    }
+}
+
+// @DataContract
+public class PushCampaignBatchNotificationDto : CampaignBatchNotificationDto
+{
+    // @DataMember
+    public var subject:String?
+
+    // @DataMember
+    public var recipients:PushRecipientsDto?
+
+    // @DataMember
+    public var content:PushMessageContentDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case subject
+        case recipients
+        case content
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        subject = try container.decodeIfPresent(String.self, forKey: .subject)
+        recipients = try container.decodeIfPresent(PushRecipientsDto.self, forKey: .recipients)
+        content = try container.decodeIfPresent(PushMessageContentDto.self, forKey: .content)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if subject != nil { try container.encode(subject, forKey: .subject) }
+        if recipients != nil { try container.encode(recipients, forKey: .recipients) }
+        if content != nil { try container.encode(content, forKey: .content) }
+    }
+}
+
+public class PaymentsWebhookLogEntry : Codable
+{
+    public var integrationId:String?
+    public var source:String?
+    public var env:String?
+    public var eventName:String?
+    public var providerEventId:String?
+    public var statusCode:Int?
+    public var Description:String?
+    public var receivedOn:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PaymentTriggerDto : TriggerDto
+{
+    // @DataMember
+    public var when:PaymentTriggerType?
+
+    // @DataMember
+    public var integrations:[String]?
+
+    // @DataMember
+    public var events:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case when
+        case integrations
+        case events
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        when = try container.decodeIfPresent(PaymentTriggerType.self, forKey: .when)
+        integrations = try container.decodeIfPresent([String].self, forKey: .integrations) ?? []
+        events = try container.decodeIfPresent([String].self, forKey: .events) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if when != nil { try container.encode(when, forKey: .when) }
+        if integrations != nil { try container.encode(integrations, forKey: .integrations) }
+        if events != nil { try container.encode(events, forKey: .events) }
+    }
+}
+
+// @DataContract
+public class PaymentTriggerProjectionList : TriggerProjectionList
+{
+    // @DataMember
+    public var type:PaymentTriggerType?
+
+    // @DataMember
+    public var integrations:[String]?
+
+    // @DataMember
+    public var events:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case integrations
+        case events
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(PaymentTriggerType.self, forKey: .type)
+        integrations = try container.decodeIfPresent([String].self, forKey: .integrations) ?? []
+        events = try container.decodeIfPresent([String].self, forKey: .events) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if integrations != nil { try container.encode(integrations, forKey: .integrations) }
+        if events != nil { try container.encode(events, forKey: .events) }
+    }
+}
+
+public class PaymentsIntegrationDto : IntegrationDto
+{
+    public var gatewayPlatform:PaymentGatewayPlatform?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case gatewayPlatform
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        gatewayPlatform = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .gatewayPlatform)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if gatewayPlatform != nil { try container.encode(gatewayPlatform, forKey: .gatewayPlatform) }
+    }
+}
+
+public class PaymentsIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var gatewayPlatform:PaymentGatewayPlatform?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case gatewayPlatform
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        gatewayPlatform = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .gatewayPlatform)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if gatewayPlatform != nil { try container.encode(gatewayPlatform, forKey: .gatewayPlatform) }
+    }
+}
+
+public class LoggingIntegrationDto : IntegrationDto
+{
+    public var provider:LoggingProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(LoggingProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+public class LoggingIntegrationListProjection : IntegrationListProjection
+{
+    // @DataMember
+    public var provider:LoggingProvider?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(LoggingProvider.self, forKey: .provider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+    }
+}
+
+// @DataContract
+public class TenantLogEntryDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var timestamp:Date?
+
+    // @DataMember
+    public var module:String?
+
+    // @DataMember
+    public var level:String?
+
+    // @DataMember
+    public var eventCode:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var message:String?
+
+    // @DataMember
+    public var correlationId:String?
+
+    // @DataMember
+    public var traceId:String?
+
+    // @DataMember
+    public var spanId:String?
+
+    // @DataMember
+    public var env:String?
+
+    // @DataMember
+    public var meta:IReadOnlyDictionary<String, String>?
+
+    required public init(){}
+}
+
+public class AgentOnboardingSnippet : Codable
+{
+    public var client:String?
+    public var config:String?
+    public var auth:String?
+    public var kind:String?
+    public var recommended:Bool?
+
+    required public init(){}
+}
+
+public class AiToolManifestItem : Codable
+{
+    public var name:String?
+    public var Description:String?
+    public var toolsets:[String] = []
+    public var requiresConfirmation:Bool?
+    public var parameters:[AiToolManifestParameter] = []
+
+    required public init(){}
+}
+
+public class ChatModelOption : Codable
+{
+    public var llmIntegrationId:String?
+    public var kind:String?
+    public var provider:String?
+    public var model:String?
+    public var label:String?
+    public var isDefault:Bool?
+    public var isAuto:Bool?
+    public var contextWindow:Int?
+
+    required public init(){}
+}
+
+public class ChatMemoryNote : Codable
+{
+    public var id:String?
+    public var kind:String?
+    public var text:String?
+    public var projectId:String?
+    public var createdAtUtc:Date?
+
+    required public init(){}
+}
+
+public class ChatSessionListItem : Codable
+{
+    public var sessionId:String?
+    public var profile:String?
+    public var projectId:String?
+    public var env:String?
+    public var title:String?
+    public var updatedAtUtc:Date?
+    public var isArchived:Bool?
+    public var isPinned:Bool?
+
+    required public init(){}
+}
+
+public class AiChatEntryWireDto : Codable
+{
+    public var kind:String?
+    public var id:String?
+    public var seq:Int?
+    public var atUtc:Date?
+    public var refEntryId:String?
+    public var workItemId:String?
+    public var feedback:String?
+    public var feedbackAtUtc:Date?
+    public var feedbackByUserAuthId:String?
+
+    required public init(){}
+}
+
+public class ScaffoldStep : Codable
+{
+    public var order:Int?
+    public var kind:String?
+    public var title:String?
+    public var tool:String?
+    public var arguments:JsonObject?
+    public var checkTool:String?
+    public var templateRef:String?
+
+    required public init(){}
+}
+
+public class ScaffoldIssue : Codable
+{
+    public var `where`:String?
+    public var code:String?
+    public var message:String?
+
+    required public init(){}
+}
+
+public class ScaffoldApplyReport : Codable
+{
+    public var completed:Bool?
+    public var projectId:String?
+    public var projectUrl:String?
+    public var summary:String?
+    public var steps:[ScaffoldStepReportWithLink] = []
+
+    required public init(){}
+}
+
+public class TemplatePreview : Codable
+{
+    public var channel:String?
+    public var ok:Bool?
+    public var parts:IReadOnlyList<TemplatePreviewPartResult>?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+public class ProjectBriefSnapshotWireDto : Codable
+{
+    public var projectId:String?
+    public var upToSeq:Int?
+    public var atUtc:Date?
+    public var requirements:[ProjectBriefRequirementWireDto] = []
+    public var decisions:[ProjectBriefDecisionWireDto] = []
+    public var openAssumptions:[ProjectBriefAssumptionWireDto] = []
+    public var summary:String?
+
+    required public init(){}
+}
+
+public class ProjectBriefEventWireDto : Codable
+{
+    public var id:String?
+    public var projectId:String?
+    public var seq:Int?
+    public var atUtc:Date?
+    public var kind:String?
+    public var requirementId:String?
+    public var supersedesEventId:String?
+    public var text:String?
+    public var confidence:Double?
+    public var sources:[ProjectBriefSourceWireDto] = []
+    public var origin:String?
+    public var satisfiedBy:[ProjectBriefSatisfiedByWireDto] = []
+
+    required public init(){}
+}
+
+public class WorkItemWireDto : Codable
+{
+    public var id:String?
+    public var projectId:String?
+    public var status:String?
+    public var goal:String?
+    public var notInScope:[String] = []
+    public var scopeRequirementIds:[String] = []
+    public var difficulty:Int?
+    public var difficultyReason:String?
+    public var planEntryRefs:[WorkItemEntryRefWireDto] = []
+    public var runRefs:[WorkItemRunRefWireDto] = []
+    public var artifacts:[WorkItemArtifactWireDto] = []
+    public var movedOut:[WorkItemMovedOutWireDto] = []
+    public var needsYou:[WorkItemNeedsYouWireDto] = []
+    public var openQuestions:[WorkItemOpenQuestionWireDto] = []
+    public var sessionIds:[String] = []
+    public var parentId:String?
+    public var children:[String] = []
+    public var summaryEntryRef:WorkItemEntryRefWireDto?
+    public var createdBy:String?
+    public var createdAtUtc:Date?
+    public var updatedAtUtc:Date?
+    public var doneVerdict:String?
+    public var doneConditions:[WorkItemDoneConditionWireDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiTriggerProjectionList : TriggerProjectionList
+{
+    // @DataMember
+    public var type:AiTriggerType?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(AiTriggerType.self, forKey: .type)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+    }
+}
+
+// @DataContract
+public class AiTriggerDto : TriggerDto
+{
+    // @DataMember
+    public var when:AiTriggerType?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case when
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        when = try container.decodeIfPresent(AiTriggerType.self, forKey: .when)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if when != nil { try container.encode(when, forKey: .when) }
+    }
+}
+
+// @DataContract
+public class AiRoleDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var isSystem:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiProjectRolesDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var roles:[AiRoleDto] = []
+
+    required public init(){}
+}
+
+public class EmbeddingIntegrationDto : IntegrationDto
+{
+    public var provider:EmbeddingProvider?
+    public var model:String?
+    public var dimension:Int?
+    public var baseUrl:String?
+    public var isConfigured:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case model
+        case dimension
+        case baseUrl
+        case isConfigured
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .provider)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
+        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
+        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+    }
+}
+
+public class EmbeddingIntegrationListProjection : IntegrationListProjection
+{
+    public var embeddingProvider:EmbeddingProvider?
+    public var model:String?
+    public var dimension:Int?
+    public var isConfigured:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case embeddingProvider
+        case model
+        case dimension
+        case isConfigured
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        embeddingProvider = try container.decodeIfPresent(EmbeddingProvider.self, forKey: .embeddingProvider)
+        model = try container.decodeIfPresent(String.self, forKey: .model)
+        dimension = try container.decodeIfPresent(Int.self, forKey: .dimension)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if embeddingProvider != nil { try container.encode(embeddingProvider, forKey: .embeddingProvider) }
+        if model != nil { try container.encode(model, forKey: .model) }
+        if dimension != nil { try container.encode(dimension, forKey: .dimension) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+    }
+}
+
+public class LlmIntegrationDto : IntegrationDto
+{
+    public var provider:LlmProvider?
+    public var baseUrl:String?
+    public var defaultModel:String?
+    public var isConfigured:Bool?
+    public var isSystemOwned:Bool?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case baseUrl
+        case defaultModel
+        case isConfigured
+        case isSystemOwned
+        case isDefault
+        case models
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(LlmProvider.self, forKey: .provider)
+        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
+        defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
+        if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+        if models.count > 0 { try container.encode(models, forKey: .models) }
+    }
+}
+
+public class LlmIntegrationListProjection : IntegrationListProjection
+{
+    public var llmProvider:LlmProvider?
+    public var baseUrl:String?
+    public var defaultModel:String?
+    public var isDefault:Bool?
+    public var models:[LlmModelOptionDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case llmProvider
+        case baseUrl
+        case defaultModel
+        case isDefault
+        case models
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        llmProvider = try container.decodeIfPresent(LlmProvider.self, forKey: .llmProvider)
+        baseUrl = try container.decodeIfPresent(String.self, forKey: .baseUrl)
+        defaultModel = try container.decodeIfPresent(String.self, forKey: .defaultModel)
+        isDefault = try container.decodeIfPresent(Bool.self, forKey: .isDefault)
+        models = try container.decodeIfPresent([LlmModelOptionDto].self, forKey: .models) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if llmProvider != nil { try container.encode(llmProvider, forKey: .llmProvider) }
+        if baseUrl != nil { try container.encode(baseUrl, forKey: .baseUrl) }
+        if defaultModel != nil { try container.encode(defaultModel, forKey: .defaultModel) }
+        if isDefault != nil { try container.encode(isDefault, forKey: .isDefault) }
+        if models.count > 0 { try container.encode(models, forKey: .models) }
+    }
+}
+
+public class McpIntegrationDto : IntegrationDto
+{
+    public var provider:McpProvider?
+    public var transport:McpTransport?
+    public var metadata:McpMetadata?
+    public var isConfigured:Bool?
+    public var isSystemOwned:Bool?
+    public var command:String?
+    public var args:[String]?
+    public var serverUrl:String?
+    public var auth:McpAuth?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case transport
+        case metadata
+        case isConfigured
+        case isSystemOwned
+        case command
+        case args
+        case serverUrl
+        case auth
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(McpProvider.self, forKey: .provider)
+        transport = try container.decodeIfPresent(McpTransport.self, forKey: .transport)
+        metadata = try container.decodeIfPresent(McpMetadata.self, forKey: .metadata)
+        isConfigured = try container.decodeIfPresent(Bool.self, forKey: .isConfigured)
+        isSystemOwned = try container.decodeIfPresent(Bool.self, forKey: .isSystemOwned)
+        command = try container.decodeIfPresent(String.self, forKey: .command)
+        args = try container.decodeIfPresent([String].self, forKey: .args) ?? []
+        serverUrl = try container.decodeIfPresent(String.self, forKey: .serverUrl)
+        auth = try container.decodeIfPresent(McpAuth.self, forKey: .auth)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if transport != nil { try container.encode(transport, forKey: .transport) }
+        if metadata != nil { try container.encode(metadata, forKey: .metadata) }
+        if isConfigured != nil { try container.encode(isConfigured, forKey: .isConfigured) }
+        if isSystemOwned != nil { try container.encode(isSystemOwned, forKey: .isSystemOwned) }
+        if command != nil { try container.encode(command, forKey: .command) }
+        if args != nil { try container.encode(args, forKey: .args) }
+        if serverUrl != nil { try container.encode(serverUrl, forKey: .serverUrl) }
+        if auth != nil { try container.encode(auth, forKey: .auth) }
+    }
+}
+
+public class McpIntegrationListProjection : IntegrationListProjection
+{
+    public var mcpProvider:McpProvider?
+    public var transport:McpTransport?
+    public var category:String?
+    public var Description:String?
+    public var icon:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case mcpProvider
+        case transport
+        case category
+        case Description
+        case icon
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        mcpProvider = try container.decodeIfPresent(McpProvider.self, forKey: .mcpProvider)
+        transport = try container.decodeIfPresent(McpTransport.self, forKey: .transport)
+        category = try container.decodeIfPresent(String.self, forKey: .category)
+        Description = try container.decodeIfPresent(String.self, forKey: .Description)
+        icon = try container.decodeIfPresent(String.self, forKey: .icon)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if mcpProvider != nil { try container.encode(mcpProvider, forKey: .mcpProvider) }
+        if transport != nil { try container.encode(transport, forKey: .transport) }
+        if category != nil { try container.encode(category, forKey: .category) }
+        if Description != nil { try container.encode(Description, forKey: .Description) }
+        if icon != nil { try container.encode(icon, forKey: .icon) }
+    }
+}
+
+public protocol IVirtualFile
+{
+    //virtualPathProvider:IVirtualPathProvider ignored. Swift doesn't support interface properties
+    var `extension`:String? { get set }
+    var length:Int? { get set }
+
+}
+
+// @Flags()
+public enum CacheControl : Int, Codable
+{
+    case None = 0
+    case Public = 1
+    case Private = 2
+    case MustRevalidate = 4
+    case NoCache = 8
+    case NoStore = 16
+    case NoTransform = 32
+    case ProxyRevalidate = 64
+}
+
+public protocol IContentTypeWriter
+{
+}
+
+public protocol IRequest
+{
+    var originalRequest:String? { get set }
+    //response:IResponse ignored. Swift doesn't support interface properties
+    var operationName:String? { get set }
+    var verb:String? { get set }
+    var requestAttributes:RequestAttributes? { get set }
+    //requestPreferences:IRequestPreferences ignored. Swift doesn't support interface properties
+    var dto:String? { get set }
+    var contentType:String? { get set }
+    var isLocal:Bool? { get set }
+    var userAgent:String? { get set }
+    var cookies:[String:Cookie]? { get set }
+    var responseContentType:String? { get set }
+    var hasExplicitResponseContentType:Bool? { get set }
+    var items:[String:String]? { get set }
+    var headers:NameValueCollection? { get set }
+    var queryString:NameValueCollection? { get set }
+    var formData:NameValueCollection? { get set }
+    var useBufferedStream:Bool? { get set }
+    var rawUrl:String? { get set }
+    var absoluteUri:String? { get set }
+    var userHostAddress:String? { get set }
+    var remoteIp:String? { get set }
+    var authorization:String? { get set }
+    var isSecureConnection:Bool? { get set }
+    var acceptTypes:[String]? { get set }
+    var pathInfo:String? { get set }
+    var originalPathInfo:String? { get set }
+    var inputStream:Data? { get set }
+    var contentLength:Int? { get set }
+    var files:[IHttpFile]? { get set }
+    var urlReferrer:Uri? { get set }
+    var requestAborted:CancellationToken? { get set }
+
+}
+
+// @DataContract
+public class SchedulerTaskListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var taskId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var cron:String?
+
+    // @DataMember
+    public var type:SchedulerTaskType?
+
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var isFailing:Bool?
+
+    // @DataMember
+    public var lastFailureReason:String?
+
+    // @DataMember
+    public var lastFailedAtUnix:Int?
+
+    // @DataMember
+    public var viewId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SchedulerTaskRunDto : Codable
+{
+    // @DataMember
+    public var logId:String?
+
+    // @DataMember
+    public var atUtc:Date?
+
+    // @DataMember
+    public var atUnix:Int?
+
+    // @DataMember
+    public var outcome:SchedulerTaskRunOutcome?
+
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var detail:String?
+
+    // @DataMember
+    public var correlationId:String?
+
+    required public init(){}
+}
+
+public class ResolvedResourceEntry : Codable
+{
+    public var ref:ResourceRefDto?
+    public var status:ResolvedRefStatus?
+    public var resolved:String?
+    public var diagnostic:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class UserDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var projectId:String?
+
+    // @DataMember
+    public var primaryEmail:String?
+
+    // @DataMember
+    public var primaryPhone:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    // @DataMember
+    public var firstName:String?
+
+    // @DataMember
+    public var lastName:String?
+
+    // @DataMember
+    public var fullName:String?
+
+    // @DataMember
+    public var company:String?
+
+    // @DataMember
+    public var locale:String?
+
+    // @DataMember
+    public var timeZone:String?
+
+    // @DataMember
+    public var gender:String?
+
+    // @DataMember
+    public var birthDate:Int?
+
+    // @DataMember
+    public var addressLine1:String?
+
+    // @DataMember
+    public var addressLine2:String?
+
+    // @DataMember
+    public var country:String?
+
+    // @DataMember
+    public var city:String?
+
+    // @DataMember
+    public var state:String?
+
+    // @DataMember
+    public var postalCode:String?
+
+    // @DataMember
+    public var tags:[String]?
+
+    // @DataMember
+    public var roles:[String]?
+
+    // @DataMember
+    public var lifecycle:String?
+
+    // @DataMember
+    public var sourceOfCreation:String?
+
+    // @DataMember
+    public var mergedIntoContactId:String?
+
+    // @DataMember
+    public var createdOn:Date?
+
+    // @DataMember
+    public var modifiedOn:Date?
+
+    // @DataMember
+    public var auths:[AuthDto]?
+
+    // @DataMember
+    public var marketingPreferences:[String:ChannelSubscriptionStateDto]?
+
+    required public init(){}
+}
+
+public class ProjectComplianceDto : Codable
+{
+    public var regimes:[String] = []
+    public var consentPurposes:[ConsentPurposeDto] = []
+    public var retentionWindows:[RetentionWindowDto] = []
+
+    required public init(){}
+}
+
+public class LegalHoldDto : Codable
+{
+    public var id:String?
+    public var subjectKind:String?
+    public var subjectId:String?
+    public var reason:String?
+    public var placedAt:Date?
+    public var placedBy:String?
+    public var releasedAt:Date?
+    public var releasedBy:String?
+
+    required public init(){}
+}
+
+public class DsarRequestDto : Codable
+{
+    public var id:String?
+    public var subjectKind:String?
+    public var subjectId:String?
+    public var status:String?
+    public var receivedAt:Date?
+    public var slaDeadline:Date?
+    public var autoApproveAt:Date?
+    public var decidedAt:Date?
+    public var decidedBy:String?
+    public var rejectionReason:String?
+
+    required public init(){}
+}
+
+public class ComplianceAuditEntryDto : Codable
+{
+    public var id:String?
+    public var timestamp:Date?
+    public var action:String?
+    public var subjectKind:String?
+    public var subjectId:String?
+    public var reason:String?
+    public var metadata:[String:String]?
+
+    required public init(){}
+}
+
+public class AccountComplianceDto : Codable
+{
+    public var dsarMode:String?
+    public var dsarDelayDays:Int?
+    public var autoForwardAdvisories:Bool?
+    public var securityContact:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SupportCaseDetailDto : Codable
+{
+    // @DataMember
+    public var `case`:SupportCaseDto?
+
+    // @DataMember
+    public var messages:[SupportCaseMessageDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class SupportCaseListProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var projectId:String?
+
+    // @DataMember
+    public var kind:SupportCaseKind?
+
+    // @DataMember
+    public var severity:SupportCaseSeverity?
+
+    // @DataMember
+    public var status:SupportCaseStatus?
+
+    // @DataMember
+    public var customerStatus:SupportCustomerStatus?
+
+    // @DataMember
+    public var subject:String?
+
+    // @DataMember
+    public var openedOn:Int?
+
+    // @DataMember
+    public var messageCount:Int?
+
+    // @DataMember
+    public var lastMessageOn:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticPackDescriptorDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var version:Int?
+
+    // @DataMember
+    public var summary:String?
+
+    // @DataMember
+    public var steps:[DiagnosticPackStepDescriptorDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticPackRunResultDto : Codable
+{
+    // @DataMember
+    public var packName:String?
+
+    // @DataMember
+    public var packVersion:Int?
+
+    // @DataMember
+    public var caseId:String?
+
+    // @DataMember
+    public var steps:[DiagnosticPackStepResultDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticEchoDto : Codable
+{
+    // @DataMember
+    public var containerName:String?
+
+    // @DataMember
+    public var isManagedService:Bool?
+
+    // @DataMember
+    public var apiVersion:String?
+
+    // @DataMember
+    public var hubVersion:String?
+
+    // @DataMember
+    public var release:String?
+
+    // @DataMember
+    public var runtime:String?
+
+    // @DataMember
+    public var hubUrl:String?
+
+    // @DataMember
+    public var apiUrl:String?
+
+    // @DataMember
+    public var licensePresent:Bool?
+
+    // @DataMember
+    public var regions:[DiagnosticEchoRegionDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticEventsPageDto : Codable
+{
+    // @DataMember
+    public var stream:String?
+
+    // @DataMember
+    public var from:Int?
+
+    // @DataMember
+    public var count:Int?
+
+    // @DataMember
+    public var hasMore:Bool?
+
+    // @DataMember
+    public var nextFrom:Int?
+
+    // @DataMember
+    public var items:[DiagnosticEventItemDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticLogsResponse : Codable
+{
+    // @DataMember
+    public var list:PaginatedResponse<TenantLogEntryDto>?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticRedisInspectDto : Codable
+{
+    // @DataMember
+    public var keyPattern:String?
+
+    // @DataMember
+    public var cacheKey:String?
+
+    // @DataMember
+    public var isList:Bool?
+
+    // @DataMember
+    public var item:[String:String]?
+
+    // @DataMember
+    public var listItems:[DiagnosticRedisListItemDto]?
+
+    // @DataMember
+    public var hasMore:Bool?
+
+    // @DataMember
+    public var startingAfter:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticHealthCheckDto : Codable
+{
+    // @DataMember
+    public var checkId:String?
+
+    // @DataMember
+    public var isHealthy:Bool?
+
+    // @DataMember
+    public var statusCode:Int?
+
+    // @DataMember
+    public var detail:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public enum EmailProvider : String, Codable
+{
+    case Smtp
+    case SendGrid
+    case MailGun
+    case AwsSes
+    case Fake
+}
+
+public enum SmtpPorts : Int, Codable
+{
+    case Default = 25
+    case Ssl = 465
+    case Tls = 587
+    case Fallback = 2525
+}
+
+public enum AwsIntegrationType : String, Codable
+{
+    case Iam
+    case CrossAccountRole
+}
+
+public enum MailGunRegion : String, Codable
+{
+    case Us
+    case Eu
+}
+
+public enum EmailCampaignRecipientsSourceTypes : String, Codable
+{
+    case AllUsers
+    case SpecifiedUsers
+    case AccountUsers
+    case Email
+    case Collection
+}
+
+public enum CollectionEmailCampaignRecipientField : String, Codable
+{
+    case User
+    case Email
+}
+
+public enum MembershipTriggerType : String, Codable
+{
+    case OnRegistered
+    case OnInvited
+    case OnVerified
+    case OnUpdated
+    case OnDeleted
+    case OnBlocked
+    case OnReactivated
+    case OnUserCreated
+}
+
+// @DataContract
+public class TriggerActionDto : Codable
+{
+    // @DataMember
+    public var type:TriggerActionType?
+
+    // @DataMember
+    public var integrationId:String?
+
+    required public init(){}
+}
+
+public enum SchemaTriggerType : String, Codable
+{
+    case OnInserted
+    case OnDeleted
+    case OnUpdated
+}
+
+public enum FilesTriggerType : String, Codable
+{
+    case OnFileUploaded
+    case OnFileDeleted
+}
+
+public enum PaymentTriggerType : String, Codable
+{
+    case OnOrderCreated
+    case OnOrderPaid
+    case OnWebhookCallReceived
+}
+
+public enum DatabaseProvider : String, Codable
+{
+    case MongoDbConnectionString
+    case CodeMashMongoDbAtlasFlexManaged
+}
+
+public enum AwsS3IntegrationType : String, Codable
+{
+    case Iam
+    case CrossAccountRole
+}
+
+public enum LoggingProvider : String, Codable
+{
+    case Console
+    case NorbixLogging
+    case DataDog
+    case NewRelic
+    case Sentry
+    case GrafanaLoki
+    case Axiom
+    case ElasticCloud
+    case AWSCloudWatch
+    case GCPCloudLogging
+    case AzureMonitorLogs
+    case GenericHttp
+    case Kafka
+    case AMQP
+    case Prometheus
+    case AzureOTel
+    case Splunk
+    case ElasticSearch
+    case Kibana
+    case LocalFile
+    case AWSS3
+    case AWSKinesis
+    case MongoDB
+    case InternalKafka
+}
+
+public enum AwsS3LoggingIntegrationType : String, Codable
+{
+    case Iam
+    case CrossAccountRole
+}
+
+public enum MembershipProvider : String, Codable
+{
+    case AppleSignIn
+    case GoogleSignIn
+    case Google
+    case Facebook
+    case X
+    case GitHub
+    case LinkedIn
+    case Okta
+    case Microsoft
+}
+
+public class OAuthModeConfig : Codable
+{
+    public var name:DisplayName?
+    public var callbackUrl:Uri?
+    public var logoutUrl:Uri?
+    public var failureRedirectUrl:Uri?
+    public var roleName:RoleName?
+
+    required public init(){}
+}
+
+public enum PaymentGatewayPlatform : String, Codable
+{
+    case Stripe
+    case Adyen
+    case Paddle
+    case LemonSqueezy
+    case AppleInApp
+    case GoogleInApp
+    case Shopify
+    case WooCommerce
+    case Magento
+    case PayPal
+    case Braintree
+    case AuthorizeNet
+    case CheckOutCom
+    case Mollie
+    case Worldpay
+}
+
+// @DataContract
+public enum PushProvider : String, Codable
+{
+    case AppleApns
+    case SafariWeb
+    case SafariPush
+    case AndroidFirebase
+    case ChromeWeb
+    case FirefoxWeb
+    case EdgeWeb
+    case ChromePush
+    case CodeMashIosApp
+    case CodeMashAndroidApp
+    case CodeMashSafariPlugin
+    case CodeMashSafariWeb
+    case CodeMashChromePlugin
+    case CodeMashChromeWeb
+    case Expo
+    case Fake
+}
+
+public enum CodeProvider : String, Codable
+{
+    case AwsLambda
+    case AzureFunctions
+    case GoogleCloudFunctions
+    case Pipedream
+    case Zapier
+    case CloudflareWorkers
+    case Vercel
+    case Netlify
+    case SupabaseEdge
+    case Modal
+    case Fake
+}
+
+public enum AwsLambdaIntegrationType : String, Codable
+{
+    case Iam
+    case CrossAccountRole
+}
+
+public enum LlmProvider : String, Codable
+{
+    case OpenAI
+    case Anthropic
+    case Ollama
+    case Groq
+    case Google
+    case Mistral
+    case OpenRouter
+    case Grok
+    case NorbixHosted
+}
+
+public class LlmModelOptionRequest : Codable
+{
+    public var id:String?
+    public var displayName:String?
+
+    required public init(){}
+}
+
+public protocol ILlmApiKeyRequest
+{
+    var apiKey:String? { get set }
+
+}
+
+public enum McpProvider : String, Codable
+{
+    case Docker
+    case Obsidian
+    case GoogleCalendar
+    case Stripe
+    case GitHub
+    case MongoDb
+    case Playwright
+    case BraveSearch
+}
+
+public enum McpTransport : String, Codable
+{
+    case Sse
+    case HttpStream
+    case Stdio
+}
+
+public enum NotificationMedium : String, Codable
+{
+    case Email
+    case Sms
+    case Push
+}
+
+// @DataContract
+public class TemplateDto : IHasViewId, IHasDatabaseId, Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var templateName:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var communicationChannel:CommunicationChannel?
+
+    // @DataMember
+    public var medium:NotificationMedium?
+
+    // @DataMember
+    public var isActive:Bool?
+
+    // @DataMember
+    public var tags:[String]?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){}
+}
+
+public protocol IHasViewId
+{
+    var viewId:String? { get set }
+
+}
+
+public protocol IHasDatabaseId
+{
+    var id:String? { get set }
+
+}
+
+public protocol IBindableContract
+{
+}
+
+public protocol IHasRazorTemplateCode
+{
+}
+
+public enum SystemEmailTemplateTheme : String, Codable
+{
+    case Text
+    case Branded
+    case Creative
+}
+
+public class EmailCampaignDeliverySettingsDto : Codable
+{
+    // @DataMember
+    public var recipientsSourceType:EmailCampaignRecipientsSourceTypes?
+
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    // @DataMember
+    public var campaignTime:Int?
+
+    // @DataMember
+    public var respectTimeZoneSettings:RespectTimeZoneSettings?
+
+    required public init(){}
+}
+
+public enum TriggerActionType : String, Codable
+{
+    case Code
+    case Push
+    case Sms
+    case Email
+    case WebhookCall
+    case SseCall
+    case Marketplace
+}
+
+// @DataContract
+public class PushCampaignDeliverySettingsDto : Codable
+{
+    // @DataMember
+    public var recipientsSourceType:PushCampaignRecipientsSourceTypes?
+
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    // @DataMember
+    public var campaignTime:Int?
+
+    // @DataMember
+    public var respectTimeZoneSettings:RespectTimeZoneSettings?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeDeliverySettingsDto : Codable
+{
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class WebhookDeliverySettingsDto : Codable
+{
+    // @DataMember
+    public var destinationIds:[String]?
+
+    // @DataMember
+    public var eventName:String?
+
+    // @DataMember
+    public var contentType:String?
+
+    // @DataMember
+    public var includeRawPayload:Bool?
+
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SmsCampaignDeliverySettingsDto : Codable
+{
+    // @DataMember
+    public var recipientsSourceType:SmsCampaignRecipientsSourceTypes?
+
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto]?
+
+    // @DataMember
+    public var campaignTime:Int?
+
+    // @DataMember
+    public var respectTimeZoneSettings:RespectTimeZoneSettings?
+
+    required public init(){}
+}
+
+// @Flags()
+public enum RespectTimeZoneSettings : Int, Codable
+{
+    case RespectToLastLoginZone = 1
+    case RespectToRegistrationZone = 2
+    case RespectToRegistrationProjectZone = 4
+}
+
+public enum PushDeviceDeliveryFamily : String, Codable
+{
+    case Ios
+    case Android
+    case Chrome
+    case Safari
+    case Expo
+}
+
+public enum PushCampaignRecipientsSourceTypes : String, Codable
+{
+    case AllUsers
+    case SpecifiedUsers
+    case Collection
+    case Devices
+    case AccountUsers
+}
+
+// @DataContract
+public class PushDeviceDeliveryTokenDto : Codable
+{
+    // @DataMember
+    public var pushDeviceToken:String?
+
+    // @DataMember
+    public var deliveryFamily:PushDeviceDeliveryFamily?
+
+    required public init(){}
+}
+
+public class LlmModelOptionDto : Codable
+{
+    public var id:String?
+    public var displayName:String?
+    public var inputCreditRate:Double?
+    public var outputCreditRate:Double?
+
+    required public init(){}
+}
+
+public class McpMetadata : Codable
+{
+    public var name:String?
+    public var category:String?
+    public var Description:String?
+    public var icon:String?
+
+    required public init(){}
+}
+
+public enum McpAuth : String, Codable
+{
+    case OAuth2
+    case ApiKey
+    case None
+}
+
+public enum IntegrationStatus : String, Codable
+{
+    case Unknown
+    case Pending
+    case Provisioning
+    case Active
+    case Failed
+    case Deprovisioning
+}
+
+public enum SmsProvider : String, Codable
+{
+    case Twilio
+    case Vonage
+    case Plivo
+    case Telnyx
+    case Bird
+    case Telesign
+    case Sinch
+    case Fake
+}
+
+public class AwsSesEmailIntegrationDto : EmailIntegrationDto
+{
+    public var region:String?
+    public var identityArn:String?
+    public var configurationSetName:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case region
+        case identityArn
+        case configurationSetName
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        region = try container.decodeIfPresent(String.self, forKey: .region)
+        identityArn = try container.decodeIfPresent(String.self, forKey: .identityArn)
+        configurationSetName = try container.decodeIfPresent(String.self, forKey: .configurationSetName)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if region != nil { try container.encode(region, forKey: .region) }
+        if identityArn != nil { try container.encode(identityArn, forKey: .identityArn) }
+        if configurationSetName != nil { try container.encode(configurationSetName, forKey: .configurationSetName) }
+    }
+}
+
+public class IntegrationDto : IHasViewId, Codable
+{
+    public var viewId:String?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var env:String?
+    public var lastIntegrationTestAtUtc:Date?
+    public var lastIntegrationTestSucceeded:Bool?
+    public var lastIntegrationTestErrors:IReadOnlyList<String>?
+    public var humanDeliveryConfirmedAtUtc:Date?
+    public var requiresHumanDeliveryConfirmation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceFieldDefinitionDto : Codable
+{
+    // @DataMember
+    public var key:String?
+
+    // @DataMember
+    public var label:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var documentationUrl:String?
+
+    // @DataMember
+    public var type:MarketplaceFieldType?
+
+    // @DataMember
+    public var isRequired:Bool?
+
+    // @DataMember
+    public var defaultValue:String?
+
+    // @DataMember
+    public var placeholder:String?
+
+    // @DataMember
+    public var validationPattern:String?
+
+    // @DataMember
+    public var allowedValues:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceHttpRequestSpecDto : Codable
+{
+    // @DataMember
+    public var method:String?
+
+    // @DataMember
+    public var pathTemplate:String?
+
+    // @DataMember
+    public var parameters:IReadOnlyList<MarketplaceParameterSpecDto>?
+
+    // @DataMember
+    public var contentType:String?
+
+    required public init(){}
+}
+
+public class AiChatEntryAttachmentWireDto : Codable
+{
+    public var id:String?
+    public var name:String?
+
+    required public init(){}
+}
+
+public class AiChatEntrySourceWireDto : Codable
+{
+    public var kind:String?
+    public var requirementId:String?
+    public var sessionId:String?
+    public var entryId:String?
+    public var entrySeq:Int?
+    public var artifactId:String?
+    public var label:String?
+    public var step:Int?
+    public var number:Int?
+    public var sourceKind:String?
+    public var sourceId:String?
+    public var score:Double?
+    public var cited:Bool?
+
+    required public init(){}
+}
+
+public class AiChatQuestionWireDto : Codable
+{
+    public var id:String?
+    public var text:String?
+    public var options:[AiChatQuestionOptionWireDto] = []
+    public var `default`:String?
+    public var allowFreeText:Bool?
+
+    required public init(){}
+}
+
+public class AiChatGateResultWireDto : Codable
+{
+    public var `class`:String?
+    public var reason:String?
+    public var affectedRequirementIds:[String] = []
+
+    required public init(){}
+}
+
+public class AiChatPlanStepWireDto : Codable
+{
+    public var n:Int?
+    public var tool:String?
+    public var title:String?
+    public var goal:String?
+    public var inputs:AiChatPlanStepInputsWireDto?
+    public var dependsOn:[Int] = []
+    public var replaces:Int?
+    public var done:[AiChatPlanStepDoneCheckWireDto] = []
+    public var loop:AiChatPlanStepLoopWireDto?
+    public var difficulty:Int?
+
+    required public init(){}
+}
+
+public class AiChatStepLogLineWireDto : Codable
+{
+    public var seq:Int?
+    public var tool:String?
+    public var agent:String?
+    public var status:String?
+    public var detail:String?
+
+    required public init(){}
+}
+
+public class JsonSchemaFieldDto : Codable
+{
+    // @DataMember
+    public var fieldName:String?
+
+    required public init(){}
+}
+
 public class CurrencyDefaultDto : Codable
 {
     // @DataMember
@@ -41233,6 +40911,2452 @@ public class CurrencyDefaultDto : Codable
 
     // @DataMember
     public var currency:String?
+
+    required public init(){}
+}
+
+public enum CodeFunctionCallerKind : String, Codable
+{
+    case User
+    case ApiKey
+    case System
+}
+
+public class DocumentRefDto : ResourceRefDto
+{
+    public var databaseIntegrationId:String?
+    public var schemaId:String?
+    public var externalId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case kind
+        case databaseIntegrationId
+        case schemaId
+        case externalId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try container.decodeIfPresent(ResourceKindDto.self, forKey: .kind)
+        databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
+        schemaId = try container.decodeIfPresent(String.self, forKey: .schemaId)
+        externalId = try container.decodeIfPresent(String.self, forKey: .externalId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if kind != nil { try container.encode(kind, forKey: .kind) }
+        if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+        if schemaId != nil { try container.encode(schemaId, forKey: .schemaId) }
+        if externalId != nil { try container.encode(externalId, forKey: .externalId) }
+    }
+}
+
+// @DataContract
+public class TagTranslationDto : Codable
+{
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var content:TagDescriptionDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TagDefinitionBaseDto : Codable
+{
+    // @DataMember
+    public var tag:String?
+
+    // @DataMember
+    public var translations:[TagTranslationDto] = []
+
+    required public init(){}
+}
+
+public enum DeliveryChannel : String, Codable
+{
+    case Email
+    case Push
+    case Sms
+    case WebPush
+    case InApp
+    case ChatBot
+    case ChatPlatform
+}
+
+// @DataContract
+public class AiPlanModelDto : Codable
+{
+    // @DataMember
+    public var llmIntegrationId:String?
+
+    // @DataMember
+    public var model:String?
+
+    required public init(){}
+}
+
+public enum AiPlanQuotaUnit : String, Codable
+{
+    case None
+    case Credits
+    case Tokens
+}
+
+// @DataContract
+public class AiPlanFeaturesDto : Codable
+{
+    // @DataMember
+    public var attachments:Bool?
+
+    // @DataMember
+    public var rag:Bool?
+
+    // @DataMember
+    public var memory:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class FileResourceDto : Codable
+{
+    // @DataMember(Order=1)
+    public var id:String?
+
+    // @DataMember(Order=2)
+    public var originalFileName:String?
+
+    // @DataMember(Order=3)
+    public var `extension`:String?
+
+    // @DataMember(Order=4)
+    public var storedFileName:String?
+
+    // @DataMember(Order=5)
+    public var sizeBytes:Int?
+
+    // @DataMember(Order=6)
+    public var checksum:FileChecksumDto?
+
+    required public init(){}
+}
+
+public class CursorArgs : ICursorArgs, Codable
+{
+    public var field:String?
+    public var order:Int?
+
+    required public init(){}
+}
+
+public class SchemaListColumnDto : Codable
+{
+    // @DataMember
+    public var field:String?
+
+    required public init(){}
+}
+
+public class SchemaListSortDto : Codable
+{
+    // @DataMember
+    public var field:String?
+
+    // @DataMember
+    public var order:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public enum EmailValidationProvider : Int, Codable
+{
+    case ZeroBounce = 1
+    case NeverBounce = 2
+    case Bouncer = 3
+    case MailgunValidate = 4
+}
+
+// @DataContract
+public class EmailMessageContentDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var subject:String?
+
+    // @DataMember
+    public var body:EmailBodyDto?
+
+    // @DataMember
+    public var staticAttachments:[FileResourceRefDto]?
+
+    required public init(){}
+}
+
+public enum TokenMappingResolverType : String, Codable
+{
+    case NotSet
+    case Custom
+    case Project
+    case ProjectSocials
+    case Initiator
+    case Recipient
+    case SchemaRecord
+    case TargetUser
+    case TagDefinitions
+    case EmailSignatures
+    case Campaign
+    case Template
+    case EmailFooters
+    case Old
+    case New
+}
+
+// @DataContract
+public class SmsMessageContentDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var body:String?
+
+    required public init(){}
+}
+
+public enum MarketplaceTokenResolverKind : String, Codable
+{
+    case Static
+    case Request
+    case Project
+    case Initiator
+    case Custom
+    case IntegrationConfig
+    case IntegrationSecret
+}
+
+public enum MarketplaceSecretValueFormat : String, Codable
+{
+    case Raw
+    case Bearer
+    case Basic
+    case Prefixed
+}
+
+// @DataContract
+public class PushMessageContentDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var body:String?
+
+    required public init(){}
+}
+
+public enum DeviceType : String, Codable
+{
+    case Unknown
+    case Phone
+    case Tablet
+    case Desktop
+    case Tv
+}
+
+public enum EmbeddingProvider : String, Codable
+{
+    case Voyage
+    case OpenAI
+}
+
+public enum ResourceKindDto : String, Codable
+{
+    case Contact
+    case Document
+    case File
+    case PaymentCustomer
+    case Order
+    case Payment
+    case Product
+    case Integration
+}
+
+public enum CaseResolutionFixKind : String, Codable
+{
+    case CodeFix
+    case ConfigChange
+    case CustomerInstruction
+    case KnownLimitation
+    case Duplicate
+}
+
+public class EchoAgentSnippetDto : Codable
+{
+    public var client:String?
+    public var kind:String?
+    public var recommended:Bool?
+    public var auth:String?
+    public var config:String?
+
+    required public init(){}
+}
+
+public class PublicPasswordPolicyDto : Codable
+{
+    public var minLength:Int?
+    public var maxLength:Int?
+    public var minNumbers:Int?
+    public var minUpper:Int?
+    public var minLower:Int?
+    public var minSpecial:Int?
+    public var allowedSpecial:String?
+
+    required public init(){}
+}
+
+public class PublicAiAssistantDto : Codable
+{
+    public var id:String?
+    public var name:String?
+    public var welcome:String?
+
+    required public init(){}
+}
+
+public class ErrorDto : Codable
+{
+    public var message:String?
+    public var errorCode:String?
+    public var context:[String:String]?
+    public var stackTrace:[ErrorDto]?
+
+    required public init(){}
+}
+
+// @Flags()
+public enum AccountStatus : Int, Codable
+{
+    case Registered = 1
+    case PendingValidation = 2
+    case Active = 8
+    case InActive = 16
+    case Blocked = 32
+    case Unregistered = 64
+}
+
+// @DataContract
+public class UsageBillingPeriodDto : Codable
+{
+    // @DataMember
+    public var period:String?
+
+    // @DataMember
+    public var totalCents:Int?
+
+    // @DataMember
+    public var perCluster:[UsageBillingClusterChargeDto] = []
+
+    // @DataMember
+    public var recordedAtUtc:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class UsageBillingIngestionFailureDto : Codable
+{
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var period:String?
+
+    // @DataMember
+    public var stripeEventId:String?
+
+    // @DataMember
+    public var message:String?
+
+    // @DataMember
+    public var reportedAtUtc:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionItemDto : Codable
+{
+    // @DataMember
+    public var type:String?
+
+    // @DataMember
+    public var id:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionBlockerDto : Codable
+{
+    // @DataMember
+    public var contentType:String?
+
+    // @DataMember
+    public var contentId:String?
+
+    // @DataMember
+    public var refKind:String?
+
+    // @DataMember
+    public var unresolvedRef:String?
+
+    required public init(){}
+}
+
+public enum ProjectStatus : String, Codable
+{
+    case Active
+    case Provisioning
+    case ProvisioningFailed
+    case NoDatabase
+    case Disabled
+    case Suspended
+    case Removed
+}
+
+// @DataContract
+public class ProjectBrandDto : Codable
+{
+    // @DataMember
+    public var mainColor:String?
+
+    // @DataMember
+    public var accentColor:String?
+
+    // @DataMember
+    public var logo:FileResourceRefDto?
+
+    // @DataMember
+    public var icon:FileResourceRefDto?
+
+    required public init(){}
+}
+
+public class NotificationSettingsDto : Codable
+{
+    public var channels:[NotificationSettingsChannelDto] = []
+    public var allGroups:[GroupDefinitionDto] = []
+    public var allTags:[TagDefinitionDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class AuthenticationFlowSummaryDto : Codable
+{
+    // @DataMember
+    public var type:String?
+
+    // @DataMember
+    public var provider:String?
+
+    // @DataMember
+    public var passwordComplexity:AuthenticationFlowPasswordPolicyDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DatabaseDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var triggers:[SchemaTriggerDto]?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    required public init(){}
+}
+
+// @DataContract
+public class EmailDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    // @DataMember
+    public var defaultIntegrationViewId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var triggers:[MembershipTriggerDto]?
+
+    // @DataMember
+    public var customRoles:[RoleItemDto]?
+
+    // @DataMember
+    public var customPolicies:[PolicyItemDto]?
+
+    // @DataMember
+    public var authorization:AuthorizationDto?
+
+    // @DataMember
+    public var requireEmailValidation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class LoggingDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var isEstablished:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ServerEventsDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    // @DataMember
+    public var marketingTags:[TagDefinitionDto]?
+
+    // @DataMember
+    public var transactionalTags:[TagDefinitionDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SchedulerDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CodeDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var defaultIntegrationViewId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class FilesDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var triggers:[FilesTriggerDto]?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    required public init(){}
+}
+
+// @DataContract
+public class PaymentsDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var triggers:[PaymentTriggerDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SmsDto : Codable
+{
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var defaultIntegrationViewIds:[String:String] = [:]
+
+    required public init(){}
+}
+
+public enum Continent : String, Codable
+{
+    case Africa
+    case Antarctica
+    case Asia
+    case Europe
+    case NorthAmerica
+    case Oceania
+    case SouthAmerica
+}
+
+// @DataContract
+public class AiUserPlanAssignmentDto : Codable
+{
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var planId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiAssistantDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var welcomeMessage:String?
+
+    // @DataMember
+    public var systemPrompt:String?
+
+    // @DataMember
+    public var toolsets:[String] = []
+
+    // @DataMember
+    public var llmIntegrationId:String?
+
+    // @DataMember
+    public var model:String?
+
+    // @DataMember
+    public var memoryEnabled:Bool?
+
+    // @DataMember
+    public var ragSourceIds:[String] = []
+
+    // @DataMember
+    public var weakMatchThreshold:Double?
+
+    // @DataMember
+    public var planId:String?
+
+    // @DataMember
+    public var isDefault:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiUsageGroupDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var llmInputTokens:Int?
+
+    // @DataMember
+    public var llmOutputTokens:Int?
+
+    // @DataMember
+    public var embeddingTokens:Int?
+
+    // @DataMember
+    public var rerankCalls:Int?
+
+    // @DataMember
+    public var totalTokens:Int?
+
+    // @DataMember
+    public var chargeableTokens:Int?
+
+    // @DataMember
+    public var chargeableRerankCalls:Int?
+
+    // @DataMember
+    public var credits:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ProjectAiWalletDto : Codable
+{
+    // @DataMember
+    public var period:String?
+
+    // @DataMember
+    public var includedCredits:Int?
+
+    // @DataMember
+    public var purchasedCredits:Int?
+
+    // @DataMember
+    public var consumedCredits:Int?
+
+    // @DataMember
+    public var remainingCredits:Int?
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var lines:[AiWalletLineDto] = []
+
+    required public init(){}
+}
+
+// @Flags()
+public enum ApplicationModule : Int, Codable
+{
+    case Account = 0
+    case Membership = 1
+    case Database = 2
+    case Files = 4
+    case Code = 8
+    case Email = 16
+    case Push = 32
+    case Payment = 64
+    case Scheduler = 128
+    case Logging = 256
+    case ServerEvents = 512
+    case Ai = 1024
+    case Sms = 2048
+    case Project = 4096
+    case Compliance = 8192
+    case Contacts = 16384
+    case Marketplace = 32768
+    case Diagnostics = 65536
+}
+
+public enum LanguageGapKind : String, Codable
+{
+    case Template
+    case Footer
+    case Signature
+}
+
+public enum AuthType : String, Codable
+{
+    case Service
+    case Email
+    case UserName
+    case Phone
+    case Guest
+    case Social
+}
+
+public class RegistrationDto : Codable
+{
+    public var registrationInformation:AccessInformationDto?
+
+    required public init(){}
+}
+
+public class LoginDto : Codable
+{
+    public var needChangePasswordOnNextLogin:Bool?
+    public var lastAccessInformation:AccessInformationDto?
+
+    required public init(){}
+}
+
+public class UserGeneralInfoDto : Codable
+{
+    public var phone:String?
+    public var primaryEmail:String?
+    public var displayName:String?
+    public var firstName:String?
+    public var lastName:String?
+    public var fullName:String?
+    public var addressLine1:String?
+    public var addressLine2:String?
+    public var country:String?
+    public var city:String?
+    public var state:String?
+    public var postalCode:String?
+    public var company:String?
+    public var gender:Gender?
+    public var birthDate:Int?
+    public var timeZone:String?
+    public var language:String?
+    public var blockAllMarketingMessages:Bool?
+    public var blockedTags:[String:HashSet<String>]?
+    public var blockReasons:[MarketingBlockReason]?
+    public var extraMetadata:String?
+    public var notes:String?
+
+    required public init(){}
+}
+
+public enum AuthStatus : Int, Codable
+{
+    case Registered = 0
+    case PendingValidation = 2
+    case Active = 8
+    case Unregistered = 16
+    case Suspended = 32
+    case InActive = 64
+    case Blocked = 128
+}
+
+public class PermissionDto : Codable
+{
+    public var sid:String?
+    public var effect:PermissionEffect?
+    public var actions:[String] = []
+    public var resources:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class LicenseDomainDnsRecordDto : Codable
+{
+    // @DataMember
+    public var host:String?
+
+    // @DataMember
+    public var recordType:String?
+
+    // @DataMember
+    public var resolved:Bool?
+
+    // @DataMember
+    public var required:Bool?
+
+    required public init(){}
+}
+
+public class CodeMashSubscriptionDto : Codable
+{
+    public var viewId:String?
+    public var domain:String?
+    public var willExpireOn:Date?
+    public var issuedOn:Date?
+    public var isTrial:Bool?
+    public var subscriptionRefId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiServiceUserKeyDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var hint:String?
+
+    // @DataMember
+    public var issuedAt:Date?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TriggerDto : IHasViewId, IQueuedTrigger, Codable
+{
+    // @DataMember
+    public var type:TriggerType?
+
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var thenAction:TriggerActionDto?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var activationCode:String?
+
+    // @DataMember
+    public var order:Int?
+
+    // @DataMember
+    public var breakOnError:Bool?
+
+    // @DataMember
+    public var savedByAuthId:String?
+
+    required public init(){}
+}
+
+public protocol IQueuedTrigger
+{
+    var viewId:String? { get set }
+    var name:String? { get set }
+    var order:Int? { get set }
+    var breakOnError:Bool? { get set }
+
+}
+
+// @DataContract
+public class TriggerProjectionList : IHasViewId, IQueuedTrigger, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var actionType:TriggerActionType?
+
+    // @DataMember
+    public var hasPreExecuteCode:Bool?
+
+    // @DataMember
+    public var isEnabled:Bool?
+
+    // @DataMember
+    public var order:Int?
+
+    // @DataMember
+    public var breakOnError:Bool?
+
+    required public init(){}
+}
+
+public class IntegrationListProjection : IHasViewId, Codable
+{
+    public var viewId:String?
+    public var integrationName:String?
+    public var isEnabled:Bool?
+    public var lastIntegrationTestAtUtc:Date?
+    public var lastIntegrationTestSucceeded:Bool?
+    public var lastIntegrationTestErrors:IReadOnlyList<String>?
+    public var humanDeliveryConfirmedAtUtc:Date?
+    public var requiresHumanDeliveryConfirmation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipEmailPreferencesDto : Codable
+{
+    // @DataMember
+    public var registrationViaEmail:MembershipEmailActionSettingsDto?
+
+    // @DataMember
+    public var verificationViaEmail:MembershipEmailActionSettingsDto?
+
+    // @DataMember
+    public var passwordResetViaEmail:MembershipEmailActionSettingsDto?
+
+    // @DataMember
+    public var invitationViaEmail:MembershipEmailActionSettingsDto?
+
+    // @DataMember
+    public var deactivationViaEmail:MembershipEmailActionSettingsDto?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PasswordComplexityDto : Codable
+{
+    // @DataMember
+    public var minLength:Int?
+
+    // @DataMember
+    public var maxLength:Int?
+
+    // @DataMember
+    public var minNumbers:Int?
+
+    // @DataMember
+    public var maxNumbers:Int?
+
+    // @DataMember
+    public var minUpper:Int?
+
+    // @DataMember
+    public var maxUpper:Int?
+
+    // @DataMember
+    public var minLower:Int?
+
+    // @DataMember
+    public var maxLower:Int?
+
+    // @DataMember
+    public var minSpecial:Int?
+
+    // @DataMember
+    public var maxSpecial:Int?
+
+    // @DataMember
+    public var allowedSpecial:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipCredentialsSettingsDto : Codable
+{
+    // @DataMember
+    public var logoutUrl:String?
+
+    // @DataMember
+    public var allowUsernames:Bool?
+
+    // @DataMember
+    public var modes:[MembershipCredentialsSettingsModeDto]?
+
+    required public init(){}
+}
+
+public class DataSchemaDto : Codable
+{
+    // @DataMember
+    public var json:String?
+
+    // @DataMember
+    public var fields:[JsonSchemaFieldDto] = []
+
+    required public init(){}
+}
+
+public class VisualSchemaDto : Codable
+{
+    // @DataMember
+    public var json:String?
+
+    required public init(){}
+}
+
+public class TaxonomyRef : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    required public init(){}
+}
+
+public class TermMultiParentDto : Codable
+{
+    // @DataMember
+    public var taxonomyId:String?
+
+    // @DataMember
+    public var parentId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var names:[String:String]?
+
+    required public init(){}
+}
+
+public class SchemaIndexIntegrationStatusDto : Codable
+{
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var state:String?
+
+    // @DataMember
+    public var wanted:[SchemaIndexDto] = []
+
+    // @DataMember
+    public var created:[String] = []
+
+    // @DataMember
+    public var dropped:[String] = []
+
+    // @DataMember
+    public var overCap:[SchemaIndexDto] = []
+
+    // @DataMember
+    public var refusedReason:String?
+
+    // @DataMember
+    public var lastRunUtc:Date?
+
+    required public init(){}
+}
+
+public class CollectionIndexKeyDto : Codable
+{
+    // @DataMember
+    public var field:String?
+
+    // @DataMember
+    public var order:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SeedCollectionReportItemDto : Codable
+{
+    // @DataMember
+    public var collectionName:String?
+
+    // @DataMember
+    public var requested:Int?
+
+    // @DataMember
+    public var inserted:Int?
+
+    // @DataMember
+    public var ids:[String] = []
+
+    // @DataMember
+    public var errors:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class SchemaRefDto : Codable
+{
+    // @DataMember(Order=1)
+    public var schemaId:String?
+
+    // @DataMember(Order=2)
+    public var schemaName:String?
+
+    // @DataMember(Order=3)
+    public var databaseIntegrationId:String?
+
+    required public init(){}
+}
+
+public class ImportFileColumnDto : Codable
+{
+    // @DataMember
+    public var index:Int?
+
+    // @DataMember
+    public var header:String?
+
+    // @DataMember
+    public var samples:[String] = []
+
+    // @DataMember
+    public var detectedType:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class NotificationModuleDependencyItemDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var category:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TemplateListProjection : IHasViewId, IHasDatabaseId, Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var templateName:String?
+
+    // @DataMember
+    public var isActive:Bool?
+
+    // @DataMember
+    public var type:CommunicationChannel?
+
+    // @DataMember
+    public var tags:[String]?
+
+    // @DataMember
+    public var env:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MjmlParseError : Codable
+{
+    // @DataMember(Name="line")
+    public var line:Int?
+
+    // @DataMember(Name="message")
+    public var message:String?
+
+    // @DataMember(Name="tagName")
+    public var tagName:String?
+
+    // @DataMember(Name="formattedMessage")
+    public var formattedMessage:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class ListItemProjection : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var displayName:String?
+
+    required public init(){}
+}
+
+public class CampaignStatusChangeEntryDto : Codable
+{
+    public var time:Date?
+    public var status:CampaignStatus?
+    public var errors:[ErrorDto]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CampaignDto : IHasResponsibleUserId, IHasDatabaseId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var createdOn:Date?
+
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var forceCampaignLanguage:Bool?
+
+    // @DataMember
+    public var campaignProcessingIntegrationId:String?
+
+    // @DataMember
+    public var statusHistory:[CampaignStatusChangeEntryDto] = []
+
+    // @DataMember
+    public var status:CampaignStatusChangeEntryDto?
+
+    // @DataMember
+    public var tokenMappingValues:[TokenMappingDto]?
+
+    // @DataMember
+    public var notes:String?
+
+    // @DataMember
+    public var createdById:String?
+
+    // @DataMember
+    public var timeZoneId:String?
+
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var id:String?
+
+    required public init(){}
+}
+
+public protocol IHasResponsibleUserId
+{
+    var userId:String? { get set }
+
+}
+
+public enum CampaignStatus : String, Codable
+{
+    case Pending
+    case Registered
+    case Scheduled
+    case Started
+    case Stopped
+    case Processing
+    case Completed
+    case Failed
+}
+
+// @DataContract
+public class EmailRecipientsDto : Codable
+{
+    // @DataMember
+    public var to:[EmailRecipientDto]?
+
+    // @DataMember
+    public var cc:[EmailRecipientDto]?
+
+    // @DataMember
+    public var bcc:[EmailRecipientDto]?
+
+    // @DataMember
+    public var startingAfter:String?
+
+    // @DataMember
+    public var hasMore:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CampaignBatchDto : IHasDatabaseId, Codable
+{
+    // @DataMember
+    public var campaignId:String?
+
+    // @DataMember
+    public var batchId:String?
+
+    // @DataMember
+    public var startAfter:String?
+
+    // @DataMember
+    public var statusHistory:[BatchStatusChangeEntryDto] = []
+
+    // @DataMember
+    public var id:String?
+
+    required public init(){}
+}
+
+public class NotificationStatusChangeEntryDto : Codable
+{
+    public var time:Date?
+    public var status:CampaignNotificationStatus?
+    public var sourceId:String?
+    public var errors:[ErrorDto]?
+    public var tags:[String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class CampaignBatchNotificationDto : IHasDatabaseId, Codable
+{
+    // @DataMember
+    public var campaignId:String?
+
+    // @DataMember
+    public var batchId:String?
+
+    // @DataMember
+    public var notificationId:String?
+
+    // @DataMember
+    public var refNotificationId:String?
+
+    // @DataMember
+    public var body:String?
+
+    // @DataMember
+    public var model:[String:String]?
+
+    // @DataMember
+    public var statusHistory:[NotificationStatusChangeEntryDto] = []
+
+    // @DataMember
+    public var id:String?
+
+    required public init(){}
+}
+
+public enum CampaignBatchStatus : String, Codable
+{
+    case Registered
+    case Processing
+    case Completed
+    case Failed
+}
+
+// @DataContract
+public class SmsRecipientsDto : Codable
+{
+    // @DataMember
+    public var to:[SmsRecipientDto]?
+
+    // @DataMember
+    public var startingAfter:String?
+
+    // @DataMember
+    public var hasMore:Bool?
+
+    required public init(){}
+}
+
+public enum CodeFunctionQualifierKindDto : String, Codable
+{
+    case Alias
+    case Version
+}
+
+// @DataContract
+public class PushRecipientsDto : Codable
+{
+    // @DataMember
+    public var to:[PushRecipientDto]?
+
+    // @DataMember
+    public var startingAfter:String?
+
+    // @DataMember
+    public var hasMore:Bool?
+
+    required public init(){}
+}
+
+public class AiToolManifestParameter : Codable
+{
+    public var name:String?
+    public var type:String?
+    public var required:Bool?
+    public var Description:String?
+
+    required public init(){}
+}
+
+public class ScaffoldStepReportWithLink : Codable
+{
+    public var order:Int?
+    public var title:String?
+    public var tool:String?
+    public var status:String?
+    public var id:String?
+    public var dashboardUrl:String?
+    public var note:String?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+public class TemplatePreviewPartResult : Codable
+{
+    public var name:String?
+    public var rendered:String?
+    public var errors:IReadOnlyList<String>?
+
+    required public init(){}
+}
+
+public class ProjectBriefRequirementWireDto : Codable
+{
+    public var id:String?
+    public var text:String?
+    public var status:String?
+    public var confidence:Double?
+    public var isAssumption:Bool?
+    public var sources:[ProjectBriefSourceWireDto] = []
+    public var satisfiedBy:[ProjectBriefSatisfiedByWireDto] = []
+    public var sinceEventId:String?
+
+    required public init(){}
+}
+
+public class ProjectBriefDecisionWireDto : Codable
+{
+    public var eventId:String?
+    public var text:String?
+    public var confidence:Double?
+    public var atUtc:Date?
+    public var sources:[ProjectBriefSourceWireDto] = []
+
+    required public init(){}
+}
+
+public class ProjectBriefAssumptionWireDto : Codable
+{
+    public var requirementId:String?
+    public var eventId:String?
+    public var text:String?
+    public var confidence:Double?
+    public var atUtc:Date?
+
+    required public init(){}
+}
+
+public class ProjectBriefSourceWireDto : Codable
+{
+    public var kind:String?
+    public var sessionId:String?
+    public var entryId:String?
+    public var entrySeq:Int?
+    public var eventId:String?
+    public var userAuthId:String?
+    public var atUtc:Date?
+    public var surface:String?
+    public var quote:String?
+    public var workItemId:String?
+
+    required public init(){}
+}
+
+public class ProjectBriefSatisfiedByWireDto : Codable
+{
+    public var artifactId:String?
+    public var tool:String?
+    public var orphaned:Bool?
+
+    required public init(){}
+}
+
+public class WorkItemEntryRefWireDto : Codable
+{
+    public var sessionId:String?
+    public var entryId:String?
+
+    required public init(){}
+}
+
+public class WorkItemRunRefWireDto : Codable
+{
+    public var sessionId:String?
+    public var planEntryId:String?
+    public var runId:String?
+
+    required public init(){}
+}
+
+public class WorkItemArtifactWireDto : Codable
+{
+    public var artifactId:String?
+    public var what:String?
+    public var step:Int?
+    public var planEntryId:String?
+    public var kind:String?
+    public var name:String?
+
+    required public init(){}
+}
+
+public class WorkItemMovedOutWireDto : Codable
+{
+    public var text:String?
+    public var reason:String?
+    public var movedTo:String?
+    public var source:String?
+    public var entryRef:WorkItemEntryRefWireDto?
+    public var atUtc:Date?
+
+    required public init(){}
+}
+
+public class WorkItemNeedsYouWireDto : Codable
+{
+    public var text:String?
+    public var kind:String?
+    public var entryRef:WorkItemEntryRefWireDto?
+    public var done:Bool?
+    public var doneAtUtc:Date?
+    public var doneByUserAuthId:String?
+
+    required public init(){}
+}
+
+public class WorkItemOpenQuestionWireDto : Codable
+{
+    public var entryRef:WorkItemEntryRefWireDto?
+    public var blocking:Bool?
+    public var text:String?
+    public var atUtc:Date?
+
+    required public init(){}
+}
+
+public class WorkItemDoneConditionWireDto : Codable
+{
+    public var condition:Int?
+    public var holds:Bool?
+    public var reason:String?
+
+    required public init(){}
+}
+
+public enum AiTriggerType : String, Codable
+{
+    case OnCreditsWarning
+    case OnCreditsExhausted
+    case OnQuotaWarning
+    case OnQuotaExhausted
+}
+
+public protocol IVirtualDirectory
+{
+}
+
+public protocol IVirtualPathProvider
+{
+    //rootDirectory:IVirtualDirectory ignored. Swift doesn't support interface properties
+    var virtualPathSeparator:String? { get set }
+    var realPathSeparator:String? { get set }
+
+}
+
+public protocol IResponse
+{
+    var originalResponse:String? { get set }
+    //request:IRequest ignored. Swift doesn't support interface properties
+    var statusCode:Int? { get set }
+    var statusDescription:String? { get set }
+    var contentType:String? { get set }
+    var outputStream:Data? { get set }
+    var dto:String? { get set }
+    var useBufferedStream:Bool? { get set }
+    var isClosed:Bool? { get set }
+    var keepAlive:Bool? { get set }
+    var hasStarted:Bool? { get set }
+    var items:[String:String]? { get set }
+
+}
+
+// @Flags()
+public enum RequestAttributes : Int, Codable
+{
+    case None = 0
+    case Localhost = 1
+    case LocalSubnet = 2
+    case External = 4
+    case Secure = 8
+    case InSecure = 16
+    case AnySecurityMode = 24
+    case HttpHead = 32
+    case HttpGet = 64
+    case HttpPost = 128
+    case HttpPut = 256
+    case HttpDelete = 512
+    case HttpPatch = 1024
+    case HttpOptions = 2048
+    case HttpOther = 4096
+    case AnyHttpMethod = 8160
+    case OneWay = 8192
+    case Reply = 16384
+    case AnyCallStyle = 24576
+    case Soap11 = 32768
+    case Soap12 = 65536
+    case Xml = 131072
+    case Json = 262144
+    case Jsv = 524288
+    case ProtoBuf = 1048576
+    case Csv = 2097152
+    case Html = 4194304
+    case Jsonl = 8388608
+    case MsgPack = 16777216
+    case FormatOther = 33554432
+    case AnyFormat = 67076096
+    case Http = 67108864
+    case MessageQueue = 134217728
+    case Tcp = 268435456
+    case Grpc = 536870912
+    case EndpointOther = 1073741824
+    case AnyEndpoint = 2080374784
+    case InProcess = -2147483648
+    case InternalNetworkAccess = -2147483645
+    case AnyNetworkAccessType = -2147483641
+    case Any = -1
+}
+
+public protocol IRequestPreferences
+{
+    var acceptsBrotli:Bool? { get set }
+    var acceptsDeflate:Bool? { get set }
+    var acceptsGzip:Bool? { get set }
+
+}
+
+public protocol IHttpFile
+{
+    var name:String? { get set }
+    var fileName:String? { get set }
+    var contentLength:Int? { get set }
+    var contentType:String? { get set }
+    var inputStream:Data? { get set }
+
+}
+
+public enum SchedulerTaskRunOutcome : Int, Codable
+{
+    case Fired = 1
+    case Failed = 2
+    case Skipped = 3
+}
+
+public enum ResolvedRefStatus : String, Codable
+{
+    case Ok
+    case NotFound
+    case Unauthorized
+    case SourceError
+    case Erased
+}
+
+// @DataContract
+public class ChannelSubscriptionStateDto : Codable
+{
+    // @DataMember
+    public var unsubscribed:Bool?
+
+    // @DataMember
+    public var blockedTags:[String:[String]] = [:]
+
+    required public init(){}
+}
+
+public class ConsentPurposeDto : Codable
+{
+    public var key:String?
+    public var name:String?
+    public var channel:String?
+    public var mappedTags:[String] = []
+    public var regulatoryBasis:[String] = []
+    public var Description:String?
+    public var isDeprecated:Bool?
+
+    required public init(){}
+}
+
+public class RetentionWindowDto : Codable
+{
+    public var dataKind:String?
+    public var days:Int?
+    public var action:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SupportCaseDto : IHasViewId, Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var accountId:String?
+
+    // @DataMember
+    public var projectId:String?
+
+    // @DataMember
+    public var reporterId:String?
+
+    // @DataMember
+    public var kind:SupportCaseKind?
+
+    // @DataMember
+    public var severity:SupportCaseSeverity?
+
+    // @DataMember
+    public var status:SupportCaseStatus?
+
+    // @DataMember
+    public var customerStatus:SupportCustomerStatus?
+
+    // @DataMember
+    public var subject:String?
+
+    // @DataMember
+    public var affectedModule:String?
+
+    // @DataMember
+    public var deploymentMode:DeploymentMode?
+
+    // @DataMember
+    public var gatewayVersion:String?
+
+    // @DataMember
+    public var region:String?
+
+    // @DataMember
+    public var planTier:String?
+
+    // @DataMember
+    public var openedOn:Int?
+
+    // @DataMember
+    public var firstResponseOn:Int?
+
+    // @DataMember
+    public var resolvedOn:Int?
+
+    // @DataMember
+    public var closedOn:Int?
+
+    // @DataMember
+    public var resolution:String?
+
+    // @DataMember
+    public var messageCount:Int?
+
+    // @DataMember
+    public var lastMessageOn:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class SupportCaseMessageDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var caseId:String?
+
+    // @DataMember
+    public var authorKind:SupportMessageAuthorKind?
+
+    // @DataMember
+    public var authorId:String?
+
+    // @DataMember
+    public var authorDisplayName:String?
+
+    // @DataMember
+    public var body:String?
+
+    // @DataMember
+    public var sentOn:Int?
+
+    required public init(){}
+}
+
+public enum SupportCaseKind : String, Codable
+{
+    case Question
+    case Bug
+    case Incident
+    case Billing
+    case Security
+    case FeatureRequest
+}
+
+public enum SupportCaseSeverity : Int, Codable
+{
+    case S1 = 1
+    case S2 = 2
+    case S3 = 3
+    case S4 = 4
+}
+
+public enum SupportCaseStatus : String, Codable
+{
+    case Open
+    case Triaged
+    case InProgress
+    case WaitingOnCustomer
+    case Resolved
+    case Closed
+}
+
+public enum SupportCustomerStatus : String, Codable
+{
+    case Pending
+    case Open
+    case Solved
+    case Closed
+}
+
+// @DataContract
+public class DiagnosticPackStepDescriptorDto : Codable
+{
+    // @DataMember
+    public var stepId:String?
+
+    // @DataMember
+    public var kind:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var parameters:[String:String] = [:]
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticPackStepResultDto : Codable
+{
+    // @DataMember
+    public var stepId:String?
+
+    // @DataMember
+    public var kind:String?
+
+    // @DataMember
+    public var isSuccess:Bool?
+
+    // @DataMember
+    public var result:String?
+
+    // @DataMember
+    public var errorMessage:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticEchoRegionDto : Codable
+{
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticEventItemDto : Codable
+{
+    // @DataMember
+    public var position:Int?
+
+    // @DataMember
+    public var eventType:String?
+
+    // @DataMember
+    public var payload:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class DiagnosticRedisListItemDto : Codable
+{
+    // @DataMember
+    public var viewId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var status:String?
+
+    required public init(){}
+}
+
+public class DisplayName : Codable
+{
+    public var value:String?
+
+    required public init(){}
+}
+
+public class RoleName : Codable
+{
+    public var name:String?
+    public var displayName:String?
+    // @Ignore()
+    public var isAdministrator:Bool?
+
+    // @Ignore()
+    public var isAuthenticated:Bool?
+
+    // @Ignore()
+    public var isGuest:Bool?
+
+    // @Ignore()
+    public var isRootRole:Bool?
+
+    // @Ignore()
+    public var isCollaboratorRole:Bool?
+
+    // @Ignore()
+    public var isProjectSystemRole:Bool?
+
+    // @Ignore()
+    public var isAccountSystemRole:Bool?
+
+    // @Ignore()
+    public var isSystemRole:Bool?
+
+    required public init(){}
+}
+
+public enum MarketplaceFieldType : String, Codable
+{
+    case String
+    case Number
+    case Boolean
+    case Url
+    case Email
+    case Json
+    case MultilineText
+}
+
+// @DataContract
+public class MarketplaceParameterSpecDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var location:MarketplaceParameterLocation?
+
+    // @DataMember
+    public var valueTemplate:String?
+
+    // @DataMember
+    public var label:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var documentationUrl:String?
+
+    // @DataMember
+    public var type:String?
+
+    // @DataMember
+    public var isRequired:Bool?
+
+    required public init(){}
+}
+
+public class AiChatQuestionOptionWireDto : Codable
+{
+    public var value:String?
+    public var label:String?
+
+    required public init(){}
+}
+
+public class AiChatPlanStepInputsWireDto : Codable
+{
+    public var artifacts:[String] = []
+    public var requirements:[String] = []
+
+    required public init(){}
+}
+
+public class AiChatPlanStepDoneCheckWireDto : Codable
+{
+    public var check:String?
+    public var argsJson:String?
+
+    required public init(){}
+}
+
+public class AiChatPlanStepLoopWireDto : Codable
+{
+    public var maxIterations:Int?
+    public var maxToolCalls:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class TagDescriptionDto : Codable
+{
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var Description:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class FileChecksumDto : Codable
+{
+    // @DataMember(Order=1)
+    public var algorithm:String?
+
+    // @DataMember(Order=2)
+    public var hash:String?
+
+    required public init(){}
+}
+
+public protocol ICursorArgs
+{
+    var field:String? { get set }
+    var order:Int? { get set }
+
+}
+
+// @DataContract
+public class EmailBodyDto : IHasRazorTemplateCode, Codable
+{
+    // @DataMember
+    public var structure:String?
+
+    // @DataMember
+    public var code:String?
+
+    // @DataMember
+    public var templateEngine:EmailTemplateEngine?
+
+    required public init(){}
+}
+
+// @DataContract
+public class UsageBillingClusterChargeDto : Codable
+{
+    // @DataMember
+    public var atlasProjectId:String?
+
+    // @DataMember
+    public var atlasClusterName:String?
+
+    // @DataMember
+    public var cents:Int?
+
+    required public init(){}
+}
+
+public class NotificationSettingsChannelDto : Codable
+{
+    public var channel:CommunicationChannel?
+    public var groups:[NotificationsSettingsGroupDto] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class AuthenticationFlowPasswordPolicyDto : Codable
+{
+    // @DataMember
+    public var minLength:Int?
+
+    // @DataMember
+    public var maxLength:Int?
+
+    // @DataMember
+    public var minNumbers:Int?
+
+    // @DataMember
+    public var minUpper:Int?
+
+    // @DataMember
+    public var minLower:Int?
+
+    // @DataMember
+    public var minSpecial:Int?
+
+    // @DataMember
+    public var allowedSpecial:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AuthorizationDto : Codable
+{
+    // @DataMember
+    public var userRegistersAsRole:String?
+
+    // @DataMember
+    public var allowedRegisterRoles:[String]?
+
+    // @DataMember
+    public var allowedProviderRegisterRoles:[String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class AiWalletLineDto : Codable
+{
+    // @DataMember
+    public var kind:String?
+
+    // @DataMember
+    public var credits:Int?
+
+    // @DataMember
+    public var reference:String?
+
+    // @DataMember
+    public var purchasedBalance:Int?
+
+    // @DataMember
+    public var includedUsed:Int?
+
+    // @DataMember
+    public var purchasedUsed:Int?
+
+    // @DataMember
+    public var atUtc:Date?
+
+    required public init(){}
+}
+
+public class AccessInformationDto : Codable
+{
+    public var ip:String?
+    public var date:Date?
+    public var timeZone:String?
+
+    required public init(){}
+}
+
+public enum Gender : String, Codable
+{
+    case Male
+    case Female
+    case Other
+}
+
+public enum MarketingBlockReason : String, Codable
+{
+    case Unspecified
+    case Unsubscribed
+    case Complaint
+    case HardBounce
+    case InvalidEmail
+    case AdminBlock
+}
+
+public enum PermissionEffect : String, Codable
+{
+    case Allow
+    case Deny
+}
+
+// @DataContract
+public class MembershipEmailActionSettingsDto : Codable
+{
+    // @DataMember
+    public var sendEmail:Bool?
+
+    // @DataMember
+    public var template:MembershipMessageTemplateDto?
+
+    // @DataMember
+    public var callback:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipCredentialsSettingsModeDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var logoutUrl:String?
+
+    required public init(){}
+}
+
+public class SchemaIndexDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var keys:[String] = []
+
+    // @DataMember
+    public var unique:Bool?
+
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var field:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class EmailRecipientDto : Codable
+{
+    // @DataMember
+    public var emailAddress:String?
+
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var timeZoneId:String?
+
+    // @DataMember
+    public var userTokenMappings:[TokenMappingDto]?
+
+    required public init(){}
+}
+
+public enum CampaignNotificationStatus : String, Codable
+{
+    case Completed
+    case BlockedByUserPreferenceBlockAll
+    case BlockedByUserPreferenceBlockByTag
+    case Failed
+    case Viewed
+    case Clicked
+    case BlockedByValidation
+}
+
+// @DataContract
+public class SmsRecipientDto : Codable
+{
+    // @DataMember
+    public var phoneNumber:String?
+
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var userTokenMappings:[TokenMappingDto]?
+
+    // @DataMember
+    public var timeZoneId:String?
+
+    // @DataMember
+    public var record:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PushRecipientDto : Codable
+{
+    // @DataMember
+    public var deviceTokens:[PushDeviceDeliveryTokenDto] = []
+
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var language:String?
+
+    // @DataMember
+    public var userTokenMappings:[TokenMappingDto]?
+
+    // @DataMember
+    public var timeZoneId:String?
+
+    // @DataMember
+    public var record:String?
+
+    required public init(){}
+}
+
+public enum DeploymentMode : String, Codable
+{
+    case Managed
+    case SelfHosted
+    case Enterprise
+}
+
+public enum SupportMessageAuthorKind : String, Codable
+{
+    case Customer
+    case Staff
+    case Ai
+    case System
+}
+
+public enum MarketplaceParameterLocation : String, Codable
+{
+    case Body
+    case Header
+    case Query
+    case Path
+}
+
+public enum EmailTemplateEngine : String, Codable
+{
+    case NotSet
+    case Handlebars
+    case Mjml
+    case Liquid
+    case Razor
+    case Mustache
+}
+
+public class NotificationsSettingsGroupDto : Codable
+{
+    public var tag:String?
+    public var tags:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class MembershipMessageTemplateDto : Codable
+{
+    // @DataMember
+    public var id:String?
 
     required public init(){}
 }
