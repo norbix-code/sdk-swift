@@ -19,7 +19,7 @@ both clients use.
 | Client | Modules |
 | --- | --- |
 | `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `membership`, `publicProjects` |
-| `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `platform`, `regions`, `scheduler`, `webhooks` |
+| `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `platform`, `regions`, `scheduler`, `webhooks` |
 
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
 Swift tooling: **Swift Package Manager**, **XCTest**, GitHub Actions CI, and
@@ -386,6 +386,28 @@ _ = try await hub.membership.saveMembershipTrigger([
     ],
 ])
 ```
+
+### Code — cloud functions
+
+Norbix does not host code: a trigger's `Code` action, a scheduler task or a
+manual call runs a function in **your** cloud (AWS Lambda, Azure Functions,
+Google Cloud Functions) through a Code integration. `hub.code` covers every
+Code Hub endpoint (38); the five cloud-function routes list the functions an
+integration may call, their aliases and versions, invoke one by hand, give a
+sample envelope for a local run and the last runs of a trigger or task —
+`getCodeFunctions`, `getCodeFunctionQualifiers`, `invokeCodeFunction`,
+`getCodeFunctionEventSample`, `getCodeFunctionRuns`.
+
+```swift
+let functions = try await hub.code.getCodeFunctions(["integrationId": "int_1", "prefix": "orders-"])
+let result = try await hub.code.invokeCodeFunction([
+    "functionRef": ["integrationId": "int_1", "functionId": "orders-on-update", "qualifier": "prod"],
+    "payload": ["orderId": "6ac54a59212c29912eaddd81", "dryRun": true],
+    "invocationType": "Sync",
+])
+```
+
+Details and the envelope the function receives: [docs/hub/code.md](./docs/hub/code.md).
 
 ## Environment configuration
 

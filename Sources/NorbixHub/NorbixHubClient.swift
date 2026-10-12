@@ -40,6 +40,7 @@ public final class NorbixHubClient: Sendable {
     public let ai: AiModule
     public let apiKeys: ApiKeysModule
     public let auth: AuthModule
+    public let code: CodeModule
     public let database: DatabaseModule
     public let echo: EchoModule
     public let email: EmailModule
@@ -75,6 +76,7 @@ public final class NorbixHubClient: Sendable {
         self.ai = AiModule(transport: transport)
         self.apiKeys = ApiKeysModule(transport: transport)
         self.auth = AuthModule(transport: transport)
+        self.code = CodeModule(transport: transport)
         self.database = DatabaseModule(transport: transport)
         self.echo = EchoModule(transport: transport)
         self.email = EmailModule(transport: transport)
