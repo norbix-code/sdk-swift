@@ -43,6 +43,7 @@ for `GET` / `DELETE` and the JSON body otherwise.
 | `disableMarketplaceFunction` | `POST` | `/{version}/code/marketplace/integrations/{IntegrationViewId}/functions/{FunctionViewId}/disable` | `project` |
 | `getMarketplaceFunctionTokens` | `GET` | `/{version}/code/marketplace/integrations/{IntegrationViewId}/functions/{FunctionViewId}/tokens` | `project` |
 | `invokeMarketplaceFunction` | `POST` | `/{version}/code/marketplace/functions/{FunctionViewId}/invoke` | `project` |
+| `getMarketplaceFunctionRuns` | `GET` | `/{version}/code/marketplace/functions/runs` | `project` |
 | `getCodeFunctions` | `GET` | `/{version}/code/functions` | `project` |
 | `getCodeFunctionQualifiers` | `GET` | `/{version}/code/functions/qualifiers` | `project` |
 | `invokeCodeFunction` | `POST` | `/{version}/code/functions/invoke` | `project` |

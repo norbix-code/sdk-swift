@@ -2,7 +2,7 @@ import XCTest
 @testable import NorbixHub
 import NorbixCore
 
-/// `hub.code` — every Code Hub endpoint (37: the module switch, the
+/// `hub.code` — every Code Hub endpoint (38: the module switch, the
 /// integrations, the marketplace and the five cloud-function routes of
 /// `Code.Functions.md`), against `MockHTTPExecutor` (the same fake-transport
 /// pattern as `HubSchedulerModuleTests`). Never a real gateway. The table
@@ -66,6 +66,7 @@ final class HubCodeModuleTests: XCTestCase {
         ("disableMarketplaceFunction", "POST", "/v3/code/marketplace/integrations/mpi_1/functions/mpf_1/disable", { try await $0.disableMarketplaceFunction(["integrationViewId": "mpi_1", "functionViewId": "mpf_1"]) }),
         ("getMarketplaceFunctionTokens", "GET", "/v3/code/marketplace/integrations/mpi_1/functions/mpf_1/tokens", { try await $0.getMarketplaceFunctionTokens(["integrationViewId": "mpi_1", "functionViewId": "mpf_1"]) }),
         ("invokeMarketplaceFunction", "POST", "/v3/code/marketplace/functions/mpf_1/invoke", { try await $0.invokeMarketplaceFunction(["functionViewId": "mpf_1"]) }),
+        ("getMarketplaceFunctionRuns", "GET", "/v3/code/marketplace/functions/runs", { try await $0.getMarketplaceFunctionRuns([:]) }),
         ("getCodeFunctions", "GET", "/v3/code/functions", { try await $0.getCodeFunctions([:]) }),
         ("getCodeFunctionQualifiers", "GET", "/v3/code/functions/qualifiers", { try await $0.getCodeFunctionQualifiers([:]) }),
         ("invokeCodeFunction", "POST", "/v3/code/functions/invoke", { try await $0.invokeCodeFunction([:]) }),
@@ -74,8 +75,8 @@ final class HubCodeModuleTests: XCTestCase {
     ]
 
     func testEveryRouteVerbAndPath() async throws {
-        XCTAssertEqual(routes.count, 37)
-        XCTAssertEqual(Set(routes.map { $0.name }).count, 37)
+        XCTAssertEqual(routes.count, 38)
+        XCTAssertEqual(Set(routes.map { $0.name }).count, 38)
 
         for route in routes {
             let mock = MockHTTPExecutor()
@@ -182,6 +183,18 @@ final class HubCodeModuleTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/functions/runs")
         XCTAssertEqual(try query(mock), ["triggerId": "trg_1", "limit": "5"])
+        XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    func testGetMarketplaceFunctionRuns() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.getMarketplaceFunctionRuns(["taskId": "tsk_9", "limit": 5])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/functions/runs")
+        XCTAssertEqual(try query(mock), ["taskId": "tsk_9", "limit": "5"])
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
 }
