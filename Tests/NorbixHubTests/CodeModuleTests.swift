@@ -2,7 +2,7 @@ import XCTest
 @testable import NorbixHub
 import NorbixCore
 
-/// `hub.code` — every Code Hub endpoint (38: the module switch, the
+/// `hub.code` — every Code Hub endpoint (37: the module switch, the
 /// integrations, the marketplace and the five cloud-function routes of
 /// `Code.Functions.md`), against `MockHTTPExecutor` (the same fake-transport
 /// pattern as `HubSchedulerModuleTests`). Never a real gateway. The table
@@ -41,7 +41,6 @@ final class HubCodeModuleTests: XCTestCase {
         ("saveCodeIntegration", "POST", "/v3/code/integrations", { try await $0.saveCodeIntegration([:]) }),
         ("testCodeIntegration", "POST", "/v3/code/integrations/test", { try await $0.testCodeIntegration([:]) }),
         ("confirmCodeIntegrationHumanDelivery", "POST", "/v3/code/integrations/confirm-human-delivery", { try await $0.confirmCodeIntegrationHumanDelivery([:]) }),
-        ("setCodeIntegrationAsDefault", "PUT", "/v3/code/integrations/int_1/default", { try await $0.setCodeIntegrationAsDefault(["id": "int_1"]) }),
         ("deleteCodeIntegration", "DELETE", "/v3/code/integrations/int_1", { try await $0.deleteCodeIntegration(["id": "int_1"]) }),
         ("enableCodeIntegration", "PUT", "/v3/code/integrations/int_1/enable", { try await $0.enableCodeIntegration(["id": "int_1"]) }),
         ("disableCodeIntegration", "PUT", "/v3/code/integrations/int_1/disable", { try await $0.disableCodeIntegration(["id": "int_1"]) }),
@@ -75,8 +74,8 @@ final class HubCodeModuleTests: XCTestCase {
     ]
 
     func testEveryRouteVerbAndPath() async throws {
-        XCTAssertEqual(routes.count, 38)
-        XCTAssertEqual(Set(routes.map { $0.name }).count, 38)
+        XCTAssertEqual(routes.count, 37)
+        XCTAssertEqual(Set(routes.map { $0.name }).count, 37)
 
         for route in routes {
             let mock = MockHTTPExecutor()

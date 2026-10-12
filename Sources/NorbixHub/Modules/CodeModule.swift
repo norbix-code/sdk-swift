@@ -86,17 +86,6 @@ public final class CodeModule: Sendable {
         )
     }
 
-    public func setCodeIntegrationAsDefault(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/code/integrations/{Id}/default",
-            method: "PUT",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     public func deleteCodeIntegration(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/integrations/{Id}",
