@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-12 16:29:06
+Date: 2026-10-12 21:43:18
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -302,6 +302,7 @@ public class InternalsTypeGen : Codable
     public var typegen_281_FakeCodeIntegrationDto:FakeCodeIntegrationDto?
     public var typegen_282_FakeCodeIntegrationRequest:FakeCodeIntegrationRequest?
     public var typegen_283_CodeFunctionSchedulerTaskRequest:CodeFunctionSchedulerTaskRequest?
+    public var typegen_284_MarketplaceFunctionSchedulerTaskRequest:MarketplaceFunctionSchedulerTaskRequest?
 
     required public init(){}
 }
@@ -12975,7 +12976,7 @@ public class SetMarketplaceIntegrationTokenMappingsRequest : CodeMashRequestBase
     public var integrationViewId:String?
 
     // @DataMember
-    public var tokenMappings:[MarketplaceTokenMappingDto] = []
+    public var tokenMappings:[TokenMappingDto] = []
 
     required public init(){ super.init() }
 
@@ -12988,7 +12989,7 @@ public class SetMarketplaceIntegrationTokenMappingsRequest : CodeMashRequestBase
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
-        tokenMappings = try container.decodeIfPresent([MarketplaceTokenMappingDto].self, forKey: .tokenMappings) ?? []
+        tokenMappings = try container.decodeIfPresent([TokenMappingDto].self, forKey: .tokenMappings) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -13212,6 +13213,54 @@ public class GetMarketplaceFunctionCatalog : CodeMashRequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+    }
+}
+
+// @Route("/{version}/code/marketplace/functions/runs", "GET")
+public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetMarketplaceFunctionRunsResponse
+
+    /**
+    * The trigger whose marketplace function runs to list (trg_…). One of triggerId / taskId.
+    */
+    // @ApiMember(Description="The trigger whose marketplace function runs to list (trg_…). One of triggerId / taskId.")
+    public var triggerId:String?
+
+    /**
+    * The scheduler task whose marketplace function runs to list (tsk_…). One of triggerId / taskId.
+    */
+    // @ApiMember(Description="The scheduler task whose marketplace function runs to list (tsk_…). One of triggerId / taskId.")
+    public var taskId:String?
+
+    /**
+    * How many runs, newest first: 1-50. Default 20.
+    */
+    // @ApiMember(DataType="integer", Description="How many runs, newest first: 1-50. Default 20.")
+    public var limit:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case triggerId
+        case taskId
+        case limit
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
+        taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
+        limit = try container.decodeIfPresent(Int.self, forKey: .limit)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
+        if taskId != nil { try container.encode(taskId, forKey: .taskId) }
+        if limit != nil { try container.encode(limit, forKey: .limit) }
     }
 }
 
@@ -24328,22 +24377,28 @@ public class TestMarketplaceIntegrationResponse : ResponseBase
     // @DataMember
     public var items:IReadOnlyList<IntegrationTestResultItemDto>?
 
+    // @DataMember
+    public var steps:IReadOnlyList<MarketplaceValidationStepResultDto>?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case items
+        case steps
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decodeIfPresent(IReadOnlyList<IntegrationTestResultItemDto>.self, forKey: .items)
+        steps = try container.decodeIfPresent(IReadOnlyList<MarketplaceValidationStepResultDto>.self, forKey: .steps)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if items != nil { try container.encode(items, forKey: .items) }
+        if steps != nil { try container.encode(steps, forKey: .steps) }
     }
 }
 
@@ -24426,6 +24481,29 @@ public class GetMarketplaceFunctionCatalogResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if functions != nil { try container.encode(functions, forKey: .functions) }
+    }
+}
+
+public class GetMarketplaceFunctionRunsResponse : ResponseBase
+{
+    public var runs:[MarketplaceFunctionRunDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case runs
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        runs = try container.decodeIfPresent([MarketplaceFunctionRunDto].self, forKey: .runs) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if runs.count > 0 { try container.encode(runs, forKey: .runs) }
     }
 }
 
@@ -30245,11 +30323,15 @@ public class TriggerActionMarketplaceDto : TriggerActionDto
     // @DataMember
     public var payload:[String:String]?
 
+    // @DataMember
+    public var runAsUserId:String?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case functionId
         case payload
+        case runAsUserId
     }
 
     required public init(from decoder: Decoder) throws {
@@ -30257,6 +30339,7 @@ public class TriggerActionMarketplaceDto : TriggerActionDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
         payload = try container.decodeIfPresent([String:String].self, forKey: .payload) ?? [:]
+        runAsUserId = try container.decodeIfPresent(String.self, forKey: .runAsUserId)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -30264,6 +30347,7 @@ public class TriggerActionMarketplaceDto : TriggerActionDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if functionId != nil { try container.encode(functionId, forKey: .functionId) }
         if payload != nil { try container.encode(payload, forKey: .payload) }
+        if runAsUserId != nil { try container.encode(runAsUserId, forKey: .runAsUserId) }
     }
 }
 
@@ -33250,6 +33334,9 @@ public class MarketplaceIntegrationDto : IntegrationDto
     // @DataMember
     public var config:IReadOnlyDictionary<String, String>?
 
+    // @DataMember
+    public var lastValidationSteps:[MarketplaceValidationStepResultDto]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -33259,6 +33346,7 @@ public class MarketplaceIntegrationDto : IntegrationDto
         case category
         case Description
         case config
+        case lastValidationSteps
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33270,6 +33358,7 @@ public class MarketplaceIntegrationDto : IntegrationDto
         category = try container.decodeIfPresent(MarketplaceCategory.self, forKey: .category)
         Description = try container.decodeIfPresent(String.self, forKey: .Description)
         config = try container.decodeIfPresent(IReadOnlyDictionary<String, String>.self, forKey: .config)
+        lastValidationSteps = try container.decodeIfPresent([MarketplaceValidationStepResultDto].self, forKey: .lastValidationSteps) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33281,6 +33370,7 @@ public class MarketplaceIntegrationDto : IntegrationDto
         if category != nil { try container.encode(category, forKey: .category) }
         if Description != nil { try container.encode(Description, forKey: .Description) }
         if config != nil { try container.encode(config, forKey: .config) }
+        if lastValidationSteps != nil { try container.encode(lastValidationSteps, forKey: .lastValidationSteps) }
     }
 }
 
@@ -33309,7 +33399,13 @@ public class MarketplaceFunctionDto : IHasViewId, Codable
     public var requestTemplate:String?
 
     // @DataMember
-    public var mappedTokens:[MarketplaceTokenMappingDto] = []
+    public var arguments:[String:String] = [:]
+
+    // @DataMember
+    public var inputs:[MarketplaceFunctionParameterDto] = []
+
+    // @DataMember
+    public var mappedTokens:[TokenMappingDto] = []
 
     required public init(){}
 }
@@ -33345,6 +33441,12 @@ public class MarketplaceListingDto : IHasViewId, Codable
     public var documentationUrl:String?
 
     // @DataMember
+    public var videoUrl:String?
+
+    // @DataMember
+    public var availability:MarketplaceAvailability?
+
+    // @DataMember
     public var isOfficial:Bool?
 
     // @DataMember
@@ -33358,6 +33460,12 @@ public class MarketplaceListingDto : IHasViewId, Codable
 
     // @DataMember
     public var secretFields:IReadOnlyList<MarketplaceFieldDefinitionDto>?
+
+    // @DataMember
+    public var installForm:MarketplaceInstallFormDto?
+
+    // @DataMember
+    public var validationSteps:IReadOnlyList<MarketplaceValidationStepDto>?
 
     // @DataMember
     public var functions:IReadOnlyList<MarketplaceFunctionDefinitionDto>?
@@ -33384,6 +33492,12 @@ public class MarketplaceFunctionDefinitionDto : Codable
     public var group:String?
 
     // @DataMember
+    public var formKind:MarketplaceFormKind?
+
+    // @DataMember
+    public var inputs:IReadOnlyList<MarketplaceFunctionParameterDto>?
+
+    // @DataMember
     public var parameters:IReadOnlyList<MarketplaceFunctionParameterDto>?
 
     // @DataMember
@@ -33396,7 +33510,7 @@ public class MarketplaceFunctionDefinitionDto : Codable
     public var request:MarketplaceHttpRequestSpecDto?
 
     // @DataMember
-    public var defaultTokenMappings:[MarketplaceTokenMappingDto] = []
+    public var defaultTokenMappings:[TokenMappingDto] = []
 
     required public init(){}
 }
@@ -34563,6 +34677,9 @@ public class CodeFunctionDataDto : Codable
     // @DataMember
     public var payload:[String:String]?
 
+    // @DataMember
+    public var marketplace:MarketplaceFunctionCallDto?
+
     required public init(){}
 }
 
@@ -34762,6 +34879,36 @@ public class CodeFunctionSchedulerTaskRequest : SchedulerTaskRequest
         if invocationType != nil { try container.encode(invocationType, forKey: .invocationType) }
         if config != nil { try container.encode(config, forKey: .config) }
         if mappedTokens != nil { try container.encode(mappedTokens, forKey: .mappedTokens) }
+    }
+}
+
+public class MarketplaceFunctionSchedulerTaskRequest : SchedulerTaskRequest
+{
+    public var functionId:String?
+    public var payload:[String:String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case type
+        case functionId
+        case payload
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        type = try container.decodeIfPresent(SchedulerTaskType.self, forKey: .type)
+        functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
+        payload = try container.decodeIfPresent([String:String].self, forKey: .payload) ?? [:]
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if type != nil { try container.encode(type, forKey: .type) }
+        if functionId != nil { try container.encode(functionId, forKey: .functionId) }
+        if payload != nil { try container.encode(payload, forKey: .payload) }
     }
 }
 
@@ -35593,6 +35740,12 @@ public class TokenMappingDto : Codable
     // @DataMember
     public var resolver:TokenMappingResolverType?
 
+    // @DataMember
+    public var secretKeys:[String]?
+
+    // @DataMember
+    public var secretFormat:SecretValueFormat?
+
     required public init(){}
 }
 
@@ -35758,27 +35911,6 @@ public enum MarketplaceTransport : String, Codable
     case Code
     case Internal
     case Sdk
-}
-
-// @DataContract
-public class MarketplaceTokenMappingDto : Codable
-{
-    // @DataMember
-    public var token:String?
-
-    // @DataMember
-    public var resolver:MarketplaceTokenResolverKind?
-
-    // @DataMember
-    public var value:String?
-
-    // @DataMember
-    public var secretKeys:[String]?
-
-    // @DataMember
-    public var format:MarketplaceSecretValueFormat?
-
-    required public init(){}
 }
 
 public class CodeIntegrationRequest : Codable
@@ -36027,6 +36159,7 @@ public enum SchedulerTaskType : String, Codable
     case SmsCampaign
     case CodeFunctionalCall
     case WebhookCall
+    case MarketplaceFunctionCall
 }
 
 public class SchedulerTaskRequest : Codable
@@ -36921,6 +37054,12 @@ public class InstallationLicenseStatusDto : Codable
 
     // @DataMember(Name="licenseExpireUtc")
     public var licenseExpireUtc:Date?
+
+    // @DataMember(Name="lastHeartbeatOutcome")
+    public var lastHeartbeatOutcome:String?
+
+    // @DataMember(Name="lastHeartbeatError")
+    public var lastHeartbeatError:String?
 
     // @DataMember(Name="message")
     public var message:String?
@@ -38573,6 +38712,12 @@ public class MarketplaceListingProjection : IHasViewId, Codable
     // @DataMember
     public var functionCount:Int?
 
+    // @DataMember
+    public var availability:MarketplaceAvailability?
+
+    // @DataMember
+    public var videoUrl:String?
+
     required public init(){}
 }
 
@@ -38619,6 +38764,30 @@ public class MarketplaceIntegrationListProjection : IHasViewId, Codable
 }
 
 // @DataContract
+public class MarketplaceValidationStepResultDto : Codable
+{
+    // @DataMember
+    public var key:String?
+
+    // @DataMember
+    public var label:String?
+
+    // @DataMember
+    public var requiredForFunctions:Bool?
+
+    // @DataMember
+    public var succeeded:Bool?
+
+    // @DataMember
+    public var skipped:Bool?
+
+    // @DataMember
+    public var message:String?
+
+    required public init(){}
+}
+
+// @DataContract
 public class MarketplaceFunctionProjection : IHasViewId, Codable
 {
     // @DataMember
@@ -38638,6 +38807,42 @@ public class MarketplaceFunctionProjection : IHasViewId, Codable
 
     // @DataMember
     public var mappingCount:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceFunctionRunDto : Codable
+{
+    // @DataMember
+    public var firedAt:Date?
+
+    // @DataMember
+    public var event:String?
+
+    // @DataMember
+    public var source:String?
+
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var runAsUserId:String?
+
+    // @DataMember
+    public var succeeded:Bool?
+
+    // @DataMember
+    public var durationMs:Int?
+
+    // @DataMember
+    public var error:String?
+
+    // @DataMember
+    public var vendorRequestId:String?
+
+    // @DataMember
+    public var input:String?
 
     required public init(){}
 }
@@ -40785,6 +40990,13 @@ public class IntegrationDto : IHasViewId, Codable
     required public init(){}
 }
 
+public enum MarketplaceAvailability : String, Codable
+{
+    case Development
+    case Staging
+    case Production
+}
+
 // @DataContract
 public class MarketplaceFieldDefinitionDto : Codable
 {
@@ -40819,6 +41031,52 @@ public class MarketplaceFieldDefinitionDto : Codable
     public var allowedValues:IReadOnlyList<String>?
 
     required public init(){}
+}
+
+// @DataContract
+public class MarketplaceInstallFormDto : Codable
+{
+    // @DataMember
+    public var dataSchema:String?
+
+    // @DataMember
+    public var uiSchema:String?
+
+    // @DataMember
+    public var secretKeys:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceValidationStepDto : Codable
+{
+    // @DataMember
+    public var key:String?
+
+    // @DataMember
+    public var label:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var requiredForFunctions:Bool?
+
+    // @DataMember
+    public var probe:MarketplaceHttpRequestSpecDto?
+
+    required public init(){}
+}
+
+public enum MarketplaceFormKind : String, Codable
+{
+    case Generic
+    case DatabaseQuery
+    case DatabaseWrite
+    case Message
+    case Prompt
+    case Web
 }
 
 // @DataContract
@@ -40937,6 +41195,24 @@ public enum CodeFunctionCallerKind : String, Codable
     case User
     case ApiKey
     case System
+}
+
+// @DataContract
+public class MarketplaceFunctionCallDto : Codable
+{
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var functionKey:String?
+
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var payload:[String:String] = [:]
+
+    required public init(){}
 }
 
 public class DocumentRefDto : ResourceRefDto
@@ -41134,6 +41410,17 @@ public enum TokenMappingResolverType : String, Codable
     case EmailFooters
     case Old
     case New
+    case RequestInput
+    case IntegrationConfig
+    case IntegrationSecret
+}
+
+public enum SecretValueFormat : String, Codable
+{
+    case Raw
+    case Bearer
+    case Basic
+    case Prefixed
 }
 
 // @DataContract
@@ -41143,25 +41430,6 @@ public class SmsMessageContentDto : IHasRazorTemplateCode, Codable
     public var body:String?
 
     required public init(){}
-}
-
-public enum MarketplaceTokenResolverKind : String, Codable
-{
-    case Static
-    case Request
-    case Project
-    case Initiator
-    case Custom
-    case IntegrationConfig
-    case IntegrationSecret
-}
-
-public enum MarketplaceSecretValueFormat : String, Codable
-{
-    case Raw
-    case Bearer
-    case Basic
-    case Prefixed
 }
 
 // @DataContract
