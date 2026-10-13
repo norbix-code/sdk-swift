@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-12 21:43:18
+Date: 2026-10-13 06:06:38
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -13222,15 +13222,21 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
     public typealias Return = GetMarketplaceFunctionRunsResponse
 
     /**
-    * The trigger whose marketplace function runs to list (trg_…). One of triggerId / taskId.
+    * The marketplace function whose runs to list, from every source (func_…). One of functionId / triggerId / taskId.
     */
-    // @ApiMember(Description="The trigger whose marketplace function runs to list (trg_…). One of triggerId / taskId.")
+    // @ApiMember(Description="The marketplace function whose runs to list, from every source (func_…). One of functionId / triggerId / taskId.")
+    public var functionId:String?
+
+    /**
+    * The trigger whose marketplace function runs to list (trg_…). One of functionId / triggerId / taskId.
+    */
+    // @ApiMember(Description="The trigger whose marketplace function runs to list (trg_…). One of functionId / triggerId / taskId.")
     public var triggerId:String?
 
     /**
-    * The scheduler task whose marketplace function runs to list (tsk_…). One of triggerId / taskId.
+    * The scheduler task whose marketplace function runs to list (tsk_…). One of functionId / triggerId / taskId.
     */
-    // @ApiMember(Description="The scheduler task whose marketplace function runs to list (tsk_…). One of triggerId / taskId.")
+    // @ApiMember(Description="The scheduler task whose marketplace function runs to list (tsk_…). One of functionId / triggerId / taskId.")
     public var taskId:String?
 
     /**
@@ -13242,6 +13248,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case functionId
         case triggerId
         case taskId
         case limit
@@ -13250,6 +13257,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
         triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
         taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
         limit = try container.decodeIfPresent(Int.self, forKey: .limit)
@@ -13258,6 +13266,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if functionId != nil { try container.encode(functionId, forKey: .functionId) }
         if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
         if taskId != nil { try container.encode(taskId, forKey: .taskId) }
         if limit != nil { try container.encode(limit, forKey: .limit) }
@@ -38833,6 +38842,9 @@ public class MarketplaceFunctionRunDto : Codable
     public var succeeded:Bool?
 
     // @DataMember
+    public var status:String?
+
+    // @DataMember
     public var durationMs:Int?
 
     // @DataMember
@@ -38840,6 +38852,18 @@ public class MarketplaceFunctionRunDto : Codable
 
     // @DataMember
     public var vendorRequestId:String?
+
+    // @DataMember
+    public var correlationId:String?
+
+    // @DataMember
+    public var hasDetails:Bool?
+
+    // @DataMember
+    public var triggerId:String?
+
+    // @DataMember
+    public var taskId:String?
 
     // @DataMember
     public var input:String?
