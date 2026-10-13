@@ -197,4 +197,17 @@ final class HubCodeModuleTests: XCTestCase {
         XCTAssertEqual(try query(mock), ["taskId": "tsk_9", "limit": "5"])
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
+
+    /// Exactly one of functionId / triggerId / taskId (gateway item gw-runs): a function's own runs.
+    func testMarketplaceFunctionRunsByFunctionIdGoInTheQuery() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.getMarketplaceFunctionRuns(["functionId": "func_1p4R3gTobGZpD6fXvHT4rd", "limit": 50])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/functions/runs")
+        XCTAssertEqual(try query(mock), ["functionId": "func_1p4R3gTobGZpD6fXvHT4rd", "limit": "50"])
+        XCTAssertNil(mock.lastRequest?.httpBody)
+    }
 }
