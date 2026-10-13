@@ -50,6 +50,27 @@ for `GET` / `DELETE` and the JSON body otherwise.
 | `getCodeFunctionEventSample` | `GET` | `/{version}/code/functions/event-sample` | `project` |
 | `getCodeFunctionRuns` | `GET` | `/{version}/code/functions/runs` | `project` |
 
+
+## Marketplace function runs
+
+Each call of a marketplace function is one run row: an invoke (user, API key,
+AI), a trigger run or a scheduler fire. `getMarketplaceFunctionRuns` takes
+exactly one of `functionId` (every source, newest first, up to 50),
+`triggerId` or `taskId`, plus `limit` (1–50, default 20):
+
+```swift
+let runs = try await hub.code.getMarketplaceFunctionRuns(["functionId": "func_…", "limit": 10])
+```
+
+A row carries `status` (`ok` / `failed` / `skipped`, nil on rows written before
+the field existed), `durationMs`, `source`, `event`, `correlationId` and
+`hasDetails`. The input, steps and response of a run are written to the
+project log under the row's `correlationId`, only while the environment's
+Norbix Logging is on — then `hasDetails` is true. The gateway serves them at
+`GET /{version}/logs/audit?targetCorrelationId={correlationId}`; this SDK has
+no method for that logs route yet (`hub.logs` covers the logging settings and
+integrations only), so read the details from another Norbix SDK or the CLI.
+
 ## Cloud functions
 
 The five `code/functions` routes of the gateway contract `Code.Functions.md`
