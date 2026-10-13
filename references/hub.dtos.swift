@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-13 13:23:40
+Date: 2026-10-13 16:21:30
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -7210,6 +7210,8 @@ public class FindRecords : CodeMashListPaginationRequestBase, IReturn
     // @ApiMember(Description="Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids.")
     public var expandReferences:Bool?
 
+    public var allLanguages:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -7222,6 +7224,7 @@ public class FindRecords : CodeMashListPaginationRequestBase, IReturn
         case sortBy
         case sortOrder
         case expandReferences
+        case allLanguages
     }
 
     required public init(from decoder: Decoder) throws {
@@ -7236,6 +7239,7 @@ public class FindRecords : CodeMashListPaginationRequestBase, IReturn
         sortBy = try container.decodeIfPresent(String.self, forKey: .sortBy)
         sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder)
         expandReferences = try container.decodeIfPresent(Bool.self, forKey: .expandReferences)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -7250,6 +7254,7 @@ public class FindRecords : CodeMashListPaginationRequestBase, IReturn
         if sortBy != nil { try container.encode(sortBy, forKey: .sortBy) }
         if sortOrder != nil { try container.encode(sortOrder, forKey: .sortOrder) }
         if expandReferences != nil { try container.encode(expandReferences, forKey: .expandReferences) }
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
     }
 }
 
@@ -7281,6 +7286,8 @@ public class FindOneRecord : CodeMashRequestBase, IReturn
     // @ApiMember(Description="Set true to get every reference value as { id, display } (display = the target's displayField per the schema; null when the target is gone). Needs read permission on every source the schema links to (users, roles, taxonomy, collection, files) — otherwise the read is refused with CM-ERRORS-DATABASE-056 naming the source. Default false returns the stored ids.")
     public var expandReferences:Bool?
 
+    public var allLanguages:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -7288,6 +7295,7 @@ public class FindOneRecord : CodeMashRequestBase, IReturn
         case id
         case databaseIntegrationId
         case expandReferences
+        case allLanguages
     }
 
     required public init(from decoder: Decoder) throws {
@@ -7297,6 +7305,7 @@ public class FindOneRecord : CodeMashRequestBase, IReturn
         id = try container.decodeIfPresent(String.self, forKey: .id)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
         expandReferences = try container.decodeIfPresent(Bool.self, forKey: .expandReferences)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -7306,6 +7315,7 @@ public class FindOneRecord : CodeMashRequestBase, IReturn
         if id != nil { try container.encode(id, forKey: .id) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
         if expandReferences != nil { try container.encode(expandReferences, forKey: .expandReferences) }
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
     }
 }
 
@@ -13068,6 +13078,36 @@ public class StartMarketplaceIntegrationSignIn : CodeMashRequestBase, IReturn
     }
 }
 
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/oauth/sign-out", "POST")
+public class SignOutMarketplaceIntegration : CodeMashRequestBase, IReturn
+{
+    public typealias Return = SignOutMarketplaceIntegrationResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+    }
+}
+
 // @Route("/{version}/code/marketplace/integrations", "POST")
 // @DataContract
 public class SaveMarketplaceIntegration : CodeMashRequestBase, IReturn
@@ -13484,6 +13524,12 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
     public var taskId:String?
 
     /**
+    * The MCP connection whose tool runs to list — the calls an AI chat made to one of its tools without a saved function (int_…). One of functionId / triggerId / taskId / integrationId.
+    */
+    // @ApiMember(Description="The MCP connection whose tool runs to list — the calls an AI chat made to one of its tools without a saved function (int_…). One of functionId / triggerId / taskId / integrationId.")
+    public var integrationId:String?
+
+    /**
     * How many runs, newest first: 1-50. Default 20.
     */
     // @ApiMember(DataType="integer", Description="How many runs, newest first: 1-50. Default 20.")
@@ -13495,6 +13541,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
         case functionId
         case triggerId
         case taskId
+        case integrationId
         case limit
     }
 
@@ -13504,6 +13551,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
         functionId = try container.decodeIfPresent(String.self, forKey: .functionId)
         triggerId = try container.decodeIfPresent(String.self, forKey: .triggerId)
         taskId = try container.decodeIfPresent(String.self, forKey: .taskId)
+        integrationId = try container.decodeIfPresent(String.self, forKey: .integrationId)
         limit = try container.decodeIfPresent(Int.self, forKey: .limit)
     }
 
@@ -13513,6 +13561,7 @@ public class GetMarketplaceFunctionRuns : CodeMashRequestBase, IReturn
         if functionId != nil { try container.encode(functionId, forKey: .functionId) }
         if triggerId != nil { try container.encode(triggerId, forKey: .triggerId) }
         if taskId != nil { try container.encode(taskId, forKey: .taskId) }
+        if integrationId != nil { try container.encode(integrationId, forKey: .integrationId) }
         if limit != nil { try container.encode(limit, forKey: .limit) }
     }
 }
@@ -22092,6 +22141,8 @@ public class IssueServiceUserApiKeyResponse : Codable
     public var id:Int?
     public var name:String?
     public var key:String?
+    public var environment:String?
+    public var responseStatus:CodeMashResponseStatus?
 
     required public init(){}
 }
@@ -22099,6 +22150,7 @@ public class IssueServiceUserApiKeyResponse : Codable
 public class ListServiceUserApiKeysResponse : Codable
 {
     public var keys:[ServiceUserApiKeyDto] = []
+    public var responseStatus:CodeMashResponseStatus?
 
     required public init(){}
 }
@@ -24557,6 +24609,9 @@ public class GetMarketplaceIntegrationAccessResponse : ResponseBase
     // @DataMember
     public var functions:IReadOnlyList<MarketplaceAccessFunctionDto>?
 
+    // @DataMember
+    public var canManage:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -24564,6 +24619,7 @@ public class GetMarketplaceIntegrationAccessResponse : ResponseBase
         case packages
         case tools
         case functions
+        case canManage
     }
 
     required public init(from decoder: Decoder) throws {
@@ -24573,6 +24629,7 @@ public class GetMarketplaceIntegrationAccessResponse : ResponseBase
         packages = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessPackageDto>.self, forKey: .packages)
         tools = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessToolDto>.self, forKey: .tools)
         functions = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessFunctionDto>.self, forKey: .functions)
+        canManage = try container.decodeIfPresent(Bool.self, forKey: .canManage)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -24582,6 +24639,7 @@ public class GetMarketplaceIntegrationAccessResponse : ResponseBase
         if packages != nil { try container.encode(packages, forKey: .packages) }
         if tools != nil { try container.encode(tools, forKey: .tools) }
         if functions != nil { try container.encode(functions, forKey: .functions) }
+        if canManage != nil { try container.encode(canManage, forKey: .canManage) }
     }
 }
 
@@ -24731,6 +24789,33 @@ public class StartMarketplaceIntegrationSignInResponse : ResponseBase
         if authorizeUrl != nil { try container.encode(authorizeUrl, forKey: .authorizeUrl) }
         if redirectUrl != nil { try container.encode(redirectUrl, forKey: .redirectUrl) }
         if expiresAt != nil { try container.encode(expiresAt, forKey: .expiresAt) }
+    }
+}
+
+public class SignOutMarketplaceIntegrationResponse : ResponseBase
+{
+    public var wasSignedIn:Bool?
+    public var revoke:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case wasSignedIn
+        case revoke
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        wasSignedIn = try container.decodeIfPresent(Bool.self, forKey: .wasSignedIn)
+        revoke = try container.decodeIfPresent(String.self, forKey: .revoke)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if wasSignedIn != nil { try container.encode(wasSignedIn, forKey: .wasSignedIn) }
+        if revoke != nil { try container.encode(revoke, forKey: .revoke) }
     }
 }
 
@@ -37542,6 +37627,7 @@ public class ServiceUserApiKeyDto : Codable
     public var name:String?
     public var visibleKey:String?
     public var scopes:[String] = []
+    public var environment:String?
     public var createdDate:Date?
     public var expiryDate:Date?
     public var cancelledDate:Date?
@@ -39199,6 +39285,9 @@ public class MarketplaceAccessRoleDto : Codable
     // @DataMember
     public var defaultNotApplied:String?
 
+    // @DataMember
+    public var canChange:Bool?
+
     required public init(){}
 }
 
@@ -39231,6 +39320,12 @@ public class MarketplaceAccessToolDto : Codable
 
     // @DataMember
     public var grantable:Bool?
+
+    // @DataMember
+    public var curated:Bool?
+
+    // @DataMember
+    public var excludedFromFullAccess:Bool?
 
     required public init(){}
 }
@@ -39361,6 +39456,12 @@ public class MarketplaceAccessChangesDto : Codable
     // @DataMember
     public var notGrantable:IReadOnlyList<String>?
 
+    // @DataMember
+    public var readOnlyHintOverridden:IReadOnlyList<String>?
+
+    // @DataMember
+    public var excludedFromFullAccess:IReadOnlyList<String>?
+
     required public init(){}
 }
 
@@ -39435,6 +39536,12 @@ public class MarketplaceFunctionRunDto : Codable
 
     // @DataMember
     public var input:String?
+
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var toolName:String?
 
     required public init(){}
 }
@@ -39686,6 +39793,24 @@ public class PushDeviceListProjection : Codable
     // @DataMember
     public var platformApiLevel:Int?
 
+    // @DataMember
+    public var platform:String?
+
+    // @DataMember
+    public var appVersion:String?
+
+    // @DataMember
+    public var installationId:String?
+
+    // @DataMember
+    public var locale:String?
+
+    // @DataMember
+    public var timeZone:String?
+
+    // @DataMember
+    public var updatedAtUtc:Date?
+
     required public init(){}
 }
 
@@ -39775,12 +39900,16 @@ public class PushCampaignBatchNotificationDto : CampaignBatchNotificationDto
     // @DataMember
     public var content:PushMessageContentDto?
 
+    // @DataMember
+    public var readBy:[NotificationReadMarkDto]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case subject
         case recipients
         case content
+        case readBy
     }
 
     required public init(from decoder: Decoder) throws {
@@ -39789,6 +39918,7 @@ public class PushCampaignBatchNotificationDto : CampaignBatchNotificationDto
         subject = try container.decodeIfPresent(String.self, forKey: .subject)
         recipients = try container.decodeIfPresent(PushRecipientsDto.self, forKey: .recipients)
         content = try container.decodeIfPresent(PushMessageContentDto.self, forKey: .content)
+        readBy = try container.decodeIfPresent([NotificationReadMarkDto].self, forKey: .readBy) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -39797,6 +39927,7 @@ public class PushCampaignBatchNotificationDto : CampaignBatchNotificationDto
         if subject != nil { try container.encode(subject, forKey: .subject) }
         if recipients != nil { try container.encode(recipients, forKey: .recipients) }
         if content != nil { try container.encode(content, forKey: .content) }
+        if readBy != nil { try container.encode(readBy, forKey: .readBy) }
     }
 }
 
@@ -43267,6 +43398,18 @@ public class PushRecipientsDto : Codable
 
     // @DataMember
     public var hasMore:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class NotificationReadMarkDto : Codable
+{
+    // @DataMember
+    public var userId:String?
+
+    // @DataMember
+    public var readAtUtc:Date?
 
     required public init(){}
 }
