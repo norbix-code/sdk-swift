@@ -55,6 +55,9 @@ final class HubCodeModuleTests: XCTestCase {
         ("disableMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/disable", { try await $0.disableMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
         ("testMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/test", { try await $0.testMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
         ("getMarketplaceIntegrationTools", "GET", "/v3/code/marketplace/integrations/mpi_1/tools", { try await $0.getMarketplaceIntegrationTools(["integrationViewId": "mpi_1"]) }),
+        ("getMarketplaceIntegrationAccess", "GET", "/v3/code/marketplace/integrations/mpi_1/access", { try await $0.getMarketplaceIntegrationAccess(["integrationViewId": "mpi_1"]) }),
+        ("setMarketplaceIntegrationRoleAccess", "PUT", "/v3/code/marketplace/integrations/mpi_1/access/roles", { try await $0.setMarketplaceIntegrationRoleAccess(["integrationViewId": "mpi_1"]) }),
+        ("saveMarketplaceIntegrationCustomAccess", "POST", "/v3/code/marketplace/integrations/mpi_1/access/roles/custom", { try await $0.saveMarketplaceIntegrationCustomAccess(["integrationViewId": "mpi_1"]) }),
         ("replaceMarketplaceIntegrationSecrets", "PUT", "/v3/code/marketplace/integrations/mpi_1/secrets", { try await $0.replaceMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("revealMarketplaceIntegrationSecrets", "POST", "/v3/code/marketplace/integrations/mpi_1/secrets/reveal", { try await $0.revealMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("setMarketplaceIntegrationTokenMappings", "PUT", "/v3/code/marketplace/integrations/mpi_1/token-mappings", { try await $0.setMarketplaceIntegrationTokenMappings(["integrationViewId": "mpi_1"]) }),
@@ -76,8 +79,8 @@ final class HubCodeModuleTests: XCTestCase {
     ]
 
     func testEveryRouteVerbAndPath() async throws {
-        XCTAssertEqual(routes.count, 39)
-        XCTAssertEqual(Set(routes.map { $0.name }).count, 39)
+        XCTAssertEqual(routes.count, 42)
+        XCTAssertEqual(Set(routes.map { $0.name }).count, 42)
 
         for route in routes {
             let mock = MockHTTPExecutor()
@@ -224,5 +227,69 @@ final class HubCodeModuleTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_7Hq2mcpServer/tools")
         XCTAssertEqual(try query(mock), [:])
         XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    /// The access matrix of a connection (gateway item access, route 25):
+    /// the id goes into the path, nothing on the query, no body.
+    func testMarketplaceIntegrationAccessPutsTheIdInThePath() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.getMarketplaceIntegrationAccess(["integrationViewId": "int_6Qp1dW2kRm8NsT4vYc0Hb"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_6Qp1dW2kRm8NsT4vYc0Hb/access")
+        XCTAssertEqual(try query(mock), [:])
+        XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    /// A role package (route 26): the id in the path, the role, package and Manage flag in the JSON body.
+    func testSetMarketplaceIntegrationRoleAccessSendsTheRoleInTheBody() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.setMarketplaceIntegrationRoleAccess([
+            "integrationViewId": "int_6Qp1dW2kRm8NsT4vYc0Hb",
+            "roleId": "acc_6Qp1dW2kRm8NsT4vYc0Hb_nr_3kLm9QwErTyU",
+            "package": "ReadOnly",
+            "manage": false,
+        ])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_6Qp1dW2kRm8NsT4vYc0Hb/access/roles")
+        XCTAssertEqual(try query(mock), [:])
+        let sent = try body(mock)
+        XCTAssertNil(sent["integrationViewId"])
+        XCTAssertEqual(sent["roleId"] as? String, "acc_6Qp1dW2kRm8NsT4vYc0Hb_nr_3kLm9QwErTyU")
+        XCTAssertEqual(sent["package"] as? String, "ReadOnly")
+        XCTAssertEqual(sent["manage"] as? Bool, false)
+    }
+
+    /// A custom access policy (route 27): the id in the path, the ticks in the JSON body.
+    func testSaveMarketplaceIntegrationCustomAccessSendsTheTicksInTheBody() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.saveMarketplaceIntegrationCustomAccess([
+            "integrationViewId": "int_6Qp1dW2kRm8NsT4vYc0Hb",
+            "roleId": "acc_6Qp1dW2kRm8NsT4vYc0Hb_nr_3kLm9QwErTyU",
+            "basePackage": "ReadOnly",
+            "tools": ["create_issue"],
+            "functions": ["func_4hT2b9QkLm3XcT1yRfGh7a"],
+            "manage": false,
+            "newPolicyForThisRoleOnly": true,
+        ])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_6Qp1dW2kRm8NsT4vYc0Hb/access/roles/custom")
+        XCTAssertEqual(try query(mock), [:])
+        let sent = try body(mock)
+        XCTAssertNil(sent["integrationViewId"])
+        XCTAssertEqual(sent["roleId"] as? String, "acc_6Qp1dW2kRm8NsT4vYc0Hb_nr_3kLm9QwErTyU")
+        XCTAssertEqual(sent["basePackage"] as? String, "ReadOnly")
+        XCTAssertEqual(sent["tools"] as? [String], ["create_issue"])
+        XCTAssertEqual(sent["functions"] as? [String], ["func_4hT2b9QkLm3XcT1yRfGh7a"])
+        XCTAssertEqual(sent["manage"] as? Bool, false)
+        XCTAssertEqual(sent["newPolicyForThisRoleOnly"] as? Bool, true)
     }
 }
