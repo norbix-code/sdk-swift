@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-13 09:01:24
+Date: 2026-10-13 12:57:24
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -12688,6 +12688,190 @@ public class GetMarketplaceListings : CodeMashListPaginationRequestBase, IReturn
     }
 }
 
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/access", "GET")
+public class GetMarketplaceIntegrationAccess : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetMarketplaceIntegrationAccessResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+    }
+}
+
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/access/roles", "PUT")
+// @DataContract
+public class SetMarketplaceIntegrationRoleAccess : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @DataMember
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    /**
+    * The role's composite id: acc_…_nr_… (account / team role) or pr_…_nr_… (project role).
+    */
+    // @DataMember
+    // @ApiMember(Description="The role's composite id: acc_…_nr_… (account / team role) or pr_…_nr_… (project role).", IsRequired=true)
+    public var roleId:String?
+
+    /**
+    * None, Viewer, FunctionsOnly, ReadOnly or FullAccess.
+    */
+    // @DataMember
+    // @ApiMember(Description="None, Viewer, FunctionsOnly, ReadOnly or FullAccess.")
+    public var package:MarketplaceAccessLevel?
+
+    /**
+    * True to also give the Manage package (edit the connection, its secrets, validation and functions).
+    */
+    // @DataMember
+    // @ApiMember(Description="True to also give the Manage package (edit the connection, its secrets, validation and functions).")
+    public var manage:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+        case roleId
+        case package
+        case manage
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+        roleId = try container.decodeIfPresent(String.self, forKey: .roleId)
+        package = try container.decodeIfPresent(MarketplaceAccessLevel.self, forKey: .package)
+        manage = try container.decodeIfPresent(Bool.self, forKey: .manage)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+        if roleId != nil { try container.encode(roleId, forKey: .roleId) }
+        if package != nil { try container.encode(package, forKey: .package) }
+        if manage != nil { try container.encode(manage, forKey: .manage) }
+    }
+}
+
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/access/roles/custom", "POST")
+// @DataContract
+public class SaveMarketplaceIntegrationCustomAccess : CodeMashRequestBase, IReturn
+{
+    public typealias Return = SaveMarketplaceIntegrationCustomAccessResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @DataMember
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    /**
+    * The role's composite id: acc_…_nr_… or pr_…_nr_….
+    */
+    // @DataMember
+    // @ApiMember(Description="The role's composite id: acc_…_nr_… or pr_…_nr_….", IsRequired=true)
+    public var roleId:String?
+
+    /**
+    * The package to start from: None, Viewer, FunctionsOnly, ReadOnly or FullAccess.
+    */
+    // @DataMember
+    // @ApiMember(Description="The package to start from: None, Viewer, FunctionsOnly, ReadOnly or FullAccess.")
+    public var basePackage:MarketplaceAccessLevel?
+
+    /**
+    * Tool names the role may run (from the connection's tools).
+    */
+    // @DataMember
+    // @ApiMember(Description="Tool names the role may run (from the connection's tools).")
+    public var tools:[String] = []
+
+    /**
+    * Function ids (func_…) of this connection the role may run.
+    */
+    // @DataMember
+    // @ApiMember(Description="Function ids (func_…) of this connection the role may run.")
+    public var functions:[String] = []
+
+    /**
+    * True to include the Manage rights (edit the connection, its secrets, validation and functions).
+    */
+    // @DataMember
+    // @ApiMember(Description="True to include the Manage rights (edit the connection, its secrets, validation and functions).")
+    public var manage:Bool?
+
+    /**
+    * True to write a new policy for this role only when its current custom policy is shared with other roles.
+    */
+    // @DataMember
+    // @ApiMember(Description="True to write a new policy for this role only when its current custom policy is shared with other roles.")
+    public var newPolicyForThisRoleOnly:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+        case roleId
+        case basePackage
+        case tools
+        case functions
+        case manage
+        case newPolicyForThisRoleOnly
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+        roleId = try container.decodeIfPresent(String.self, forKey: .roleId)
+        basePackage = try container.decodeIfPresent(MarketplaceAccessLevel.self, forKey: .basePackage)
+        tools = try container.decodeIfPresent([String].self, forKey: .tools) ?? []
+        functions = try container.decodeIfPresent([String].self, forKey: .functions) ?? []
+        manage = try container.decodeIfPresent(Bool.self, forKey: .manage)
+        newPolicyForThisRoleOnly = try container.decodeIfPresent(Bool.self, forKey: .newPolicyForThisRoleOnly)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+        if roleId != nil { try container.encode(roleId, forKey: .roleId) }
+        if basePackage != nil { try container.encode(basePackage, forKey: .basePackage) }
+        if tools.count > 0 { try container.encode(tools, forKey: .tools) }
+        if functions.count > 0 { try container.encode(functions, forKey: .functions) }
+        if manage != nil { try container.encode(manage, forKey: .manage) }
+        if newPolicyForThisRoleOnly != nil { try container.encode(newPolicyForThisRoleOnly, forKey: .newPolicyForThisRoleOnly) }
+    }
+}
+
 // @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}", "DELETE")
 public class DeleteMarketplaceIntegration : CodeMashRequestBase, IReturn
 {
@@ -24328,6 +24512,86 @@ public class GetMarketplaceListingsResponse : ResponseBase
     }
 }
 
+// @DataContract
+public class GetMarketplaceIntegrationAccessResponse : ResponseBase
+{
+    // @DataMember
+    public var roles:IReadOnlyList<MarketplaceAccessRoleDto>?
+
+    // @DataMember
+    public var packages:IReadOnlyList<MarketplaceAccessPackageDto>?
+
+    // @DataMember
+    public var tools:IReadOnlyList<MarketplaceAccessToolDto>?
+
+    // @DataMember
+    public var functions:IReadOnlyList<MarketplaceAccessFunctionDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case roles
+        case packages
+        case tools
+        case functions
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        roles = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessRoleDto>.self, forKey: .roles)
+        packages = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessPackageDto>.self, forKey: .packages)
+        tools = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessToolDto>.self, forKey: .tools)
+        functions = try container.decodeIfPresent(IReadOnlyList<MarketplaceAccessFunctionDto>.self, forKey: .functions)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if roles != nil { try container.encode(roles, forKey: .roles) }
+        if packages != nil { try container.encode(packages, forKey: .packages) }
+        if tools != nil { try container.encode(tools, forKey: .tools) }
+        if functions != nil { try container.encode(functions, forKey: .functions) }
+    }
+}
+
+// @DataContract
+public class SaveMarketplaceIntegrationCustomAccessResponse : ResponseBase
+{
+    // @DataMember
+    public var policyId:String?
+
+    // @DataMember
+    public var created:Bool?
+
+    // @DataMember
+    public var usedByRoles:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case policyId
+        case created
+        case usedByRoles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        policyId = try container.decodeIfPresent(String.self, forKey: .policyId)
+        created = try container.decodeIfPresent(Bool.self, forKey: .created)
+        usedByRoles = try container.decodeIfPresent(Int.self, forKey: .usedByRoles)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if policyId != nil { try container.encode(policyId, forKey: .policyId) }
+        if created != nil { try container.encode(created, forKey: .created) }
+        if usedByRoles != nil { try container.encode(usedByRoles, forKey: .usedByRoles) }
+    }
+}
+
 public class GetMarketplaceIntegrationResponse : ResponseBase
 {
     public var integration:MarketplaceIntegrationDto?
@@ -24454,11 +24718,15 @@ public class TestMarketplaceIntegrationResponse : ResponseBase
     // @DataMember
     public var steps:IReadOnlyList<MarketplaceValidationStepResultDto>?
 
+    // @DataMember
+    public var accessChanges:MarketplaceAccessChangesDto?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case items
         case steps
+        case accessChanges
     }
 
     required public init(from decoder: Decoder) throws {
@@ -24466,6 +24734,7 @@ public class TestMarketplaceIntegrationResponse : ResponseBase
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decodeIfPresent(IReadOnlyList<IntegrationTestResultItemDto>.self, forKey: .items)
         steps = try container.decodeIfPresent(IReadOnlyList<MarketplaceValidationStepResultDto>.self, forKey: .steps)
+        accessChanges = try container.decodeIfPresent(MarketplaceAccessChangesDto.self, forKey: .accessChanges)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -24473,6 +24742,7 @@ public class TestMarketplaceIntegrationResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if items != nil { try container.encode(items, forKey: .items) }
         if steps != nil { try container.encode(steps, forKey: .steps) }
+        if accessChanges != nil { try container.encode(accessChanges, forKey: .accessChanges) }
     }
 }
 
@@ -35987,6 +36257,16 @@ public enum MarketplaceTransport : String, Codable
     case Sdk
 }
 
+public enum MarketplaceAccessLevel : String, Codable
+{
+    case None
+    case Viewer
+    case FunctionsOnly
+    case ReadOnly
+    case FullAccess
+    case Manage
+}
+
 public class CodeIntegrationRequest : Codable
 {
     public var integrationId:String?
@@ -38796,6 +39076,90 @@ public class MarketplaceListingProjection : IHasViewId, Codable
 }
 
 // @DataContract
+public class MarketplaceAccessRoleDto : Codable
+{
+    // @DataMember
+    public var roleId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var scope:String?
+
+    // @DataMember
+    public var isSystem:Bool?
+
+    // @DataMember
+    public var fixed:Bool?
+
+    // @DataMember
+    public var package:MarketplaceAccessLevel?
+
+    // @DataMember
+    public var isCustom:Bool?
+
+    // @DataMember
+    public var manage:Bool?
+
+    // @DataMember
+    public var custom:IReadOnlyList<MarketplaceAccessCustomPolicyDto>?
+
+    // @DataMember
+    public var defaultNotApplied:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceAccessPackageDto : Codable
+{
+    // @DataMember
+    public var kind:MarketplaceAccessLevel?
+
+    // @DataMember
+    public var policyId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var exists:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceAccessToolDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var readOnly:Bool?
+
+    // @DataMember
+    public var grantable:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceAccessFunctionDto : Codable
+{
+    // @DataMember
+    public var functionId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var functionKey:String?
+
+    required public init(){}
+}
+
+// @DataContract
 public class MarketplaceIntegrationListProjection : IHasViewId, Codable
 {
     // @DataMember
@@ -38881,6 +39245,24 @@ public class MarketplaceValidationStepResultDto : Codable
 
     // @DataMember
     public var message:String?
+
+    // @DataMember
+    public var errorCode:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceAccessChangesDto : Codable
+{
+    // @DataMember
+    public var readOnlyAdded:IReadOnlyList<String>?
+
+    // @DataMember
+    public var readOnlyRemoved:IReadOnlyList<String>?
+
+    // @DataMember
+    public var notGrantable:IReadOnlyList<String>?
 
     required public init(){}
 }
@@ -42752,6 +43134,21 @@ public class SmsRecipientsDto : Codable
 
     // @DataMember
     public var hasMore:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceAccessCustomPolicyDto : Codable
+{
+    // @DataMember
+    public var policyId:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var usedByRoles:Int?
 
     required public init(){}
 }
