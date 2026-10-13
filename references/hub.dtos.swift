@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-13 06:06:38
+Date: 2026-10-13 09:01:24
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -12824,6 +12824,36 @@ public class GetMarketplaceIntegrations : CodeMashListPaginationRequestBase, IRe
     }
 }
 
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/tools", "GET")
+public class GetMarketplaceIntegrationTools : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetMarketplaceIntegrationToolsResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+    }
+}
+
 // @Route("/{version}/code/marketplace/integrations", "POST")
 // @DataContract
 public class SaveMarketplaceIntegration : CodeMashRequestBase, IReturn
@@ -24341,6 +24371,41 @@ public class GetMarketplaceIntegrationsResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class GetMarketplaceIntegrationToolsResponse : ResponseBase
+{
+    public var tools:IReadOnlyList<MarketplaceMcpToolDto>?
+    public var listedAt:Date?
+    public var catalogHash:String?
+    public var truncated:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case tools
+        case listedAt
+        case catalogHash
+        case truncated
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        tools = try container.decodeIfPresent(IReadOnlyList<MarketplaceMcpToolDto>.self, forKey: .tools)
+        listedAt = try container.decodeIfPresent(Date.self, forKey: .listedAt)
+        catalogHash = try container.decodeIfPresent(String.self, forKey: .catalogHash)
+        truncated = try container.decodeIfPresent(Bool.self, forKey: .truncated)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if tools != nil { try container.encode(tools, forKey: .tools) }
+        if listedAt != nil { try container.encode(listedAt, forKey: .listedAt) }
+        if catalogHash != nil { try container.encode(catalogHash, forKey: .catalogHash) }
+        if truncated != nil { try container.encode(truncated, forKey: .truncated) }
     }
 }
 
@@ -38768,6 +38833,30 @@ public class MarketplaceIntegrationListProjection : IHasViewId, Codable
 
     // @DataMember
     public var requiresHumanDeliveryConfirmation:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class MarketplaceMcpToolDto : Codable
+{
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var Description:String?
+
+    // @DataMember
+    public var inputSchema:String?
+
+    // @DataMember
+    public var readOnlyHint:Bool?
+
+    // @DataMember
+    public var destructiveHint:Bool?
 
     required public init(){}
 }
