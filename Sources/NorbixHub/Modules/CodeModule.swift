@@ -277,6 +277,19 @@ public final class CodeModule: Sendable {
         )
     }
 
+    /// POST: start the OAuth sign-in of an MCP connection (route 28): `["integrationViewId": "int_…"]`;
+    /// answers `authorizeUrl` (open it in a browser), `redirectUrl`, `expiresAt`.
+    public func startMarketplaceIntegrationSignIn(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/oauth/start",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func replaceMarketplaceIntegrationSecrets(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/secrets",
