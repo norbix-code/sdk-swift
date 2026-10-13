@@ -229,6 +229,18 @@ public final class CodeModule: Sendable {
         )
     }
 
+    /// GET the stored MCP tool catalog of a connection (route 24): `["integrationViewId": "int_…"]`.
+    public func getMarketplaceIntegrationTools(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/tools",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func replaceMarketplaceIntegrationSecrets(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/secrets",

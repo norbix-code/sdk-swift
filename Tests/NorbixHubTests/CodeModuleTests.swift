@@ -54,6 +54,7 @@ final class HubCodeModuleTests: XCTestCase {
         ("enableMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/enable", { try await $0.enableMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
         ("disableMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/disable", { try await $0.disableMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
         ("testMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/test", { try await $0.testMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
+        ("getMarketplaceIntegrationTools", "GET", "/v3/code/marketplace/integrations/mpi_1/tools", { try await $0.getMarketplaceIntegrationTools(["integrationViewId": "mpi_1"]) }),
         ("replaceMarketplaceIntegrationSecrets", "PUT", "/v3/code/marketplace/integrations/mpi_1/secrets", { try await $0.replaceMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("revealMarketplaceIntegrationSecrets", "POST", "/v3/code/marketplace/integrations/mpi_1/secrets/reveal", { try await $0.revealMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("setMarketplaceIntegrationTokenMappings", "PUT", "/v3/code/marketplace/integrations/mpi_1/token-mappings", { try await $0.setMarketplaceIntegrationTokenMappings(["integrationViewId": "mpi_1"]) }),
@@ -75,8 +76,8 @@ final class HubCodeModuleTests: XCTestCase {
     ]
 
     func testEveryRouteVerbAndPath() async throws {
-        XCTAssertEqual(routes.count, 38)
-        XCTAssertEqual(Set(routes.map { $0.name }).count, 38)
+        XCTAssertEqual(routes.count, 39)
+        XCTAssertEqual(Set(routes.map { $0.name }).count, 39)
 
         for route in routes {
             let mock = MockHTTPExecutor()
@@ -208,6 +209,20 @@ final class HubCodeModuleTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/functions/runs")
         XCTAssertEqual(try query(mock), ["functionId": "func_1p4R3gTobGZpD6fXvHT4rd", "limit": "50"])
+        XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    /// The stored MCP tool catalog of a connection (gateway item mcp-step1, route 24):
+    /// the id goes into the path, nothing on the query, no body.
+    func testMarketplaceIntegrationToolsPutTheIdInThePath() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.getMarketplaceIntegrationTools(["integrationViewId": "int_7Hq2mcpServer"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_7Hq2mcpServer/tools")
+        XCTAssertEqual(try query(mock), [:])
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
 }
