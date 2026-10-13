@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-13 12:57:24
+Date: 2026-10-13 13:23:40
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -13038,6 +13038,36 @@ public class GetMarketplaceIntegrationTools : CodeMashRequestBase, IReturn
     }
 }
 
+// @Route("/{version}/code/marketplace/integrations/{IntegrationViewId}/oauth/start", "POST")
+public class StartMarketplaceIntegrationSignIn : CodeMashRequestBase, IReturn
+{
+    public typealias Return = StartMarketplaceIntegrationSignInResponse
+
+    /**
+    * Integration view id, from get_marketplace_integrations.
+    */
+    // @ApiMember(Description="Integration view id, from get_marketplace_integrations.", IsRequired=true)
+    public var integrationViewId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case integrationViewId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        integrationViewId = try container.decodeIfPresent(String.self, forKey: .integrationViewId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if integrationViewId != nil { try container.encode(integrationViewId, forKey: .integrationViewId) }
+    }
+}
+
 // @Route("/{version}/code/marketplace/integrations", "POST")
 // @DataContract
 public class SaveMarketplaceIntegration : CodeMashRequestBase, IReturn
@@ -24673,6 +24703,37 @@ public class GetMarketplaceIntegrationToolsResponse : ResponseBase
     }
 }
 
+public class StartMarketplaceIntegrationSignInResponse : ResponseBase
+{
+    public var authorizeUrl:String?
+    public var redirectUrl:String?
+    public var expiresAt:Date?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case authorizeUrl
+        case redirectUrl
+        case expiresAt
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        authorizeUrl = try container.decodeIfPresent(String.self, forKey: .authorizeUrl)
+        redirectUrl = try container.decodeIfPresent(String.self, forKey: .redirectUrl)
+        expiresAt = try container.decodeIfPresent(Date.self, forKey: .expiresAt)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if authorizeUrl != nil { try container.encode(authorizeUrl, forKey: .authorizeUrl) }
+        if redirectUrl != nil { try container.encode(redirectUrl, forKey: .redirectUrl) }
+        if expiresAt != nil { try container.encode(expiresAt, forKey: .expiresAt) }
+    }
+}
+
 public class EmptyMarketplaceSecretsResponse : ResponseBase
 {
     required public init(){ super.init() }
@@ -33681,6 +33742,18 @@ public class MarketplaceIntegrationDto : IntegrationDto
     // @DataMember
     public var lastValidationSteps:[MarketplaceValidationStepResultDto]?
 
+    // @DataMember
+    public var signedIn:Bool?
+
+    // @DataMember
+    public var signedInBy:String?
+
+    // @DataMember
+    public var signedInAt:Date?
+
+    // @DataMember
+    public var tokenExpiresAt:Date?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -33691,6 +33764,10 @@ public class MarketplaceIntegrationDto : IntegrationDto
         case Description
         case config
         case lastValidationSteps
+        case signedIn
+        case signedInBy
+        case signedInAt
+        case tokenExpiresAt
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33703,6 +33780,10 @@ public class MarketplaceIntegrationDto : IntegrationDto
         Description = try container.decodeIfPresent(String.self, forKey: .Description)
         config = try container.decodeIfPresent(IReadOnlyDictionary<String, String>.self, forKey: .config)
         lastValidationSteps = try container.decodeIfPresent([MarketplaceValidationStepResultDto].self, forKey: .lastValidationSteps) ?? []
+        signedIn = try container.decodeIfPresent(Bool.self, forKey: .signedIn)
+        signedInBy = try container.decodeIfPresent(String.self, forKey: .signedInBy)
+        signedInAt = try container.decodeIfPresent(Date.self, forKey: .signedInAt)
+        tokenExpiresAt = try container.decodeIfPresent(Date.self, forKey: .tokenExpiresAt)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33715,6 +33796,10 @@ public class MarketplaceIntegrationDto : IntegrationDto
         if Description != nil { try container.encode(Description, forKey: .Description) }
         if config != nil { try container.encode(config, forKey: .config) }
         if lastValidationSteps != nil { try container.encode(lastValidationSteps, forKey: .lastValidationSteps) }
+        if signedIn != nil { try container.encode(signedIn, forKey: .signedIn) }
+        if signedInBy != nil { try container.encode(signedInBy, forKey: .signedInBy) }
+        if signedInAt != nil { try container.encode(signedInAt, forKey: .signedInAt) }
+        if tokenExpiresAt != nil { try container.encode(tokenExpiresAt, forKey: .tokenExpiresAt) }
     }
 }
 
@@ -33789,6 +33874,12 @@ public class MarketplaceListingDto : IHasViewId, Codable
 
     // @DataMember
     public var availability:MarketplaceAvailability?
+
+    // @DataMember
+    public var connectSteps:IReadOnlyList<String>?
+
+    // @DataMember
+    public var oAuthRedirectUrl:String?
 
     // @DataMember
     public var isOfficial:Bool?
@@ -39197,6 +39288,12 @@ public class MarketplaceIntegrationListProjection : IHasViewId, Codable
 
     // @DataMember
     public var requiresHumanDeliveryConfirmation:Bool?
+
+    // @DataMember
+    public var signedIn:Bool?
+
+    // @DataMember
+    public var signedInAt:Date?
 
     required public init(){}
 }
