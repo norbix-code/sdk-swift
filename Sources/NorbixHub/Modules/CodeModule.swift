@@ -241,6 +241,42 @@ public final class CodeModule: Sendable {
         )
     }
 
+    /// GET the access matrix of a connection (route 25): `["integrationViewId": "int_…"]`.
+    public func getMarketplaceIntegrationAccess(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/access",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// PUT one package (None, Viewer, FunctionsOnly, ReadOnly, FullAccess) and the Manage flag on a role (route 26): `integrationViewId`, `roleId`, `package`, `manage`.
+    public func setMarketplaceIntegrationRoleAccess(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/access/roles",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// POST a custom access policy of the connection for one role (route 27): `integrationViewId`, `roleId`, `basePackage`, `tools`, `functions`, `manage`, `newPolicyForThisRoleOnly`.
+    public func saveMarketplaceIntegrationCustomAccess(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/access/roles/custom",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func replaceMarketplaceIntegrationSecrets(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/marketplace/integrations/{IntegrationViewId}/secrets",
