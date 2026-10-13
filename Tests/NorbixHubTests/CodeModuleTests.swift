@@ -59,6 +59,7 @@ final class HubCodeModuleTests: XCTestCase {
         ("setMarketplaceIntegrationRoleAccess", "PUT", "/v3/code/marketplace/integrations/mpi_1/access/roles", { try await $0.setMarketplaceIntegrationRoleAccess(["integrationViewId": "mpi_1"]) }),
         ("saveMarketplaceIntegrationCustomAccess", "POST", "/v3/code/marketplace/integrations/mpi_1/access/roles/custom", { try await $0.saveMarketplaceIntegrationCustomAccess(["integrationViewId": "mpi_1"]) }),
         ("startMarketplaceIntegrationSignIn", "POST", "/v3/code/marketplace/integrations/mpi_1/oauth/start", { try await $0.startMarketplaceIntegrationSignIn(["integrationViewId": "mpi_1"]) }),
+        ("signOutMarketplaceIntegration", "POST", "/v3/code/marketplace/integrations/mpi_1/oauth/sign-out", { try await $0.signOutMarketplaceIntegration(["integrationViewId": "mpi_1"]) }),
         ("replaceMarketplaceIntegrationSecrets", "PUT", "/v3/code/marketplace/integrations/mpi_1/secrets", { try await $0.replaceMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("revealMarketplaceIntegrationSecrets", "POST", "/v3/code/marketplace/integrations/mpi_1/secrets/reveal", { try await $0.revealMarketplaceIntegrationSecrets(["integrationViewId": "mpi_1"]) }),
         ("setMarketplaceIntegrationTokenMappings", "PUT", "/v3/code/marketplace/integrations/mpi_1/token-mappings", { try await $0.setMarketplaceIntegrationTokenMappings(["integrationViewId": "mpi_1"]) }),
@@ -80,8 +81,8 @@ final class HubCodeModuleTests: XCTestCase {
     ]
 
     func testEveryRouteVerbAndPath() async throws {
-        XCTAssertEqual(routes.count, 43)
-        XCTAssertEqual(Set(routes.map { $0.name }).count, 43)
+        XCTAssertEqual(routes.count, 44)
+        XCTAssertEqual(Set(routes.map { $0.name }).count, 44)
 
         for route in routes {
             let mock = MockHTTPExecutor()
@@ -304,6 +305,20 @@ final class HubCodeModuleTests: XCTestCase {
 
         XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
         XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_6Qp1dW2kRm8NsT4vYc0Hb/oauth/start")
+        XCTAssertEqual(try query(mock), [:])
+        XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    /// The OAuth sign-out of an MCP connection (gateway item access-2b, route 30):
+    /// a POST with the id in the path, nothing on the query and no body.
+    func testSignOutMarketplaceIntegrationPutsTheIdInThePath() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.code.signOutMarketplaceIntegration(["integrationViewId": "int_6Qp1dW2kRm8NsT4vYc0Hb"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/integrations/int_6Qp1dW2kRm8NsT4vYc0Hb/oauth/sign-out")
         XCTAssertEqual(try query(mock), [:])
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
