@@ -106,12 +106,13 @@ public final class Transport: @unchecked Sendable {
         timeout: TimeInterval? = nil,
         bearerToken: String? = nil,
         env: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        language: String? = nil
     ) async throws -> Any? {
         let data = try await performRequest(
             path: path, method: method, request: request,
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
-            region: region
+            region: region, language: language
         )
         if data.isEmpty { return nil }
         // A 2xx does not mean the call worked: the gateway answers a business
@@ -145,13 +146,14 @@ public final class Transport: @unchecked Sendable {
         bearerToken: String? = nil,
         env: String? = nil,
         region: String? = nil,
+        language: String? = nil,
         as type: T.Type,
         decoder: JSONDecoder = .norbixDefault
     ) async throws -> T {
         let data = try await performRequest(
             path: path, method: method, request: request,
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
-            region: region
+            region: region, language: language
         )
         // Same rule as the untyped variant: a 200 the gateway marked as failed
         // is a failure, not a value to decode (10b-files, issue #67).
@@ -179,12 +181,13 @@ public final class Transport: @unchecked Sendable {
         timeout: TimeInterval? = nil,
         bearerToken: String? = nil,
         env: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        language: String? = nil
     ) async throws -> Data {
         try await performRequest(
             path: path, method: method, request: request,
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
-            region: region
+            region: region, language: language
         )
     }
 
@@ -232,12 +235,13 @@ public final class Transport: @unchecked Sendable {
         timeout: TimeInterval?,
         bearerToken: String?,
         env: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        language: String? = nil
     ) async throws -> Data {
         try await performRequestFull(
             path: path, method: method, request: request,
             scope: scope, timeout: timeout, bearerToken: bearerToken, env: env,
-            region: region
+            region: region, language: language
         ).0
     }
 
@@ -253,6 +257,7 @@ public final class Transport: @unchecked Sendable {
         bearerToken: String?,
         env: String? = nil,
         region: String? = nil,
+        language: String? = nil,
         accept: String = "application/json",
         extraHeaders: [String: String] = [:],
         rawBody: Data? = nil
@@ -328,6 +333,17 @@ public final class Transport: @unchecked Sendable {
         let resolvedRegion = region ?? snapshot.region
         if let resolvedRegion, !resolvedRegion.isEmpty {
             httpRequest.setValue(resolvedRegion, forHTTPHeaderField: "nb-region")
+        }
+
+        // Language selector: per-call override wins over the client default.
+        // There is no default language, so `Accept-Language` is sent only
+        // when resolved, verbatim (q-values are honoured by the gateway; the
+        // project default applies when nothing matches). The gateway's old
+        // `cultureCode` field and `CultureCode` / `norbix-language` headers
+        // are gone — this header is the only language input.
+        let resolvedLanguage = language ?? snapshot.language
+        if let resolvedLanguage, !resolvedLanguage.isEmpty {
+            httpRequest.setValue(resolvedLanguage, forHTTPHeaderField: "Accept-Language")
         }
 
         if let body = built.body {
