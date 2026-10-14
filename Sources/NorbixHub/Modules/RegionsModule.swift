@@ -27,7 +27,8 @@ public final class RegionsModule: Sendable {
         _ request: [String: Any] = [:],
         timeout: TimeInterval? = nil,
         bearerToken: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        language: String? = nil
     ) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/regions",
@@ -36,7 +37,8 @@ public final class RegionsModule: Sendable {
             scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken,
-            region: region
+            region: region,
+            language: language
         )
     }
 
@@ -51,7 +53,8 @@ public final class RegionsModule: Sendable {
         additionalRegions: [String]? = nil,
         timeout: TimeInterval? = nil,
         bearerToken: String? = nil,
-        region: String? = nil
+        region: String? = nil,
+        language: String? = nil
     ) async throws -> Any? {
         var request: [String: Any] = ["projectId": projectId]
         if let primaryRegion { request["primaryRegion"] = primaryRegion }
@@ -63,7 +66,8 @@ public final class RegionsModule: Sendable {
             scope: .project,
             timeout: timeout,
             bearerToken: bearerToken,
-            region: region
+            region: region,
+            language: language
         )
     }
 }

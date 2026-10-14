@@ -79,6 +79,12 @@ public struct NorbixConfig: Sendable {
     /// when unset (`nil`, the default) no header is sent and the backend
     /// picks its own default.
     public var region: String?
+    /// Language every request asks for, sent verbatim as the standard
+    /// `Accept-Language` header (e.g. `lt` or `lt-LT, en;q=0.8` — q-values
+    /// are honoured by the gateway). There is **no default language**: when
+    /// unset (`nil`, the default) no header is sent and the gateway answers
+    /// in the project's default language. Responses carry `Content-Language`.
+    public var language: String?
     public var auth: NorbixAuth
     public var baseUrl: String
     public var version: String
@@ -97,6 +103,7 @@ public struct NorbixConfig: Sendable {
         accountId: String? = nil,
         env: String = "PROD",
         region: String? = nil,
+        language: String? = nil,
         auth: NorbixAuth = .unauthenticated,
         baseUrl: String,
         version: String,
@@ -121,6 +128,7 @@ public struct NorbixConfig: Sendable {
         self.accountId = accountId
         self.env = env
         self.region = (region?.isEmpty == false) ? region : nil
+        self.language = (language?.isEmpty == false) ? language : nil
         self.auth = auth
         self.baseUrl = baseUrl
         self.version = version
@@ -140,6 +148,7 @@ public struct NorbixConfig: Sendable {
     /// - `NORBIX_API_VERSION` / `NORBIX_HUB_VERSION` (override version)
     /// - `NORBIX_ENV` (project environment, defaults to `PROD`)
     /// - `NORBIX_REGION` (Norbix region code, e.g. `nb-eu-germany`; unset by default)
+    /// - `NORBIX_LANGUAGE` (`Accept-Language` value, e.g. `lt-LT, en;q=0.8`; unset by default)
     public static func fromEnvironment(
         target: Target,
         environment: [String: String] = ProcessInfo.processInfo.environment
@@ -183,6 +192,7 @@ public struct NorbixConfig: Sendable {
             accountId: environment["NORBIX_ACCOUNT_ID"],
             env: environment["NORBIX_ENV"] ?? "PROD",
             region: environment["NORBIX_REGION"],
+            language: environment["NORBIX_LANGUAGE"],
             auth: auth,
             baseUrl: baseUrl,
             version: version,

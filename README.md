@@ -144,6 +144,7 @@ initializers and `NorbixConfig.fromEnvironment` fall back to it when no
 
 ```bash
 NORBIX_REGION=nb-eu-germany
+NORBIX_LANGUAGE="lt-LT, en;q=0.8"   # optional: sent as Accept-Language
 ```
 
 ### Switching at runtime
@@ -215,6 +216,59 @@ _ = try await hub.account.createProject([
     // ...other project fields
 ])
 ```
+
+## Language
+
+The gateway picks the response language from the standard `Accept-Language`
+header only (q-values are honoured; the project's default language applies
+when nothing matches) and names the language it used in the
+`Content-Language` response header. There is **no default language**: when
+none is configured, no header is sent.
+
+Pass `language` when constructing either client — a single tag or a full
+q-value list, sent verbatim:
+
+```swift
+let client = try NorbixApiClient(
+    projectId: "proj_123",
+    apiKey: "sk_live_xxx",
+    language: "lt"
+)
+
+let hub = try NorbixHubClient(
+    projectId: "proj_123",
+    apiKey: "sk_live_xxx",
+    language: "lt-LT, en;q=0.8"
+)
+```
+
+Or set the `NORBIX_LANGUAGE` environment variable — the convenience
+initializers and `NorbixConfig.fromEnvironment` fall back to it when no
+`language` argument is given:
+
+```bash
+NORBIX_LANGUAGE="lt-LT, en;q=0.8"
+```
+
+Switch at runtime with `setLanguage(_:)` and read it back with `language`;
+`nil` (or an empty string) unsets it, so no header is sent again:
+
+```swift
+hub.setLanguage("en")
+print(hub.language ?? "unset") // "en"
+hub.setLanguage(nil)           // unset: no Accept-Language header
+```
+
+Wherever a per-call `region:` exists (the `hub.regions` methods and the
+`Transport.send` / `downloadData` calls) a per-call `language:` overrides the
+client's language for that single request:
+
+```swift
+let regions = try await hub.regions.getAccountRegions([:], language: "en")
+```
+
+The old `cultureCode` request field and the `CultureCode` /
+`norbix-language` headers are no longer read by the gateway; use `language`.
 
 ## Real-world examples
 

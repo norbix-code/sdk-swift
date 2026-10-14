@@ -99,6 +99,7 @@ public final class NorbixHubClient: Sendable {
         accountId: String? = nil,
         env: String? = nil,
         region: String? = nil,
+        language: String? = nil,
         baseUrl: String? = nil,
         version: String? = nil,
         timeout: TimeInterval = NorbixDefaults.timeout,
@@ -135,6 +136,7 @@ public final class NorbixHubClient: Sendable {
             accountId: accountId ?? processEnv["NORBIX_ACCOUNT_ID"],
             env: env ?? processEnv["NORBIX_ENV"] ?? "PROD",
             region: region ?? processEnv["NORBIX_REGION"],
+            language: language ?? processEnv["NORBIX_LANGUAGE"],
             auth: auth,
             baseUrl: baseUrl ?? processEnv["NORBIX_HUB_URL"] ?? NorbixDefaults.hubBaseUrl,
             version: version ?? processEnv["NORBIX_HUB_VERSION"] ?? NorbixDefaults.hubVersion,
@@ -227,6 +229,25 @@ public final class NorbixHubClient: Sendable {
     /// Current Norbix region the client targets, or `nil` when unset.
     public var region: String? {
         transport.config.region
+    }
+
+    /// Switch the language for subsequent requests (`Accept-Language`
+    /// header, e.g. `"lt"` or `"lt-LT, en;q=0.8"`; sent verbatim). Pass
+    /// `nil` (or an empty string) to unset — there is no default language,
+    /// so no header is sent when unset and the gateway answers in the
+    /// project's default language. Per-call `language` arguments still
+    /// override the header for individual requests.
+    public func setLanguage(_ language: String?) {
+        let resolved = (language?.isEmpty == false) ? language : nil
+        transport.updateConfig { config in
+            config.language = resolved
+        }
+    }
+
+    /// Current language (`Accept-Language` value) the client sends, or `nil`
+    /// when unset.
+    public var language: String? {
+        transport.config.language
     }
 
     public var isAuthenticated: Bool {
