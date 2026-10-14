@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-13 16:21:30
+Date: 2026-10-14 08:01:45
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -5495,6 +5495,13 @@ public class GetDatabaseTaxonomyTreeRequest : CodeMashRequestBase, IReturn
     public typealias Return = GetDatabaseTaxonomyTreeResponse
 
     /**
+    * Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.
+    */
+    // @DataMember
+    // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
+    public var allLanguages:Bool?
+
+    /**
     * When true, each taxonomy node also carries its own term tree (heavier response).
     */
     // @DataMember
@@ -5511,6 +5518,7 @@ public class GetDatabaseTaxonomyTreeRequest : CodeMashRequestBase, IReturn
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case allLanguages
         case includeTerms
         case databaseIntegrationId
     }
@@ -5518,6 +5526,7 @@ public class GetDatabaseTaxonomyTreeRequest : CodeMashRequestBase, IReturn
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
         includeTerms = try container.decodeIfPresent(Bool.self, forKey: .includeTerms)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
     }
@@ -5525,6 +5534,7 @@ public class GetDatabaseTaxonomyTreeRequest : CodeMashRequestBase, IReturn
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
         if includeTerms != nil { try container.encode(includeTerms, forKey: .includeTerms) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
     }
@@ -5749,6 +5759,13 @@ public class GetDatabaseTaxonomyTermRequest : CodeMashRequestBase, IReturn
     public typealias Return = GetDatabaseTaxonomyTermResponse
 
     /**
+    * Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.
+    */
+    // @DataMember
+    // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
+    public var allLanguages:Bool?
+
+    /**
     * Taxonomy id from get_database_taxonomies.
     */
     // @DataMember
@@ -5772,6 +5789,7 @@ public class GetDatabaseTaxonomyTermRequest : CodeMashRequestBase, IReturn
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case allLanguages
         case taxonomyId
         case id
         case databaseIntegrationId
@@ -5780,6 +5798,7 @@ public class GetDatabaseTaxonomyTermRequest : CodeMashRequestBase, IReturn
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
         taxonomyId = try container.decodeIfPresent(String.self, forKey: .taxonomyId)
         id = try container.decodeIfPresent(String.self, forKey: .id)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
@@ -5788,6 +5807,7 @@ public class GetDatabaseTaxonomyTermRequest : CodeMashRequestBase, IReturn
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
         if taxonomyId != nil { try container.encode(taxonomyId, forKey: .taxonomyId) }
         if id != nil { try container.encode(id, forKey: .id) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
@@ -5803,6 +5823,13 @@ public class GetDatabaseTaxonomyTermRequest : CodeMashRequestBase, IReturn
 public class GetDatabaseMergedTermTreeRequest : CodeMashRequestBase, IReturn
 {
     public typealias Return = GetDatabaseMergedTermTreeResponse
+
+    /**
+    * Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.
+    */
+    // @DataMember
+    // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
+    public var allLanguages:Bool?
 
     /**
     * Root taxonomy slug/name (from get_database_taxonomies). Its terms are the roots; child-taxonomy terms nest under them.
@@ -5821,6 +5848,7 @@ public class GetDatabaseMergedTermTreeRequest : CodeMashRequestBase, IReturn
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case allLanguages
         case taxonomyName
         case databaseIntegrationId
     }
@@ -5828,6 +5856,7 @@ public class GetDatabaseMergedTermTreeRequest : CodeMashRequestBase, IReturn
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
         taxonomyName = try container.decodeIfPresent(String.self, forKey: .taxonomyName)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
     }
@@ -5835,6 +5864,7 @@ public class GetDatabaseMergedTermTreeRequest : CodeMashRequestBase, IReturn
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
         if taxonomyName != nil { try container.encode(taxonomyName, forKey: .taxonomyName) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
     }
@@ -5849,6 +5879,13 @@ public class GetDatabaseMergedTermTreeRequest : CodeMashRequestBase, IReturn
 public class GetDatabaseTaxonomyTermTreeRequest : CodeMashRequestBase, IReturn
 {
     public typealias Return = GetDatabaseTaxonomyTermTreeResponse
+
+    /**
+    * Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.
+    */
+    // @DataMember
+    // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
+    public var allLanguages:Bool?
 
     /**
     * Taxonomy slug/name to fetch the term tree for, from get_database_taxonomies.
@@ -5881,6 +5918,7 @@ public class GetDatabaseTaxonomyTermTreeRequest : CodeMashRequestBase, IReturn
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case allLanguages
         case taxonomyName
         case rootTermId
         case depth
@@ -5890,6 +5928,7 @@ public class GetDatabaseTaxonomyTermTreeRequest : CodeMashRequestBase, IReturn
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        allLanguages = try container.decodeIfPresent(Bool.self, forKey: .allLanguages)
         taxonomyName = try container.decodeIfPresent(String.self, forKey: .taxonomyName)
         rootTermId = try container.decodeIfPresent(String.self, forKey: .rootTermId)
         depth = try container.decodeIfPresent(Int.self, forKey: .depth)
@@ -5899,6 +5938,7 @@ public class GetDatabaseTaxonomyTermTreeRequest : CodeMashRequestBase, IReturn
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if allLanguages != nil { try container.encode(allLanguages, forKey: .allLanguages) }
         if taxonomyName != nil { try container.encode(taxonomyName, forKey: .taxonomyName) }
         if rootTermId != nil { try container.encode(rootTermId, forKey: .rootTermId) }
         if depth != nil { try container.encode(depth, forKey: .depth) }
@@ -19703,6 +19743,40 @@ public class MergeContactsRequest : CodeMashRequestBase, IReturn
 }
 
 /**
+* Repair contact roles from their logins
+*/
+// @Route("/{version}/membership/users/repair-roles", "POST")
+// @Api(Description="Repair contact roles from their logins")
+public class RepairContactRolesRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = RepairContactRolesResponse
+
+    /**
+    * True (default) = only count what would change. False = write.
+    */
+    // @ApiMember(Description="True (default) = only count what would change. False = write.")
+    public var dryRun:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case dryRun
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+    }
+}
+
+/**
 * Update a contact
 */
 // @Route("/{version}/membership/users/{contactId}", "PATCH")
@@ -21008,8 +21082,6 @@ public class GetAccessToken : IReturn, IPost, Codable
 
 public class EchoResponse : Codable
 {
-    public var containerName:String?
-    public var ip:String?
     public var release:CodeMashRelease?
     public var runtime:CodeMashRuntime?
     public var managedServiceHubUrl:String?
@@ -21018,18 +21090,10 @@ public class EchoResponse : Codable
     public var apiUrl:String?
     public var apiVersion:String?
     public var hubVersion:String?
-    public var mjmlUrl:String?
     public var adminUrlTemplate:String?
-    public var license:EchoLicenseDto?
-    public var askForEnterpriseLicenseEmail:String?
     public var emailServiceConfigured:Bool?
     public var rootBootstrapPasswordSource:String?
     public var regions:[EchoRegionDto]?
-    public var isProductionInstallation:Bool?
-    public var licensingMode:String?
-    public var graceDaysLeft:Int?
-    public var installationDomain:String?
-    public var licensingDocsUrl:String?
     public var agent:EchoAgentDto?
     public var hostingPlatform:EchoHostingPlatformDto?
 
@@ -27259,6 +27323,29 @@ public class GetAllContactsResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if items != nil { try container.encode(items, forKey: .items) }
         if nextCursor != nil { try container.encode(nextCursor, forKey: .nextCursor) }
+    }
+}
+
+public class RepairContactRolesResponse : ResponseBase
+{
+    public var result:ContactRolesRepairDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(ContactRolesRepairDto.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
     }
 }
 
@@ -35433,15 +35520,8 @@ public class MarketplaceFunctionSchedulerTaskRequest : SchedulerTaskRequest
 }
 
 // @DataContract(Namespace="http://codemash.io/types/")
-public class RequestBase : ICultureBasedRequest, IVersionBasedRequest, IHasCorrelationIdRequest, Codable
+public class RequestBase : IVersionBasedRequest, IHasCorrelationIdRequest, Codable
 {
-    /**
-    * Specify culture code when your response from the API should be localised. E.g.: en
-    */
-    // @DataMember
-    // @ApiMember(DataType="string", Description="Specify culture code when your response from the API should be localised. E.g.: en", Name="CultureCode", ParameterType="header")
-    public var cultureCode:String?
-
     /**
     * TimeZone
     */
@@ -35464,12 +35544,6 @@ public class RequestBase : ICultureBasedRequest, IVersionBasedRequest, IHasCorre
     public var correlationId:String?
 
     required public init(){}
-}
-
-public protocol ICultureBasedRequest
-{
-    var cultureCode:String? { get set }
-
 }
 
 public protocol IVersionBasedRequest
@@ -36749,33 +36823,6 @@ public enum CodeMashRuntime : String, Codable
     case Production
 }
 
-// @DataContract
-public class EchoLicenseDto : Codable
-{
-    // @DataMember(Name="domain")
-    public var domain:String?
-
-    // @DataMember(Name="accountId")
-    public var accountId:String?
-
-    // @DataMember(Name="email")
-    public var email:String?
-
-    // @DataMember(Name="release")
-    public var release:String?
-
-    // @DataMember(Name="expire")
-    public var expire:Int?
-
-    // @DataMember(Name="isTrial")
-    public var isTrial:Bool?
-
-    // @DataMember(Name="cap")
-    public var cap:Int?
-
-    required public init(){}
-}
-
 public class EchoRegionDto : Codable
 {
     public var code:String?
@@ -37593,6 +37640,15 @@ public class InstallationLicenseStatusDto : Codable
 
     // @DataMember(Name="message")
     public var message:String?
+
+    // @DataMember(Name="license")
+    public var license:InstallationLicenseDetailsDto?
+
+    // @DataMember(Name="licensingDocsUrl")
+    public var licensingDocsUrl:String?
+
+    // @DataMember(Name="askForEnterpriseLicenseEmail")
+    public var askForEnterpriseLicenseEmail:String?
 
     required public init(){}
 }
@@ -40893,6 +40949,30 @@ public class UserDto : Codable
     required public init(){}
 }
 
+// @DataContract
+public class ContactRolesRepairDto : Codable
+{
+    // @DataMember(Name="dryRun")
+    public var dryRun:Bool?
+
+    // @DataMember(Name="contactsWithoutRoles")
+    public var contactsWithoutRoles:Int?
+
+    // @DataMember(Name="contactsToRepair")
+    public var contactsToRepair:Int?
+
+    // @DataMember(Name="contactsRepaired")
+    public var contactsRepaired:Int?
+
+    // @DataMember(Name="contactsWithoutLoginRoleIds")
+    public var contactsWithoutLoginRoleIds:Int?
+
+    // @DataMember(Name="legacyRoleNamesIgnored")
+    public var legacyRoleNamesIgnored:Int?
+
+    required public init(){}
+}
+
 public class ProjectComplianceDto : Codable
 {
     public var regimes:[String] = []
@@ -42796,6 +42876,33 @@ public class CodeMashSubscriptionDto : Codable
     public var issuedOn:Date?
     public var isTrial:Bool?
     public var subscriptionRefId:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class InstallationLicenseDetailsDto : Codable
+{
+    // @DataMember(Name="domain")
+    public var domain:String?
+
+    // @DataMember(Name="accountId")
+    public var accountId:String?
+
+    // @DataMember(Name="email")
+    public var email:String?
+
+    // @DataMember(Name="release")
+    public var release:String?
+
+    // @DataMember(Name="expire")
+    public var expire:Int?
+
+    // @DataMember(Name="isTrial")
+    public var isTrial:Bool?
+
+    // @DataMember(Name="cap")
+    public var cap:Int?
 
     required public init(){}
 }
