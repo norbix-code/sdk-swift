@@ -151,6 +151,19 @@ public final class PaymentsModule: Sendable {
         )
     }
 
+    /// `GET /{version}/payments/webhooks/log` — the received payment webhooks of the project,
+    /// newest first (optional `integrationId`, `limit`).
+    public func getPaymentsWebhookLog(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/payments/webhooks/log",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func getPaymentsIntegrations(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/payments/integrations",
