@@ -16,5 +16,6 @@
 | `enablePaymentsIntegration` | `PUT` | `/{version}/payments/integrations/{Id}/enable` | `project` |
 | `getPaymentsIntegration` | `GET` | `/{version}/payments/integrations/{id}` | `project` |
 | `getPaymentsIntegrations` | `GET` | `/{version}/payments/integrations` | `project` |
+| `getPaymentsWebhookLog` | `GET` | `/{version}/payments/webhooks/log` | `project` |
 | `savePaymentsIntegration` | `POST` | `/{version}/payments/integrations` | `project` |
 | `testPaymentsIntegration` | `POST` | `/{version}/payments/integrations/test` | `project` |
