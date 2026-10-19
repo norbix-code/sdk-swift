@@ -39,6 +39,7 @@ public final class NorbixApiClient: Sendable {
     public let echo: EchoModule
     public let files: FilesModule
     public let membership: MembershipModule
+    public let payments: PaymentsModule
     public let publicProjects: PublicProjectsModule
 
     /// Build a client from an existing `NorbixConfig`.
@@ -66,6 +67,7 @@ public final class NorbixApiClient: Sendable {
         self.echo = EchoModule(transport: transport)
         self.files = FilesModule(transport: transport)
         self.membership = MembershipModule(transport: transport)
+        self.payments = PaymentsModule(transport: transport)
         self.publicProjects = PublicProjectsModule(transport: transport)
     }
 
