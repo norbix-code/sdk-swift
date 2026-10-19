@@ -18,7 +18,7 @@ both clients use.
 
 | Client | Modules |
 | --- | --- |
-| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `membership`, `publicProjects` |
+| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `membership`, `payments`, `publicProjects` |
 | `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `platform`, `regions`, `scheduler`, `webhooks` |
 
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
