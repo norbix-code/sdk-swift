@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-14 08:01:44
+Date: 2026-10-19 11:32:44
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -22,6 +22,29 @@ BaseUrl: http://localhost:5002
 
 import Foundation
 import ServiceStack
+
+public class SharedTypeGen : Codable
+{
+    public var typegen_StringFieldDto:StringFieldDto?
+    public var typegen_DecimalFieldDto:DecimalFieldDto?
+    public var typegen_CurrencyFieldDto:CurrencyFieldDto?
+    public var typegen_BooleanFieldDto:BooleanFieldDto?
+    public var typegen_DateFieldDto:DateFieldDto?
+    public var typegen_IntegerFieldDto:IntegerFieldDto?
+    public var typegen_GeolocationFieldDto:GeolocationFieldDto?
+    public var typegen_TagsFieldDto:TagsFieldDto?
+    public var typegen_FileFieldDto:FileFieldDto?
+    public var typegen_TaxonomySelectionFieldDto:TaxonomySelectionFieldDto?
+    public var typegen_CollectionSelectionFieldDto:CollectionSelectionFieldDto?
+    public var typegen_UserSelectionFieldDto:UserSelectionFieldDto?
+    public var typegen_RoleSelectionFieldDto:RoleSelectionFieldDto?
+    public var typegen_EnumSelectionFieldDto:EnumSelectionFieldDto?
+    public var typegen_ObjectFieldDto:ObjectFieldDto?
+    public var typegen_ArrayFieldDto:ArrayFieldDto?
+    public var typegen_JsonFieldDto:JsonFieldDto?
+
+    required public init(){}
+}
 
 // @Route("/{version}/echo", "GET")
 public class Echo : RequestBase, IReturn
@@ -800,82 +823,6 @@ public class SaveGuestUser : SaveUser, IReturn
 /**
 * Membership
 */
-// @Route("/{version}/membership/auth/register/user-name", "POST")
-// @Api(Description="Membership")
-// @DataContract
-public class SaveUserNameUser : SaveUser, IReturn
-{
-    public typealias Return = IdResponse
-
-    // @DataMember
-    public var password:String?
-
-    // @DataMember
-    public var userName:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case password
-        case userName
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        password = try container.decodeIfPresent(String.self, forKey: .password)
-        userName = try container.decodeIfPresent(String.self, forKey: .userName)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if password != nil { try container.encode(password, forKey: .password) }
-        if userName != nil { try container.encode(userName, forKey: .userName) }
-    }
-}
-
-/**
-* Membership
-*/
-// @Route("/{version}/membership/auth/register/email", "POST")
-// @Api(Description="Membership")
-// @DataContract
-public class SaveEmailUser : SaveUser, IReturn
-{
-    public typealias Return = IdResponse
-
-    // @DataMember
-    public var password:String?
-
-    // @DataMember
-    public var email:String?
-
-    required public init(){ super.init() }
-
-    private enum CodingKeys : String, CodingKey {
-        case password
-        case email
-    }
-
-    required public init(from decoder: Decoder) throws {
-        try super.init(from: decoder)
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        password = try container.decodeIfPresent(String.self, forKey: .password)
-        email = try container.decodeIfPresent(String.self, forKey: .email)
-    }
-
-    public override func encode(to encoder: Encoder) throws {
-        try super.encode(to: encoder)
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        if password != nil { try container.encode(password, forKey: .password) }
-        if email != nil { try container.encode(email, forKey: .email) }
-    }
-}
-
-/**
-* Membership
-*/
 // @Route("/{version}/membership/auth/register/phone", "POST")
 // @Api(Description="Membership")
 // @DataContract
@@ -906,6 +853,102 @@ public class SavePhoneUser : SaveUser, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if phone != nil { try container.encode(phone, forKey: .phone) }
+    }
+}
+
+/**
+* Membership
+*/
+// @Route("/{version}/membership/auth/register/user-name", "POST")
+// @Api(Description="Membership")
+// @DataContract
+public class SaveUserNameUser : SaveUser, IReturn, IPublicRegistrationRequest
+{
+    public typealias Return = IdResponse
+
+    // @DataMember
+    public var password:String?
+
+    // @DataMember
+    public var userName:String?
+
+    /**
+    * Optional roles from the project's "Permitted user registration roles". Empty = the default registration role.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional roles from the project's \"Permitted user registration roles\". Empty = the default registration role.")
+    public var roles:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case password
+        case userName
+        case roles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        password = try container.decodeIfPresent(String.self, forKey: .password)
+        userName = try container.decodeIfPresent(String.self, forKey: .userName)
+        roles = try container.decodeIfPresent([String].self, forKey: .roles) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if password != nil { try container.encode(password, forKey: .password) }
+        if userName != nil { try container.encode(userName, forKey: .userName) }
+        if roles != nil { try container.encode(roles, forKey: .roles) }
+    }
+}
+
+/**
+* Membership
+*/
+// @Route("/{version}/membership/auth/register/email", "POST")
+// @Api(Description="Membership")
+// @DataContract
+public class SaveEmailUser : SaveUser, IReturn, IPublicRegistrationRequest
+{
+    public typealias Return = IdResponse
+
+    // @DataMember
+    public var password:String?
+
+    // @DataMember
+    public var email:String?
+
+    /**
+    * Optional roles from the project's "Permitted user registration roles". Empty = the default registration role.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional roles from the project's \"Permitted user registration roles\". Empty = the default registration role.")
+    public var roles:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case password
+        case email
+        case roles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        password = try container.decodeIfPresent(String.self, forKey: .password)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        roles = try container.decodeIfPresent([String].self, forKey: .roles) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if password != nil { try container.encode(password, forKey: .password) }
+        if email != nil { try container.encode(email, forKey: .email) }
+        if roles != nil { try container.encode(roles, forKey: .roles) }
     }
 }
 
@@ -1168,6 +1211,41 @@ public class GetUsersRequest : CodeMashListPaginationRequestBase, IReturn
     // @ApiMember(Description="Filter to these specific user ids.")
     public var userIds:[String]?
 
+    /**
+    * Free text, case-insensitive: matches email, user name, display / first / last name or phone.
+    */
+    // @DataMember
+    // @ApiMember(Description="Free text, case-insensitive: matches email, user name, display / first / last name or phone.")
+    public var search:String?
+
+    /**
+    * Case-insensitive part of the email.
+    */
+    // @DataMember
+    // @ApiMember(Description="Case-insensitive part of the email.")
+    public var email:String?
+
+    /**
+    * Case-insensitive part of the user name.
+    */
+    // @DataMember
+    // @ApiMember(Description="Case-insensitive part of the user name.")
+    public var userName:String?
+
+    /**
+    * Status names, any of: Registered, PendingValidation, Active, Unregistered, Suspended, InActive, Blocked.
+    */
+    // @DataMember
+    // @ApiMember(Description="Status names, any of: Registered, PendingValidation, Active, Unregistered, Suspended, InActive, Blocked.")
+    public var statuses:[String]?
+
+    /**
+    * Login type names, any of: Service, Email, UserName, Phone, Guest, Social.
+    */
+    // @DataMember
+    // @ApiMember(Description="Login type names, any of: Service, Email, UserName, Phone, Guest, Social.")
+    public var types:[String]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -1178,6 +1256,11 @@ public class GetUsersRequest : CodeMashListPaginationRequestBase, IReturn
         case includeMeta
         case roleNames
         case userIds
+        case search
+        case email
+        case userName
+        case statuses
+        case types
     }
 
     required public init(from decoder: Decoder) throws {
@@ -1190,6 +1273,11 @@ public class GetUsersRequest : CodeMashListPaginationRequestBase, IReturn
         includeMeta = try container.decodeIfPresent(Bool.self, forKey: .includeMeta)
         roleNames = try container.decodeIfPresent([String].self, forKey: .roleNames) ?? []
         userIds = try container.decodeIfPresent([String].self, forKey: .userIds) ?? []
+        search = try container.decodeIfPresent(String.self, forKey: .search)
+        email = try container.decodeIfPresent(String.self, forKey: .email)
+        userName = try container.decodeIfPresent(String.self, forKey: .userName)
+        statuses = try container.decodeIfPresent([String].self, forKey: .statuses) ?? []
+        types = try container.decodeIfPresent([String].self, forKey: .types) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -1202,6 +1290,11 @@ public class GetUsersRequest : CodeMashListPaginationRequestBase, IReturn
         if includeMeta != nil { try container.encode(includeMeta, forKey: .includeMeta) }
         if roleNames != nil { try container.encode(roleNames, forKey: .roleNames) }
         if userIds != nil { try container.encode(userIds, forKey: .userIds) }
+        if search != nil { try container.encode(search, forKey: .search) }
+        if email != nil { try container.encode(email, forKey: .email) }
+        if userName != nil { try container.encode(userName, forKey: .userName) }
+        if statuses != nil { try container.encode(statuses, forKey: .statuses) }
+        if types != nil { try container.encode(types, forKey: .types) }
     }
 }
 
@@ -1328,11 +1421,25 @@ public class InviteUserRequest : CodeMashRequestBase, IReturn
     public typealias Return = EmptyResponse
 
     /**
-    * Email address the invitation is sent to.
+    * Email address the invitation is sent to. It cannot be changed later.
     */
     // @DataMember
-    // @ApiMember(Description="Email address the invitation is sent to.", IsRequired=true)
+    // @ApiMember(Description="Email address the invitation is sent to. It cannot be changed later.", IsRequired=true)
     public var email:String?
+
+    /**
+    * The invited person's full name, e.g. "Rūta Petraitė". Stored as the full name, first name (first word) and last name (the rest). The user may change it when finishing.
+    */
+    // @DataMember
+    // @ApiMember(Description="The invited person's full name, e.g. \"Rūta Petraitė\". Stored as the full name, first name (first word) and last name (the rest). The user may change it when finishing.")
+    public var fullName:String?
+
+    /**
+    * Optional. How e-mails greet the person ("Hi {salutation},"), e.g. "Rūta". Stored as the display name. When empty the full name is used. The user may change it when finishing.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional. How e-mails greet the person (\"Hi {salutation},\"), e.g. \"Rūta\". Stored as the display name. When empty the full name is used. The user may change it when finishing.")
+    public var salutation:String?
 
     /**
     * Database integration id. Optional — defaults to the request environment's default integration.
@@ -1345,6 +1452,8 @@ public class InviteUserRequest : CodeMashRequestBase, IReturn
 
     private enum CodingKeys : String, CodingKey {
         case email
+        case fullName
+        case salutation
         case databaseIntegrationId
     }
 
@@ -1352,6 +1461,8 @@ public class InviteUserRequest : CodeMashRequestBase, IReturn
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         email = try container.decodeIfPresent(String.self, forKey: .email)
+        fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
+        salutation = try container.decodeIfPresent(String.self, forKey: .salutation)
         databaseIntegrationId = try container.decodeIfPresent(String.self, forKey: .databaseIntegrationId)
     }
 
@@ -1359,7 +1470,105 @@ public class InviteUserRequest : CodeMashRequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if email != nil { try container.encode(email, forKey: .email) }
+        if fullName != nil { try container.encode(fullName, forKey: .fullName) }
+        if salutation != nil { try container.encode(salutation, forKey: .salutation) }
         if databaseIntegrationId != nil { try container.encode(databaseIntegrationId, forKey: .databaseIntegrationId) }
+    }
+}
+
+/**
+* Membership
+*/
+// @Route("/{version}/membership/auth/invitation/finish", "POST")
+// @Api(Description="Membership")
+// @DataContract
+public class FinishInvitationRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EmptyResponse
+
+    /**
+    * One-time invitation token from the e-mail link (the #token= fragment).
+    */
+    // @DataMember
+    // @ApiMember(Description="One-time invitation token from the e-mail link (the #token= fragment).", IsRequired=true)
+    public var token:String?
+
+    /**
+    * The user's password. Validated against the project's complexity policy.
+    */
+    // @DataMember
+    // @ApiMember(Description="The user's password. Validated against the project's complexity policy.", IsRequired=true)
+    public var password:String?
+
+    /**
+    * Optional. The user's full name; replaces the one the admin entered (full name, first name = first word, last name = the rest). Empty = keep the admin's.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional. The user's full name; replaces the one the admin entered (full name, first name = first word, last name = the rest). Empty = keep the admin's.")
+    public var fullName:String?
+
+    /**
+    * Optional. How e-mails greet the user (stored as the display name). Empty = keep the admin's, or the full name when the admin gave none.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional. How e-mails greet the user (stored as the display name). Empty = keep the admin's, or the full name when the admin gave none.")
+    public var salutation:String?
+
+    /**
+    * Optional. Older form of Salutation (the display name); Salutation wins when both are sent.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional. Older form of Salutation (the display name); Salutation wins when both are sent.")
+    public var displayName:String?
+
+    /**
+    * Optional first name; wins over the one taken from FullName.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional first name; wins over the one taken from FullName.")
+    public var firstName:String?
+
+    /**
+    * Optional last name; wins over the one taken from FullName.
+    */
+    // @DataMember
+    // @ApiMember(Description="Optional last name; wins over the one taken from FullName.")
+    public var lastName:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case token
+        case password
+        case fullName
+        case salutation
+        case displayName
+        case firstName
+        case lastName
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        token = try container.decodeIfPresent(String.self, forKey: .token)
+        password = try container.decodeIfPresent(String.self, forKey: .password)
+        fullName = try container.decodeIfPresent(String.self, forKey: .fullName)
+        salutation = try container.decodeIfPresent(String.self, forKey: .salutation)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        firstName = try container.decodeIfPresent(String.self, forKey: .firstName)
+        lastName = try container.decodeIfPresent(String.self, forKey: .lastName)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if token != nil { try container.encode(token, forKey: .token) }
+        if password != nil { try container.encode(password, forKey: .password) }
+        if fullName != nil { try container.encode(fullName, forKey: .fullName) }
+        if salutation != nil { try container.encode(salutation, forKey: .salutation) }
+        if displayName != nil { try container.encode(displayName, forKey: .displayName) }
+        if firstName != nil { try container.encode(firstName, forKey: .firstName) }
+        if lastName != nil { try container.encode(lastName, forKey: .lastName) }
     }
 }
 
@@ -2519,7 +2728,11 @@ public class FindMergedTermTreeRequest : CodeMashRequestBase, IReturn
     // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
     public var allLanguages:Bool?
 
+    /**
+    * The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).
+    */
     // @DataMember
+    // @ApiMember(Description="The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).", IsRequired=true)
     public var taxonomyName:String?
 
     // @DataMember
@@ -2615,7 +2828,11 @@ public class FindTermsRequest : CodeMashListPaginationRequestBase, IReturn
     // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
     public var allLanguages:Bool?
 
+    /**
+    * The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).
+    */
     // @DataMember
+    // @ApiMember(Description="The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).", IsRequired=true)
     public var taxonomyName:String?
 
     // @DataMember
@@ -2681,7 +2898,11 @@ public class FindTermsChildrenRequest : CodeMashListPaginationRequestBase, IRetu
     // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
     public var allLanguages:Bool?
 
+    /**
+    * The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).
+    */
     // @DataMember
+    // @ApiMember(Description="The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).", IsRequired=true)
     public var taxonomyName:String?
 
     // @DataMember
@@ -2747,7 +2968,11 @@ public class FindTermTreeRequest : CodeMashRequestBase, IReturn
     // @ApiMember(Description="Set true to keep name / description as stored even when Accept-Language is sent (editors). The full translations are always in names / descriptions.")
     public var allLanguages:Bool?
 
+    /**
+    * The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).
+    */
     // @DataMember
+    // @ApiMember(Description="The taxonomy: its name (slug or title; URL-encode spaces) or its id (txn_…).", IsRequired=true)
     public var taxonomyName:String?
 
     // @DataMember
@@ -4246,9 +4471,9 @@ public class RegisterOwnPushDeviceRequest : CodeMashRequestBase, IReturn
     public typealias Return = IdResponse
 
     /**
-    * Who issued the token: expo (getExpoPushTokenAsync), fcm (Android / Firebase) or apns (iOS).
+    * Who issued the token: fcm (Android / Firebase) or apns (iOS). The NATIVE device token — in an Expo app use getDevicePushTokenAsync(). Expo push tokens (provider 'expo') are refused.
     */
-    // @ApiMember(Description="Who issued the token: expo (getExpoPushTokenAsync), fcm (Android / Firebase) or apns (iOS).", IsRequired=true)
+    // @ApiMember(Description="Who issued the token: fcm (Android / Firebase) or apns (iOS). The NATIVE device token — in an Expo app use getDevicePushTokenAsync(). Expo push tokens (provider 'expo') are refused.", IsRequired=true)
     public var provider:String?
 
     /**
@@ -4545,6 +4770,347 @@ public class MarkAllOwnPushMessagesReadRequest : CodeMashRequestBase, IReturn
 }
 
 /**
+* Stores a payment order with a fixed price for one of the project's users. Server only (service user API key).
+*/
+// @Route("/{version}/payments/orders", "POST")
+// @Api(Description="Stores a payment order with a fixed price for one of the project's users. Server only (service user API key).")
+public class CreatePaymentOrderRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The user the order is for (usr_…).
+    */
+    // @ApiMember(Description="The user the order is for (usr_…).", IsRequired=true)
+    public var buyerUserId:String?
+
+    /**
+    * The project's own order reference, unique per project and environment (1–64 of A–Z a–z 0–9 . _ : -).
+    */
+    // @ApiMember(Description="The project's own order reference, unique per project and environment (1–64 of A–Z a–z 0–9 . _ : -).", IsRequired=true)
+    public var merchantReference:String?
+
+    /**
+    * 8–128 characters. Same key + same body = the stored order; same key + other body = 409. May be sent as the Idempotency-Key header instead.
+    */
+    // @ApiMember(Description="8–128 characters. Same key + same body = the stored order; same key + other body = 409. May be sent as the Idempotency-Key header instead.")
+    public var idempotencyKey:String?
+
+    /**
+    * EUR.
+    */
+    // @ApiMember(Description="EUR.", IsRequired=true)
+    public var currency:String?
+
+    /**
+    * The version of the price list the server priced the lines with.
+    */
+    // @ApiMember(Description="The version of the price list the server priced the lines with.", IsRequired=true)
+    public var priceVersion:String?
+
+    /**
+    * 1–50 lines: sku, title, quantity, unitAmountMinor (cents). Norbix computes the amounts and the total.
+    */
+    // @ApiMember(Description="1–50 lines: sku, title, quantity, unitAmountMinor (cents). Norbix computes the amounts and the total.", IsRequired=true)
+    public var lines:[PaymentOrderLineInput] = []
+
+    /**
+    * Up to 20 project values (e.g. adId). No personal or billing data.
+    */
+    // @ApiMember(Description="Up to 20 project values (e.g. adId). No personal or billing data.")
+    public var metadata:[String:String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case buyerUserId
+        case merchantReference
+        case idempotencyKey
+        case currency
+        case priceVersion
+        case lines
+        case metadata
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        buyerUserId = try container.decodeIfPresent(String.self, forKey: .buyerUserId)
+        merchantReference = try container.decodeIfPresent(String.self, forKey: .merchantReference)
+        idempotencyKey = try container.decodeIfPresent(String.self, forKey: .idempotencyKey)
+        currency = try container.decodeIfPresent(String.self, forKey: .currency)
+        priceVersion = try container.decodeIfPresent(String.self, forKey: .priceVersion)
+        lines = try container.decodeIfPresent([PaymentOrderLineInput].self, forKey: .lines) ?? []
+        metadata = try container.decodeIfPresent([String:String].self, forKey: .metadata) ?? [:]
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if buyerUserId != nil { try container.encode(buyerUserId, forKey: .buyerUserId) }
+        if merchantReference != nil { try container.encode(merchantReference, forKey: .merchantReference) }
+        if idempotencyKey != nil { try container.encode(idempotencyKey, forKey: .idempotencyKey) }
+        if currency != nil { try container.encode(currency, forKey: .currency) }
+        if priceVersion != nil { try container.encode(priceVersion, forKey: .priceVersion) }
+        if lines.count > 0 { try container.encode(lines, forKey: .lines) }
+        if metadata != nil { try container.encode(metadata, forKey: .metadata) }
+    }
+}
+
+/**
+* Reads one payment order. A buyer reads only their own orders.
+*/
+// @Route("/{version}/payments/orders/{Id}", "GET")
+// @Api(Description="Reads one payment order. A buyer reads only their own orders.")
+public class GetPaymentOrderRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetPaymentOrderResponse
+
+    /**
+    * The order id (ord_…).
+    */
+    // @ApiMember(Description="The order id (ord_…).", IsRequired=true)
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+/**
+* Lists payment orders, newest first. A buyer gets only their own orders.
+*/
+// @Route("/{version}/payments/orders", "GET")
+// @Api(Description="Lists payment orders, newest first. A buyer gets only their own orders.")
+public class GetPaymentOrdersRequest : CodeMashListPaginationRequestBase, IReturn
+{
+    public typealias Return = GetPaymentOrdersResponse
+
+    /**
+    * Server only: one buyer's orders (usr_…). A buyer always gets their own.
+    */
+    // @ApiMember(Description="Server only: one buyer's orders (usr_…). A buyer always gets their own.")
+    public var buyerUserId:String?
+
+    /**
+    * Only the order with this merchant reference.
+    */
+    // @ApiMember(Description="Only the order with this merchant reference.")
+    public var merchantReference:String?
+
+    /**
+    * Only orders in this status (Created, CheckoutStarted, Paid, …).
+    */
+    // @ApiMember(Description="Only orders in this status (Created, CheckoutStarted, Paid, …).")
+    public var status:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case buyerUserId
+        case merchantReference
+        case status
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        buyerUserId = try container.decodeIfPresent(String.self, forKey: .buyerUserId)
+        merchantReference = try container.decodeIfPresent(String.self, forKey: .merchantReference)
+        status = try container.decodeIfPresent(String.self, forKey: .status)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if buyerUserId != nil { try container.encode(buyerUserId, forKey: .buyerUserId) }
+        if merchantReference != nil { try container.encode(merchantReference, forKey: .merchantReference) }
+        if status != nil { try container.encode(status, forKey: .status) }
+    }
+}
+
+/**
+* Opens a Montonio checkout for a stored order and answers where the buyer pays. The buyer (own order) or the server.
+*/
+// @Route("/{version}/payments/orders/{Id}/checkout", "POST")
+// @Api(Description="Opens a Montonio checkout for a stored order and answers where the buyer pays. The buyer (own order) or the server.")
+public class StartPaymentCheckoutRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = StartPaymentCheckoutResponse
+
+    /**
+    * The order id (ord_…).
+    */
+    // @ApiMember(Description="The order id (ord_…).", IsRequired=true)
+    public var id:String?
+
+    /**
+    * The Montonio integration (int_…) of the project in the request's environment.
+    */
+    // @ApiMember(Description="The Montonio integration (int_…) of the project in the request's environment.", IsRequired=true)
+    public var integrationId:String?
+
+    /**
+    * bankLink (default), card, applePay or googlePay.
+    */
+    // @ApiMember(Description="bankLink (default), card, applePay or googlePay.")
+    public var method:String?
+
+    /**
+    * Where the buyer comes back after paying; its origin must be one of the project's allowed origins.
+    */
+    // @ApiMember(Description="Where the buyer comes back after paying; its origin must be one of the project's allowed origins.", IsRequired=true)
+    public var returnUrl:String?
+
+    /**
+    * Bank links only: the country whose banks are shown first (default LT).
+    */
+    // @ApiMember(Description="Bank links only: the country whose banks are shown first (default LT).")
+    public var preferredCountry:String?
+
+    /**
+    * Bank links only: one bank to open directly (the provider's bank code).
+    */
+    // @ApiMember(Description="Bank links only: one bank to open directly (the provider's bank code).")
+    public var preferredProvider:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+        case integrationId
+        case method
+        case returnUrl
+        case preferredCountry
+        case preferredProvider
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+        integrationId = try container.decodeIfPresent(String.self, forKey: .integrationId)
+        method = try container.decodeIfPresent(String.self, forKey: .method)
+        returnUrl = try container.decodeIfPresent(String.self, forKey: .returnUrl)
+        preferredCountry = try container.decodeIfPresent(String.self, forKey: .preferredCountry)
+        preferredProvider = try container.decodeIfPresent(String.self, forKey: .preferredProvider)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+        if integrationId != nil { try container.encode(integrationId, forKey: .integrationId) }
+        if method != nil { try container.encode(method, forKey: .method) }
+        if returnUrl != nil { try container.encode(returnUrl, forKey: .returnUrl) }
+        if preferredCountry != nil { try container.encode(preferredCountry, forKey: .preferredCountry) }
+        if preferredProvider != nil { try container.encode(preferredProvider, forKey: .preferredProvider) }
+    }
+}
+
+// @Route("/{version}/notifications/inbox", "GET")
+public class GetNotificationInboxRequest : CodeMashListPaginationRequestBase, IReturn
+{
+    public typealias Return = GetNotificationInboxResponse
+
+    public var unreadOnly:Bool?
+    public var channel:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case unreadOnly
+        case channel
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        unreadOnly = try container.decodeIfPresent(Bool.self, forKey: .unreadOnly)
+        channel = try container.decodeIfPresent(String.self, forKey: .channel)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if unreadOnly != nil { try container.encode(unreadOnly, forKey: .unreadOnly) }
+        if channel != nil { try container.encode(channel, forKey: .channel) }
+    }
+}
+
+// @Route("/{version}/notifications/inbox/unread-count", "GET")
+public class GetUnreadCountRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetUnreadCountResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+// @Route("/{version}/notifications/inbox/{notificationId}/read", "POST")
+public class MarkNotificationReadRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = MarkNotificationReadResponse
+
+    public var notificationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case notificationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        notificationId = try container.decodeIfPresent(String.self, forKey: .notificationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if notificationId != nil { try container.encode(notificationId, forKey: .notificationId) }
+    }
+}
+
+// @Route("/{version}/notifications/inbox/read-all", "POST")
+public class MarkAllNotificationsReadRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = MarkAllNotificationsReadResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
 * Sign In
 */
 // @Route("/auth", "GET,POST")
@@ -4655,11 +5221,15 @@ public class IdResponse : ResponseBase
     // @DataMember
     public var status:String?
 
+    // @DataMember
+    public var warnings:[String]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case id
         case status
+        case warnings
     }
 
     required public init(from decoder: Decoder) throws {
@@ -4667,6 +5237,7 @@ public class IdResponse : ResponseBase
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decodeIfPresent(String.self, forKey: .id)
         status = try container.decodeIfPresent(String.self, forKey: .status)
+        warnings = try container.decodeIfPresent([String].self, forKey: .warnings) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -4674,6 +5245,7 @@ public class IdResponse : ResponseBase
         var container = encoder.container(keyedBy: CodingKeys.self)
         if id != nil { try container.encode(id, forKey: .id) }
         if status != nil { try container.encode(status, forKey: .status) }
+        if warnings != nil { try container.encode(warnings, forKey: .warnings) }
     }
 }
 
@@ -5658,6 +6230,155 @@ public class GetOwnPushMessagesResponse : ResponseBase
     }
 }
 
+public class GetPaymentOrderResponse : ResponseBase
+{
+    public var item:PaymentOrderDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case item
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        item = try container.decodeIfPresent(PaymentOrderDto.self, forKey: .item)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if item != nil { try container.encode(item, forKey: .item) }
+    }
+}
+
+public class GetPaymentOrdersResponse : ResponseBase
+{
+    public var list:PaginatedResponse<PaymentOrderDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case list
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        list = try container.decodeIfPresent(PaginatedResponse<PaymentOrderDto>.self, forKey: .list)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class StartPaymentCheckoutResponse : ResponseBase
+{
+    public var checkout:PaymentOrderCheckoutDto?
+    public var reused:Bool?
+    public var order:PaymentOrderDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case checkout
+        case reused
+        case order
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        checkout = try container.decodeIfPresent(PaymentOrderCheckoutDto.self, forKey: .checkout)
+        reused = try container.decodeIfPresent(Bool.self, forKey: .reused)
+        order = try container.decodeIfPresent(PaymentOrderDto.self, forKey: .order)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if checkout != nil { try container.encode(checkout, forKey: .checkout) }
+        if reused != nil { try container.encode(reused, forKey: .reused) }
+        if order != nil { try container.encode(order, forKey: .order) }
+    }
+}
+
+public class GetNotificationInboxResponse : ResponseBase
+{
+    public var list:PaginatedResponse<InAppNotificationDto>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case list
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        list = try container.decodeIfPresent(PaginatedResponse<InAppNotificationDto>.self, forKey: .list)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class GetUnreadCountResponse : ResponseBase
+{
+    public var count:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case count
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        count = try container.decodeIfPresent(Int.self, forKey: .count)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if count != nil { try container.encode(count, forKey: .count) }
+    }
+}
+
+public class MarkNotificationReadResponse : ResponseBase
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+public class MarkAllNotificationsReadResponse : ResponseBase
+{
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
 // @DataContract
 public class AuthenticateResponse : IHasSessionId, IHasBearerToken, Codable
 {
@@ -5719,6 +6440,636 @@ public class GetAccessTokenResponse : Codable
     public var responseStatus:ResponseStatus?
 
     required public init(){}
+}
+
+public class StringFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var format:String?
+
+    // @DataMember
+    public var pattern:String?
+
+    // @DataMember
+    public var minLength:Int?
+
+    // @DataMember
+    public var maxLength:Int?
+
+    // @DataMember
+    public var translateOptions:IReadOnlyDictionary<String, String>?
+
+    // @DataMember
+    public var `default`:String?
+
+    // @DataMember
+    public var unique:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case format
+        case pattern
+        case minLength
+        case maxLength
+        case translateOptions
+        case `default`
+        case unique
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        format = try container.decodeIfPresent(String.self, forKey: .format)
+        pattern = try container.decodeIfPresent(String.self, forKey: .pattern)
+        minLength = try container.decodeIfPresent(Int.self, forKey: .minLength)
+        maxLength = try container.decodeIfPresent(Int.self, forKey: .maxLength)
+        translateOptions = try container.decodeIfPresent(IReadOnlyDictionary<String, String>.self, forKey: .translateOptions)
+        `default` = try container.decodeIfPresent(String.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if format != nil { try container.encode(format, forKey: .format) }
+        if pattern != nil { try container.encode(pattern, forKey: .pattern) }
+        if minLength != nil { try container.encode(minLength, forKey: .minLength) }
+        if maxLength != nil { try container.encode(maxLength, forKey: .maxLength) }
+        if translateOptions != nil { try container.encode(translateOptions, forKey: .translateOptions) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
+    }
+}
+
+public class DecimalFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var minimum:Double?
+
+    // @DataMember
+    public var maximum:Double?
+
+    // @DataMember
+    public var multipleOf:Double?
+
+    // @DataMember
+    public var `default`:Double?
+
+    // @DataMember
+    public var unique:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case minimum
+        case maximum
+        case multipleOf
+        case `default`
+        case unique
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        minimum = try container.decodeIfPresent(Double.self, forKey: .minimum)
+        maximum = try container.decodeIfPresent(Double.self, forKey: .maximum)
+        multipleOf = try container.decodeIfPresent(Double.self, forKey: .multipleOf)
+        `default` = try container.decodeIfPresent(Double.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if minimum != nil { try container.encode(minimum, forKey: .minimum) }
+        if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if multipleOf != nil { try container.encode(multipleOf, forKey: .multipleOf) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
+    }
+}
+
+public class CurrencyFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var allowedCurrencies:IReadOnlyList<String>?
+
+    // @DataMember
+    public var multipleOf:Double?
+
+    // @DataMember
+    public var minimum:Double?
+
+    // @DataMember
+    public var maximum:Double?
+
+    // @DataMember
+    public var `default`:CurrencyDefaultDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case allowedCurrencies
+        case multipleOf
+        case minimum
+        case maximum
+        case `default`
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        allowedCurrencies = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .allowedCurrencies)
+        multipleOf = try container.decodeIfPresent(Double.self, forKey: .multipleOf)
+        minimum = try container.decodeIfPresent(Double.self, forKey: .minimum)
+        maximum = try container.decodeIfPresent(Double.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(CurrencyDefaultDto.self, forKey: .`default`)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if allowedCurrencies != nil { try container.encode(allowedCurrencies, forKey: .allowedCurrencies) }
+        if multipleOf != nil { try container.encode(multipleOf, forKey: .multipleOf) }
+        if minimum != nil { try container.encode(minimum, forKey: .minimum) }
+        if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class BooleanFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var `default`:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case `default`
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        `default` = try container.decodeIfPresent(Bool.self, forKey: .`default`)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class DateFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var minimum:Int?
+
+    // @DataMember
+    public var maximum:Int?
+
+    // @DataMember
+    public var `default`:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case minimum
+        case maximum
+        case `default`
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        minimum = try container.decodeIfPresent(Int.self, forKey: .minimum)
+        maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(Int.self, forKey: .`default`)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if minimum != nil { try container.encode(minimum, forKey: .minimum) }
+        if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class IntegerFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var minimum:Int?
+
+    // @DataMember
+    public var maximum:Int?
+
+    // @DataMember
+    public var `default`:Int?
+
+    // @DataMember
+    public var unique:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case minimum
+        case maximum
+        case `default`
+        case unique
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        minimum = try container.decodeIfPresent(Int.self, forKey: .minimum)
+        maximum = try container.decodeIfPresent(Int.self, forKey: .maximum)
+        `default` = try container.decodeIfPresent(Int.self, forKey: .`default`)
+        unique = try container.decodeIfPresent(Bool.self, forKey: .unique)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if minimum != nil { try container.encode(minimum, forKey: .minimum) }
+        if maximum != nil { try container.encode(maximum, forKey: .maximum) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+        if unique != nil { try container.encode(unique, forKey: .unique) }
+    }
+}
+
+public class GeolocationFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var allowedTypes:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case allowedTypes
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        allowedTypes = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .allowedTypes)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if allowedTypes != nil { try container.encode(allowedTypes, forKey: .allowedTypes) }
+    }
+}
+
+public class TagsFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var `default`:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case minItems
+        case maxItems
+        case `default`
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        `default` = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .`default`)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class FileFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var storages:IReadOnlyList<String>?
+
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var allowedFileType:String?
+
+    // @DataMember
+    public var maxSizeMb:Double?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case storages
+        case minItems
+        case maxItems
+        case allowedFileType
+        case maxSizeMb
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        storages = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .storages)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        allowedFileType = try container.decodeIfPresent(String.self, forKey: .allowedFileType)
+        maxSizeMb = try container.decodeIfPresent(Double.self, forKey: .maxSizeMb)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if storages != nil { try container.encode(storages, forKey: .storages) }
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if allowedFileType != nil { try container.encode(allowedFileType, forKey: .allowedFileType) }
+        if maxSizeMb != nil { try container.encode(maxSizeMb, forKey: .maxSizeMb) }
+    }
+}
+
+public class TaxonomySelectionFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var taxonomyId:String?
+
+    // @DataMember
+    public var multiple:Bool?
+
+    // @DataMember
+    public var displayField:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case taxonomyId
+        case multiple
+        case displayField
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        taxonomyId = try container.decodeIfPresent(String.self, forKey: .taxonomyId)
+        multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if taxonomyId != nil { try container.encode(taxonomyId, forKey: .taxonomyId) }
+        if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
+    }
+}
+
+public class CollectionSelectionFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var collectionId:String?
+
+    // @DataMember
+    public var displayField:String?
+
+    // @DataMember
+    public var multiple:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case collectionId
+        case displayField
+        case multiple
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        collectionId = try container.decodeIfPresent(String.self, forKey: .collectionId)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
+        multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if collectionId != nil { try container.encode(collectionId, forKey: .collectionId) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
+        if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+    }
+}
+
+public class UserSelectionFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var multiple:Bool?
+
+    // @DataMember
+    public var displayField:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case multiple
+        case displayField
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
+    }
+}
+
+public class RoleSelectionFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var multiple:Bool?
+
+    // @DataMember
+    public var displayField:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case multiple
+        case displayField
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        displayField = try container.decodeIfPresent(String.self, forKey: .displayField)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if displayField != nil { try container.encode(displayField, forKey: .displayField) }
+    }
+}
+
+public class EnumSelectionFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var values:IReadOnlyList<String>?
+
+    // @DataMember
+    public var multiple:Bool?
+
+    // @DataMember
+    public var `default`:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case values
+        case multiple
+        case `default`
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        values = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .values)
+        multiple = try container.decodeIfPresent(Bool.self, forKey: .multiple)
+        `default` = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .`default`)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if values != nil { try container.encode(values, forKey: .values) }
+        if multiple != nil { try container.encode(multiple, forKey: .multiple) }
+        if `default` != nil { try container.encode(`default`, forKey: .`default`) }
+    }
+}
+
+public class ObjectFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var properties:IReadOnlyList<JsonSchemaFieldDto>?
+
+    // @DataMember
+    public var required:IReadOnlyList<String>?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case properties
+        case required
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        properties = try container.decodeIfPresent(IReadOnlyList<JsonSchemaFieldDto>.self, forKey: .properties)
+        required = try container.decodeIfPresent(IReadOnlyList<String>.self, forKey: .required)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if properties != nil { try container.encode(properties, forKey: .properties) }
+        if required != nil { try container.encode(required, forKey: .required) }
+    }
+}
+
+public class ArrayFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var items:JsonSchemaFieldDto?
+
+    // @DataMember
+    public var minItems:Int?
+
+    // @DataMember
+    public var maxItems:Int?
+
+    // @DataMember
+    public var uniqueItems:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case items
+        case minItems
+        case maxItems
+        case uniqueItems
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decodeIfPresent(JsonSchemaFieldDto.self, forKey: .items)
+        minItems = try container.decodeIfPresent(Int.self, forKey: .minItems)
+        maxItems = try container.decodeIfPresent(Int.self, forKey: .maxItems)
+        uniqueItems = try container.decodeIfPresent(Bool.self, forKey: .uniqueItems)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if items != nil { try container.encode(items, forKey: .items) }
+        if minItems != nil { try container.encode(minItems, forKey: .minItems) }
+        if maxItems != nil { try container.encode(maxItems, forKey: .maxItems) }
+        if uniqueItems != nil { try container.encode(uniqueItems, forKey: .uniqueItems) }
+    }
+}
+
+public class JsonFieldDto : JsonSchemaFieldDto
+{
+    // @DataMember
+    public var maxBytes:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case maxBytes
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        maxBytes = try container.decodeIfPresent(Int.self, forKey: .maxBytes)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if maxBytes != nil { try container.encode(maxBytes, forKey: .maxBytes) }
+    }
 }
 
 // @DataContract(Namespace="http://codemash.io/types/")
@@ -5923,6 +7274,12 @@ public class SaveUser : CodeMashRequestBase
     }
 }
 
+public protocol IPublicRegistrationRequest
+{
+    var roles:[String]? { get set }
+
+}
+
 public class CodeMashListPaginationRequestBase : RequestBase, IHasProjectId, IHasEnv
 {
     /**
@@ -6001,6 +7358,24 @@ public class PagingArgs : Codable
     public var pageSize:Int?
     public var startingAfter:String?
     public var endingBefore:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PaymentOrderLineInput : Codable
+{
+    // @DataMember
+    public var sku:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var quantity:Int?
+
+    // @DataMember
+    public var unitAmountMinor:Int?
 
     required public init(){}
 }
@@ -6348,6 +7723,9 @@ public class TermDto : Codable
     // @DataMember
     public var meta:String?
 
+    // @DataMember
+    public var origin:String?
+
     required public init(){}
 }
 
@@ -6550,6 +7928,134 @@ public class OwnPushMessageDto : Codable
     required public init(){}
 }
 
+// @DataContract
+public class PaymentOrderDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var env:String?
+
+    // @DataMember
+    public var buyerUserId:String?
+
+    // @DataMember
+    public var merchantReference:String?
+
+    // @DataMember
+    public var currency:String?
+
+    // @DataMember
+    public var priceVersion:String?
+
+    // @DataMember
+    public var lines:[PaymentOrderLineDto] = []
+
+    // @DataMember
+    public var totalMinor:Int?
+
+    // @DataMember
+    public var metadata:[String:String] = [:]
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var createdOnUtc:Date?
+
+    // @DataMember
+    public var updatedOnUtc:Date?
+
+    // @DataMember
+    public var checkouts:[PaymentOrderCheckoutDto] = []
+
+    // @DataMember
+    public var settledMinor:Int?
+
+    // @DataMember
+    public var refundedMinor:Int?
+
+    // @DataMember
+    public var paidOnUtc:Date?
+
+    // @DataMember
+    public var providerPaymentId:String?
+
+    // @DataMember
+    public var mismatches:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class PaymentOrderCheckoutDto : Codable
+{
+    // @DataMember
+    public var attempt:Int?
+
+    // @DataMember
+    public var integrationId:String?
+
+    // @DataMember
+    public var provider:String?
+
+    // @DataMember
+    public var providerOrderId:String?
+
+    // @DataMember
+    public var providerReference:String?
+
+    // @DataMember
+    public var paymentUrl:String?
+
+    // @DataMember
+    public var method:String?
+
+    // @DataMember
+    public var startedOnUtc:Date?
+
+    // @DataMember
+    public var expiresAtUtc:Date?
+
+    required public init(){}
+}
+
+public class InAppNotificationDto : Codable
+{
+    public var id:String?
+    public var projectId:String?
+    public var userId:String?
+    public var channel:String?
+    public var eventName:String?
+    public var payloadJson:String?
+    public var isRead:Bool?
+    public var seenAtUtc:Date?
+    public var readAtUtc:Date?
+    public var createdAtUtc:Date?
+
+    required public init(){}
+}
+
+public class JsonSchemaFieldDto : Codable
+{
+    // @DataMember
+    public var fieldName:String?
+
+    required public init(){}
+}
+
+public class CurrencyDefaultDto : Codable
+{
+    // @DataMember
+    public var value:Double?
+
+    // @DataMember
+    public var currency:String?
+
+    required public init(){}
+}
+
 public enum Gender : String, Codable
 {
     case Male
@@ -6657,6 +8163,7 @@ public enum AuthStatus : Int, Codable
 {
     case Registered = 0
     case PendingValidation = 2
+    case Invited = 4
     case Active = 8
     case Unregistered = 16
     case Suspended = 32
@@ -6714,6 +8221,9 @@ public class SchemaSettingsDto : Codable
 
     // @DataMember
     public var Description:String?
+
+    // @DataMember
+    public var uniqueIndexes:[SchemaUniqueIndexDto]?
 
     required public init(){}
 }
@@ -6813,6 +8323,27 @@ public enum FileProvider : String, Codable
     case GoogleDrive
 }
 
+// @DataContract
+public class PaymentOrderLineDto : Codable
+{
+    // @DataMember
+    public var sku:String?
+
+    // @DataMember
+    public var title:String?
+
+    // @DataMember
+    public var quantity:Int?
+
+    // @DataMember
+    public var unitAmountMinor:Int?
+
+    // @DataMember
+    public var amountMinor:Int?
+
+    required public init(){}
+}
+
 public protocol ICursorArgs
 {
     var field:String? { get set }
@@ -6829,10 +8360,10 @@ public class AccessInformationDto : Codable
     required public init(){}
 }
 
-public class JsonSchemaFieldDto : Codable
+public class SchemaUniqueIndexDto : Codable
 {
     // @DataMember
-    public var fieldName:String?
+    public var fields:[String] = []
 
     required public init(){}
 }
