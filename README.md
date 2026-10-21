@@ -18,7 +18,7 @@ both clients use.
 
 | Client | Modules |
 | --- | --- |
-| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `membership`, `payments`, `publicProjects` |
+| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `logs`, `membership`, `payments`, `publicProjects` |
 | `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `platform`, `regions`, `scheduler`, `webhooks` |
 
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
@@ -88,6 +88,27 @@ let integrations = try await hub.files.getFilesIntegrations()
 let anon = try NorbixHubClient(projectId: "proj_123") // no apiKey, no bearerToken
 let regions = try await anon.account.getAccountRegions()
 ```
+
+### Logs — write your own lines, read them on the Hub
+
+```swift
+_ = try await client.logs.writeLogs(["entries": [[
+    "level": "error",                    // information (default) | warning | error
+    "title": "Payment failed",           // 1–200 characters
+    "eventCode": "order:payment_failed", // stored as app:order:payment_failed
+    "correlationId": "checkout-42",
+    "meta": ["orderId": "ord_1"]
+]]])                                     // { accepted } — queued, returns at once
+
+let page = try await hub.logs.getLogs(["level": "Error", "pageSize": 20])
+```
+
+A 429 `CM-ERRORS-LOGGING-003` means the project's per-minute log quota is used
+up; wait before sending again (`NorbixError` does not carry the gateway's
+`Retry-After` header yet). After saving a logging integration, call
+`hub.logs.testLoggingIntegration` — nothing is delivered to it until its last
+test passed. Details: [`docs/api/logs.md`](docs/api/logs.md),
+[`docs/hub/logs.md`](docs/hub/logs.md).
 
 ## Self-hosted / on-prem deployments
 
