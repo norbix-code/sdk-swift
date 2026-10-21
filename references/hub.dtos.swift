@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-19 11:32:44
+Date: 2026-10-21 18:13:33
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -296,6 +296,8 @@ public class InternalsTypeGen : Codable
     public var typegen_282_FakeCodeIntegrationRequest:FakeCodeIntegrationRequest?
     public var typegen_283_CodeFunctionSchedulerTaskRequest:CodeFunctionSchedulerTaskRequest?
     public var typegen_284_MarketplaceFunctionSchedulerTaskRequest:MarketplaceFunctionSchedulerTaskRequest?
+    public var typegen_285_AwsCloudWatchLoggingIntegrationRequest:AwsCloudWatchLoggingIntegrationRequest?
+    public var typegen_286_AwsCloudWatchLoggingIntegrationDto:AwsCloudWatchLoggingIntegrationDto?
 
     required public init(){}
 }
@@ -1331,12 +1333,28 @@ public class PromoteEnvironmentRequest : CodeMashRequestBase, IReturn
     // @ApiMember(Description="When true, only returns the promotion plan (including deletions) without applying it or copying secrets. Use this to preview before a real run.")
     public var dryRun:Bool?
 
+    /**
+    * Must be true for a real run that deletes a collection holding records in the target (the preview lists each with recordCount). Without it the run refuses and changes nothing.
+    */
+    // @DataMember
+    // @ApiMember(Description="Must be true for a real run that deletes a collection holding records in the target (the preview lists each with recordCount). Without it the run refuses and changes nothing.")
+    public var confirmRecordLoss:Bool?
+
+    /**
+    * Per source integration id: action 'seed' (copy it with its secret into the target), 'skip' (leave it out) or 'map' (mapToId: a target integration of the same module the promoted content should use). Missing ids use the default: Fake providers 'seed' (unless the target already has its own Fake of that module), everything else 'skip'.
+    */
+    // @DataMember
+    // @ApiMember(Description="Per source integration id: action 'seed' (copy it with its secret into the target), 'skip' (leave it out) or 'map' (mapToId: a target integration of the same module the promoted content should use). Missing ids use the default: Fake providers 'seed' (unless the target already has its own Fake of that module), everything else 'skip'.")
+    public var integrationChoices:[PromotionIntegrationChoiceDto]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case sourceEnv
         case targetEnv
         case dryRun
+        case confirmRecordLoss
+        case integrationChoices
     }
 
     required public init(from decoder: Decoder) throws {
@@ -1345,6 +1363,8 @@ public class PromoteEnvironmentRequest : CodeMashRequestBase, IReturn
         sourceEnv = try container.decodeIfPresent(String.self, forKey: .sourceEnv)
         targetEnv = try container.decodeIfPresent(String.self, forKey: .targetEnv)
         dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+        confirmRecordLoss = try container.decodeIfPresent(Bool.self, forKey: .confirmRecordLoss)
+        integrationChoices = try container.decodeIfPresent([PromotionIntegrationChoiceDto].self, forKey: .integrationChoices) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -1353,6 +1373,8 @@ public class PromoteEnvironmentRequest : CodeMashRequestBase, IReturn
         if sourceEnv != nil { try container.encode(sourceEnv, forKey: .sourceEnv) }
         if targetEnv != nil { try container.encode(targetEnv, forKey: .targetEnv) }
         if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+        if confirmRecordLoss != nil { try container.encode(confirmRecordLoss, forKey: .confirmRecordLoss) }
+        if integrationChoices != nil { try container.encode(integrationChoices, forKey: .integrationChoices) }
     }
 }
 
@@ -1376,11 +1398,27 @@ public class RollbackPromotionRequest : CodeMashRequestBase, IReturn
     // @ApiMember(Description="The fromVersion anchor returned by the promote_environment call being rolled back.", IsRequired=true)
     public var fromVersion:Int?
 
+    /**
+    * When true, only returns the rollback plan without applying it.
+    */
+    // @DataMember
+    // @ApiMember(Description="When true, only returns the rollback plan without applying it.")
+    public var dryRun:Bool?
+
+    /**
+    * Must be true when the rollback deletes a collection holding records in the target.
+    */
+    // @DataMember
+    // @ApiMember(Description="Must be true when the rollback deletes a collection holding records in the target.")
+    public var confirmRecordLoss:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case targetEnv
         case fromVersion
+        case dryRun
+        case confirmRecordLoss
     }
 
     required public init(from decoder: Decoder) throws {
@@ -1388,6 +1426,8 @@ public class RollbackPromotionRequest : CodeMashRequestBase, IReturn
         let container = try decoder.container(keyedBy: CodingKeys.self)
         targetEnv = try container.decodeIfPresent(String.self, forKey: .targetEnv)
         fromVersion = try container.decodeIfPresent(Int.self, forKey: .fromVersion)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+        confirmRecordLoss = try container.decodeIfPresent(Bool.self, forKey: .confirmRecordLoss)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -1395,6 +1435,50 @@ public class RollbackPromotionRequest : CodeMashRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if targetEnv != nil { try container.encode(targetEnv, forKey: .targetEnv) }
         if fromVersion != nil { try container.encode(fromVersion, forKey: .fromVersion) }
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+        if confirmRecordLoss != nil { try container.encode(confirmRecordLoss, forKey: .confirmRecordLoss) }
+    }
+}
+
+// @Route("/{version}/account/projects/environments/built-ins/repair", "POST")
+// @DataContract
+public class RepairEnvironmentBuiltInsRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = RepairEnvironmentBuiltInsResponse
+
+    /**
+    * The environment to repair. Empty = every environment except PROD.
+    */
+    // @DataMember
+    // @ApiMember(Description="The environment to repair. Empty = every environment except PROD.")
+    public var environmentName:String?
+
+    /**
+    * When true, only returns what would be done.
+    */
+    // @DataMember
+    // @ApiMember(Description="When true, only returns what would be done.")
+    public var dryRun:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case environmentName
+        case dryRun
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        environmentName = try container.decodeIfPresent(String.self, forKey: .environmentName)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if environmentName != nil { try container.encode(environmentName, forKey: .environmentName) }
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
     }
 }
 
@@ -3093,6 +3177,88 @@ public class GetAccountTeamPolicies : RequestBase, IReturn
     }
 }
 
+/**
+* Removes a team member from the account
+*/
+// @Route("/{version}/account/team/member/{MemberId}", "DELETE")
+// @Api(Description="Removes a team member from the account")
+public class RemoveTeamMember : RequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The team member's id (usr_…), as get_account_collaborators lists it.
+    */
+    // @ApiMember(Description="The team member's id (usr_…), as get_account_collaborators lists it.", IsRequired=true, ParameterType="path")
+    public var memberId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case memberId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        memberId = try container.decodeIfPresent(String.self, forKey: .memberId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if memberId != nil { try container.encode(memberId, forKey: .memberId) }
+    }
+}
+
+// @Route("/{version}/account/team/member/role-environments", "PUT")
+public class SetTeamMemberRoleEnvironmentsRequest : RequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The team member's id (usr_…), as GET /account/collaborators lists it.
+    */
+    // @ApiMember(Description="The team member's id (usr_…), as GET /account/collaborators lists it.", IsRequired=true)
+    public var memberId:String?
+
+    /**
+    * The account role the member holds: its id (acc_…_nr_…) or its template id (GUID, as GetAccountTeamRoles lists it).
+    */
+    // @ApiMember(Description="The account role the member holds: its id (acc_…_nr_…) or its template id (GUID, as GetAccountTeamRoles lists it).", IsRequired=true)
+    public var roleId:String?
+
+    /**
+    * Environment names, e.g. ["TEST"]. Empty = every environment.
+    */
+    // @ApiMember(Description="Environment names, e.g. [\"TEST\"]. Empty = every environment.")
+    public var environments:[String]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case memberId
+        case roleId
+        case environments
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        memberId = try container.decodeIfPresent(String.self, forKey: .memberId)
+        roleId = try container.decodeIfPresent(String.self, forKey: .roleId)
+        environments = try container.decodeIfPresent([String].self, forKey: .environments) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if memberId != nil { try container.encode(memberId, forKey: .memberId) }
+        if roleId != nil { try container.encode(roleId, forKey: .roleId) }
+        if environments != nil { try container.encode(environments, forKey: .environments) }
+    }
+}
+
 // @Route("/{version}/account/team/roles", "GET")
 public class GetAccountTeamRoles : RequestBase, IReturn
 {
@@ -3148,6 +3314,112 @@ public class SendInviteToTeamMember : RequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if email != nil { try container.encode(email, forKey: .email) }
+        if roles != nil { try container.encode(roles, forKey: .roles) }
+    }
+}
+
+/**
+* Lists the account's pending team invitations
+*/
+// @Route("/{version}/account/team/invitations", "GET")
+// @Api(Description="Lists the account's pending team invitations")
+public class GetAccountTeamInvitations : RequestBase, IReturn
+{
+    public typealias Return = GetAccountTeamInvitationsResponse
+
+    required public init(){ super.init() }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+    }
+}
+
+/**
+* Cancels a pending team invitation
+*/
+// @Route("/{version}/account/team/invitations/{InvitationId}", "DELETE")
+// @Api(Description="Cancels a pending team invitation")
+public class CancelTeamInvitation : RequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The invitation id, as get_account_team_invitations lists it.
+    */
+    // @ApiMember(Description="The invitation id, as get_account_team_invitations lists it.", IsRequired=true, ParameterType="path")
+    public var invitationId:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case invitationId
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        invitationId = try container.decodeIfPresent(String.self, forKey: .invitationId)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if invitationId != nil { try container.encode(invitationId, forKey: .invitationId) }
+    }
+}
+
+/**
+* Updates a team member's display name and/or account roles
+*/
+// @Route("/{version}/account/team/member", "PUT")
+// @Api(Description="Updates a team member's display name and/or account roles")
+public class UpdateTeamMember : RequestBase, IReturn
+{
+    public typealias Return = IdResponse
+
+    /**
+    * The team member's id (usr_…), as get_account_collaborators lists it.
+    */
+    // @ApiMember(Description="The team member's id (usr_…), as get_account_collaborators lists it.", IsRequired=true)
+    public var memberId:String?
+
+    /**
+    * New display name. Omit to keep the current one.
+    */
+    // @ApiMember(Description="New display name. Omit to keep the current one.")
+    public var displayName:String?
+
+    /**
+    * The member's account roles after the change — REPLACES the current ones. Omit to keep the roles; an empty list removes every account role (the member stays on the team).
+    */
+    // @ApiMember(Description="The member's account roles after the change — REPLACES the current ones. Omit to keep the roles; an empty list removes every account role (the member stays on the team).")
+    public var roles:[TeamMemberRoleInput]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case memberId
+        case displayName
+        case roles
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        memberId = try container.decodeIfPresent(String.self, forKey: .memberId)
+        displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
+        roles = try container.decodeIfPresent([TeamMemberRoleInput].self, forKey: .roles) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if memberId != nil { try container.encode(memberId, forKey: .memberId) }
+        if displayName != nil { try container.encode(displayName, forKey: .displayName) }
         if roles != nil { try container.encode(roles, forKey: .roles) }
     }
 }
@@ -3885,12 +4157,19 @@ public class CreateAiServiceUserRequest : RequestBase, IReturn
     // @ApiMember(Description="Project roles to give: [{ projectId, roleIds: [pr_…_nr_…] }]. Without an account role the service user is pinned to these projects.")
     public var projectRoles:[AiProjectRoleIdsDto]?
 
+    /**
+    * Optional "Applies in" per role (N41): [{ roleId, environments: ["TEST"] }]. A role given here applies only in those environments (requests in another environment get 403 CM-ERRORS-MEMBERSHIP-041). No entry or an empty list = every environment.
+    */
+    // @ApiMember(Description="Optional \"Applies in\" per role (N41): [{ roleId, environments: [\"TEST\"] }]. A role given here applies only in those environments (requests in another environment get 403 CM-ERRORS-MEMBERSHIP-041). No entry or an empty list = every environment.")
+    public var roleEnvironments:[RoleEnvironmentsDto]?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case name
         case accountRoleIds
         case projectRoles
+        case roleEnvironments
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3899,6 +4178,7 @@ public class CreateAiServiceUserRequest : RequestBase, IReturn
         name = try container.decodeIfPresent(String.self, forKey: .name)
         accountRoleIds = try container.decodeIfPresent([String].self, forKey: .accountRoleIds) ?? []
         projectRoles = try container.decodeIfPresent([AiProjectRoleIdsDto].self, forKey: .projectRoles) ?? []
+        roleEnvironments = try container.decodeIfPresent([RoleEnvironmentsDto].self, forKey: .roleEnvironments) ?? []
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3907,6 +4187,7 @@ public class CreateAiServiceUserRequest : RequestBase, IReturn
         if name != nil { try container.encode(name, forKey: .name) }
         if accountRoleIds != nil { try container.encode(accountRoleIds, forKey: .accountRoleIds) }
         if projectRoles != nil { try container.encode(projectRoles, forKey: .projectRoles) }
+        if roleEnvironments != nil { try container.encode(roleEnvironments, forKey: .roleEnvironments) }
     }
 }
 
@@ -6546,6 +6827,49 @@ public class DiscardDatabaseSchemaDraftRequest : CodeMashRequestBase, IReturn
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+/**
+* List the endUserOwnRecords switch of every schema (and turn it on for named schemas)
+*/
+// @Route("/{version}/database/schemas/end-user-own-records", "POST")
+// @Api(Description="List the endUserOwnRecords switch of every schema (and turn it on for named schemas)")
+public class EndUserOwnRecordsReportRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = EndUserOwnRecordsReportResponse
+
+    /**
+    * True (default) = only list. False = turn the switch on for the schemas in 'enable'.
+    */
+    // @ApiMember(Description="True (default) = only list. False = turn the switch on for the schemas in 'enable'.")
+    public var dryRun:Bool?
+
+    /**
+    * Schema names to turn the switch ON for (only with dryRun:false). Empty = change nothing.
+    */
+    // @ApiMember(Description="Schema names to turn the switch ON for (only with dryRun:false). Empty = change nothing.")
+    public var enable:[String] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case dryRun
+        case enable
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+        enable = try container.decodeIfPresent([String].self, forKey: .enable) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+        if enable.count > 0 { try container.encode(enable, forKey: .enable) }
     }
 }
 
@@ -16956,6 +17280,40 @@ public class GetLogsByCorrelationId : CodeMashRequestBase, IReturn
 }
 
 /**
+* Fetch one tenant log entry by id
+*/
+// @Route("/{version}/logs/{Id}", "GET")
+// @Api(Description="Fetch one tenant log entry by id")
+public class GetLog : CodeMashRequestBase, IReturn
+{
+    public typealias Return = GetLogResponse
+
+    /**
+    * The log entry id (24 hex characters), from a get_logs row.
+    */
+    // @ApiMember(Description="The log entry id (24 hex characters), from a get_logs row.", IsRequired=true)
+    public var id:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case id
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decodeIfPresent(String.self, forKey: .id)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if id != nil { try container.encode(id, forKey: .id) }
+    }
+}
+
+/**
 * Fetch a filtered, cursor-paged list of tenant log entries
 */
 // @Route("/{version}/logs", "GET")
@@ -17091,21 +17449,21 @@ public class SaveLogSettings : CodeMashRequestBase, IReturn
     public typealias Return = SaveLogSettingsResponse
 
     /**
-    * Drop log entries from requests originating from the Norbix studio (cloud dashboard).
+    * Drop log entries from requests originating from the Norbix studio (cloud dashboard). Not sent = unchanged.
     */
-    // @ApiMember(Description="Drop log entries from requests originating from the Norbix studio (cloud dashboard).")
+    // @ApiMember(Description="Drop log entries from requests originating from the Norbix studio (cloud dashboard). Not sent = unchanged.")
     public var skipCloudDashboardLogs:Bool?
 
     /**
-    * Strip request/response body meta off http:request / http:response log entries.
+    * Strip request/response body meta off http:request / http:response log entries. Not sent = unchanged.
     */
-    // @ApiMember(Description="Strip request/response body meta off http:request / http:response log entries.")
+    // @ApiMember(Description="Strip request/response body meta off http:request / http:response log entries. Not sent = unchanged.")
     public var skipHttpBodyMeta:Bool?
 
     /**
-    * Turn on tenant-visible log entries for AI chat turns. Default false.
+    * Turn on tenant-visible log entries for AI chat turns. Default false. Not sent = unchanged.
     */
-    // @ApiMember(Description="Turn on tenant-visible log entries for AI chat turns. Default false.")
+    // @ApiMember(Description="Turn on tenant-visible log entries for AI chat turns. Default false. Not sent = unchanged.")
     public var aiChatLoggingEnabled:Bool?
 
     required public init(){ super.init() }
@@ -21928,6 +22286,29 @@ public class PromoteEnvironmentResponse : ResponseBase
     }
 }
 
+public class RepairEnvironmentBuiltInsResponse : ResponseBase
+{
+    public var items:[BuiltInRepairDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case items
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decodeIfPresent([BuiltInRepairDto].self, forKey: .items) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if items.count > 0 { try container.encode(items, forKey: .items) }
+    }
+}
+
 public class GetProjectEnvironmentsResponse : ResponseBase
 {
     public var item:ProjectEnvironmentsDto?
@@ -22365,6 +22746,29 @@ public class GetAccountTeamRolesResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if roles != nil { try container.encode(roles, forKey: .roles) }
+    }
+}
+
+public class GetAccountTeamInvitationsResponse : ResponseBase
+{
+    public var items:[TeamInvitationDto] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case items
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        items = try container.decodeIfPresent([TeamInvitationDto].self, forKey: .items) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if items.count > 0 { try container.encode(items, forKey: .items) }
     }
 }
 
@@ -23362,6 +23766,29 @@ public class ApplyDatabaseSchemaBundleResponse : ResponseBase
         if collections.count > 0 { try container.encode(collections, forKey: .collections) }
         if decisions.count > 0 { try container.encode(decisions, forKey: .decisions) }
         if errors.count > 0 { try container.encode(errors, forKey: .errors) }
+    }
+}
+
+public class EndUserOwnRecordsReportResponse : ResponseBase
+{
+    public var result:EndUserOwnRecordsReportDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case result
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        result = try container.decodeIfPresent(EndUserOwnRecordsReportDto.self, forKey: .result)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if result != nil { try container.encode(result, forKey: .result) }
     }
 }
 
@@ -26695,6 +27122,29 @@ public class GetLogsByCorrelationIdResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if items != nil { try container.encode(items, forKey: .items) }
+    }
+}
+
+public class GetLogResponse : ResponseBase
+{
+    public var item:TenantLogEntryDto?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case item
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        item = try container.decodeIfPresent(TenantLogEntryDto.self, forKey: .item)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if item != nil { try container.encode(item, forKey: .item) }
     }
 }
 
@@ -30322,6 +30772,7 @@ public class StripePaymentIntegrationRequest : PaymentIntegrationRequest
 
 public class AppleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
 {
+    public var webhookBundleId:String?
     public var merchantIdentifier:String?
     public var merchantDomain:String?
     public var displayName:String?
@@ -30329,12 +30780,12 @@ public class AppleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
     public var merchantIdentityCertificatePassword:String?
     public var paymentProcessingCertificateP12Base64:String?
     public var paymentProcessingCertificatePassword:String?
-    public var webhookBundleId:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case provider
+        case webhookBundleId
         case merchantIdentifier
         case merchantDomain
         case displayName
@@ -30342,13 +30793,13 @@ public class AppleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
         case merchantIdentityCertificatePassword
         case paymentProcessingCertificateP12Base64
         case paymentProcessingCertificatePassword
-        case webhookBundleId
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         provider = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .provider)
+        webhookBundleId = try container.decodeIfPresent(String.self, forKey: .webhookBundleId)
         merchantIdentifier = try container.decodeIfPresent(String.self, forKey: .merchantIdentifier)
         merchantDomain = try container.decodeIfPresent(String.self, forKey: .merchantDomain)
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
@@ -30356,13 +30807,13 @@ public class AppleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
         merchantIdentityCertificatePassword = try container.decodeIfPresent(String.self, forKey: .merchantIdentityCertificatePassword)
         paymentProcessingCertificateP12Base64 = try container.decodeIfPresent(String.self, forKey: .paymentProcessingCertificateP12Base64)
         paymentProcessingCertificatePassword = try container.decodeIfPresent(String.self, forKey: .paymentProcessingCertificatePassword)
-        webhookBundleId = try container.decodeIfPresent(String.self, forKey: .webhookBundleId)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if provider != nil { try container.encode(provider, forKey: .provider) }
+        if webhookBundleId != nil { try container.encode(webhookBundleId, forKey: .webhookBundleId) }
         if merchantIdentifier != nil { try container.encode(merchantIdentifier, forKey: .merchantIdentifier) }
         if merchantDomain != nil { try container.encode(merchantDomain, forKey: .merchantDomain) }
         if displayName != nil { try container.encode(displayName, forKey: .displayName) }
@@ -30370,53 +30821,52 @@ public class AppleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
         if merchantIdentityCertificatePassword != nil { try container.encode(merchantIdentityCertificatePassword, forKey: .merchantIdentityCertificatePassword) }
         if paymentProcessingCertificateP12Base64 != nil { try container.encode(paymentProcessingCertificateP12Base64, forKey: .paymentProcessingCertificateP12Base64) }
         if paymentProcessingCertificatePassword != nil { try container.encode(paymentProcessingCertificatePassword, forKey: .paymentProcessingCertificatePassword) }
-        if webhookBundleId != nil { try container.encode(webhookBundleId, forKey: .webhookBundleId) }
     }
 }
 
 public class GoogleInAppPaymentIntegrationRequest : PaymentIntegrationRequest
 {
+    public var webhookPackageName:String?
     public var merchantId:String?
     public var merchantName:String?
     public var gateway:String?
     public var privateKeyOrToken:String?
     public var gatewayMerchantId:String?
-    public var webhookPackageName:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case provider
+        case webhookPackageName
         case merchantId
         case merchantName
         case gateway
         case privateKeyOrToken
         case gatewayMerchantId
-        case webhookPackageName
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         provider = try container.decodeIfPresent(PaymentGatewayPlatform.self, forKey: .provider)
+        webhookPackageName = try container.decodeIfPresent(String.self, forKey: .webhookPackageName)
         merchantId = try container.decodeIfPresent(String.self, forKey: .merchantId)
         merchantName = try container.decodeIfPresent(String.self, forKey: .merchantName)
         gateway = try container.decodeIfPresent(String.self, forKey: .gateway)
         privateKeyOrToken = try container.decodeIfPresent(String.self, forKey: .privateKeyOrToken)
         gatewayMerchantId = try container.decodeIfPresent(String.self, forKey: .gatewayMerchantId)
-        webhookPackageName = try container.decodeIfPresent(String.self, forKey: .webhookPackageName)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if provider != nil { try container.encode(provider, forKey: .provider) }
+        if webhookPackageName != nil { try container.encode(webhookPackageName, forKey: .webhookPackageName) }
         if merchantId != nil { try container.encode(merchantId, forKey: .merchantId) }
         if merchantName != nil { try container.encode(merchantName, forKey: .merchantName) }
         if gateway != nil { try container.encode(gateway, forKey: .gateway) }
         if privateKeyOrToken != nil { try container.encode(privateKeyOrToken, forKey: .privateKeyOrToken) }
         if gatewayMerchantId != nil { try container.encode(gatewayMerchantId, forKey: .gatewayMerchantId) }
-        if webhookPackageName != nil { try container.encode(webhookPackageName, forKey: .webhookPackageName) }
     }
 }
 
@@ -32857,6 +33307,7 @@ public class AdyenPaymentIntegrationDto : PaymentsIntegrationDto
 
 public class AppleInAppPaymentIntegrationDto : PaymentsIntegrationDto
 {
+    public var webhookBundleId:String?
     public var merchantIdentifier:String?
     public var merchantDomain:String?
     public var displayName:String?
@@ -32864,6 +33315,7 @@ public class AppleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case webhookBundleId
         case merchantIdentifier
         case merchantDomain
         case displayName
@@ -32872,6 +33324,7 @@ public class AppleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        webhookBundleId = try container.decodeIfPresent(String.self, forKey: .webhookBundleId)
         merchantIdentifier = try container.decodeIfPresent(String.self, forKey: .merchantIdentifier)
         merchantDomain = try container.decodeIfPresent(String.self, forKey: .merchantDomain)
         displayName = try container.decodeIfPresent(String.self, forKey: .displayName)
@@ -32880,6 +33333,7 @@ public class AppleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if webhookBundleId != nil { try container.encode(webhookBundleId, forKey: .webhookBundleId) }
         if merchantIdentifier != nil { try container.encode(merchantIdentifier, forKey: .merchantIdentifier) }
         if merchantDomain != nil { try container.encode(merchantDomain, forKey: .merchantDomain) }
         if displayName != nil { try container.encode(displayName, forKey: .displayName) }
@@ -32888,6 +33342,7 @@ public class AppleInAppPaymentIntegrationDto : PaymentsIntegrationDto
 
 public class GoogleInAppPaymentIntegrationDto : PaymentsIntegrationDto
 {
+    public var webhookPackageName:String?
     public var merchantId:String?
     public var merchantName:String?
     public var gateway:String?
@@ -32896,6 +33351,7 @@ public class GoogleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
+        case webhookPackageName
         case merchantId
         case merchantName
         case gateway
@@ -32905,6 +33361,7 @@ public class GoogleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        webhookPackageName = try container.decodeIfPresent(String.self, forKey: .webhookPackageName)
         merchantId = try container.decodeIfPresent(String.self, forKey: .merchantId)
         merchantName = try container.decodeIfPresent(String.self, forKey: .merchantName)
         gateway = try container.decodeIfPresent(String.self, forKey: .gateway)
@@ -32914,6 +33371,7 @@ public class GoogleInAppPaymentIntegrationDto : PaymentsIntegrationDto
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
+        if webhookPackageName != nil { try container.encode(webhookPackageName, forKey: .webhookPackageName) }
         if merchantId != nil { try container.encode(merchantId, forKey: .merchantId) }
         if merchantName != nil { try container.encode(merchantName, forKey: .merchantName) }
         if gateway != nil { try container.encode(gateway, forKey: .gateway) }
@@ -33067,81 +33525,69 @@ public class StripePaymentIntegrationDto : PaymentsIntegrationDto
 public class ShopifyPaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var shopDomain:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case shopDomain
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         shopDomain = try container.decodeIfPresent(String.self, forKey: .shopDomain)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if shopDomain != nil { try container.encode(shopDomain, forKey: .shopDomain) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
 public class WooCommercePaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var storeUrl:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case storeUrl
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         storeUrl = try container.decodeIfPresent(String.self, forKey: .storeUrl)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if storeUrl != nil { try container.encode(storeUrl, forKey: .storeUrl) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
 public class MagentoPaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var storeUrl:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case storeUrl
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
         try super.init(from: decoder)
         let container = try decoder.container(keyedBy: CodingKeys.self)
         storeUrl = try container.decodeIfPresent(String.self, forKey: .storeUrl)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if storeUrl != nil { try container.encode(storeUrl, forKey: .storeUrl) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
@@ -33149,14 +33595,12 @@ public class BraintreePaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var merchantId:String?
     public var environment:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case merchantId
         case environment
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33164,7 +33608,6 @@ public class BraintreePaymentIntegrationDto : PaymentsIntegrationDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         merchantId = try container.decodeIfPresent(String.self, forKey: .merchantId)
         environment = try container.decodeIfPresent(String.self, forKey: .environment)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33172,7 +33615,6 @@ public class BraintreePaymentIntegrationDto : PaymentsIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if merchantId != nil { try container.encode(merchantId, forKey: .merchantId) }
         if environment != nil { try container.encode(environment, forKey: .environment) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
@@ -33180,14 +33622,12 @@ public class AuthorizeNetPaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var merchantLoginId:String?
     public var environment:String?
-    public var webhookSignatureKey:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case merchantLoginId
         case environment
-        case webhookSignatureKey
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33195,7 +33635,6 @@ public class AuthorizeNetPaymentIntegrationDto : PaymentsIntegrationDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         merchantLoginId = try container.decodeIfPresent(String.self, forKey: .merchantLoginId)
         environment = try container.decodeIfPresent(String.self, forKey: .environment)
-        webhookSignatureKey = try container.decodeIfPresent(String.self, forKey: .webhookSignatureKey)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33203,7 +33642,6 @@ public class AuthorizeNetPaymentIntegrationDto : PaymentsIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if merchantLoginId != nil { try container.encode(merchantLoginId, forKey: .merchantLoginId) }
         if environment != nil { try container.encode(environment, forKey: .environment) }
-        if webhookSignatureKey != nil { try container.encode(webhookSignatureKey, forKey: .webhookSignatureKey) }
     }
 }
 
@@ -33211,14 +33649,12 @@ public class CheckOutComPaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var merchantAccount:String?
     public var environment:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case merchantAccount
         case environment
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33226,7 +33662,6 @@ public class CheckOutComPaymentIntegrationDto : PaymentsIntegrationDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         merchantAccount = try container.decodeIfPresent(String.self, forKey: .merchantAccount)
         environment = try container.decodeIfPresent(String.self, forKey: .environment)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33234,7 +33669,6 @@ public class CheckOutComPaymentIntegrationDto : PaymentsIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if merchantAccount != nil { try container.encode(merchantAccount, forKey: .merchantAccount) }
         if environment != nil { try container.encode(environment, forKey: .environment) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
@@ -33242,14 +33676,12 @@ public class WorldpayPaymentIntegrationDto : PaymentsIntegrationDto
 {
     public var merchantCode:String?
     public var environment:String?
-    public var webhookSecret:String?
 
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case merchantCode
         case environment
-        case webhookSecret
     }
 
     required public init(from decoder: Decoder) throws {
@@ -33257,7 +33689,6 @@ public class WorldpayPaymentIntegrationDto : PaymentsIntegrationDto
         let container = try decoder.container(keyedBy: CodingKeys.self)
         merchantCode = try container.decodeIfPresent(String.self, forKey: .merchantCode)
         environment = try container.decodeIfPresent(String.self, forKey: .environment)
-        webhookSecret = try container.decodeIfPresent(String.self, forKey: .webhookSecret)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -33265,7 +33696,6 @@ public class WorldpayPaymentIntegrationDto : PaymentsIntegrationDto
         var container = encoder.container(keyedBy: CodingKeys.self)
         if merchantCode != nil { try container.encode(merchantCode, forKey: .merchantCode) }
         if environment != nil { try container.encode(environment, forKey: .environment) }
-        if webhookSecret != nil { try container.encode(webhookSecret, forKey: .webhookSecret) }
     }
 }
 
@@ -36010,6 +36440,79 @@ public class MarketplaceFunctionSchedulerTaskRequest : SchedulerTaskRequest
     }
 }
 
+public class AwsCloudWatchLoggingIntegrationRequest : LoggingIntegrationRequest
+{
+    public var region:String?
+    public var logGroup:String?
+    public var logStream:String?
+    public var accessKey:String?
+    public var secretKey:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case provider
+        case region
+        case logGroup
+        case logStream
+        case accessKey
+        case secretKey
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        provider = try container.decodeIfPresent(LoggingProvider.self, forKey: .provider)
+        region = try container.decodeIfPresent(String.self, forKey: .region)
+        logGroup = try container.decodeIfPresent(String.self, forKey: .logGroup)
+        logStream = try container.decodeIfPresent(String.self, forKey: .logStream)
+        accessKey = try container.decodeIfPresent(String.self, forKey: .accessKey)
+        secretKey = try container.decodeIfPresent(String.self, forKey: .secretKey)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if provider != nil { try container.encode(provider, forKey: .provider) }
+        if region != nil { try container.encode(region, forKey: .region) }
+        if logGroup != nil { try container.encode(logGroup, forKey: .logGroup) }
+        if logStream != nil { try container.encode(logStream, forKey: .logStream) }
+        if accessKey != nil { try container.encode(accessKey, forKey: .accessKey) }
+        if secretKey != nil { try container.encode(secretKey, forKey: .secretKey) }
+    }
+}
+
+public class AwsCloudWatchLoggingIntegrationDto : LoggingIntegrationDto
+{
+    public var region:String?
+    public var logGroup:String?
+    public var logStream:String?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case region
+        case logGroup
+        case logStream
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        region = try container.decodeIfPresent(String.self, forKey: .region)
+        logGroup = try container.decodeIfPresent(String.self, forKey: .logGroup)
+        logStream = try container.decodeIfPresent(String.self, forKey: .logStream)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if region != nil { try container.encode(region, forKey: .region) }
+        if logGroup != nil { try container.encode(logGroup, forKey: .logGroup) }
+        if logStream != nil { try container.encode(logStream, forKey: .logStream) }
+    }
+}
+
 public class StringFieldDto : JsonSchemaFieldDto
 {
     // @DataMember
@@ -36808,6 +37311,33 @@ public class DatabaseIntegrationRequest : Codable
 }
 
 // @DataContract
+public class PromotionIntegrationChoiceDto : Codable
+{
+    /**
+    * The SOURCE integration id (int_…), as listed in the preview's integrations[].id.
+    */
+    // @DataMember
+    // @ApiMember(Description="The SOURCE integration id (int_…), as listed in the preview's integrations[].id.", IsRequired=true)
+    public var id:String?
+
+    /**
+    * 'seed' = copy the integration (with its secret) into the target; 'skip' = leave it out; 'map' = point the promoted content at an existing target integration of the same module (mapToId).
+    */
+    // @DataMember
+    // @ApiMember(Description="'seed' = copy the integration (with its secret) into the target; 'skip' = leave it out; 'map' = point the promoted content at an existing target integration of the same module (mapToId).", IsRequired=true)
+    public var action:String?
+
+    /**
+    * Only for 'map': the TARGET integration id (same module), from the preview's integrations[].targets[].id.
+    */
+    // @DataMember
+    // @ApiMember(Description="Only for 'map': the TARGET integration id (same module), from the preview's integrations[].targets[].id.")
+    public var mapToId:String?
+
+    required public init(){}
+}
+
+// @DataContract
 public class AiPlanDto : Codable
 {
     // @DataMember
@@ -36990,6 +37520,23 @@ public class FileResourceRefDto : Codable
     required public init(){}
 }
 
+public class TeamMemberRoleInput : Codable
+{
+    /**
+    * Account role id (acc_…_nr_…) or its template id (GUID), as get_account_team_roles lists it.
+    */
+    // @ApiMember(Description="Account role id (acc_…_nr_…) or its template id (GUID), as get_account_team_roles lists it.", IsRequired=true)
+    public var roleId:String?
+
+    /**
+    * Environment names the role applies in, e.g. ["TEST"]. Empty or omitted = every environment.
+    */
+    // @ApiMember(Description="Environment names the role applies in, e.g. [\"TEST\"]. Empty or omitted = every environment.")
+    public var environments:[String]?
+
+    required public init(){}
+}
+
 // @DataContract
 public class AiProjectRoleIdsDto : Codable
 {
@@ -36998,6 +37545,18 @@ public class AiProjectRoleIdsDto : Codable
 
     // @DataMember
     public var roleIds:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class RoleEnvironmentsDto : Codable
+{
+    // @DataMember
+    public var roleId:String?
+
+    // @DataMember
+    public var environments:[String] = []
 
     required public init(){}
 }
@@ -37319,6 +37878,9 @@ public class SchemaSettingsDto : Codable
 
     // @DataMember
     public var uniqueIndexes:[SchemaUniqueIndexDto]?
+
+    // @DataMember
+    public var endUserOwnRecords:Bool?
 
     required public init(){}
 }
@@ -38177,6 +38739,21 @@ public class UsageBillingDto : Codable
 public class PromotionResultDto : Codable
 {
     // @DataMember
+    public var summary:PromotionSummaryDto?
+
+    // @DataMember
+    public var items:[PromotionItemChangeDto] = []
+
+    // @DataMember
+    public var integrations:[PromotionIntegrationChangeDto] = []
+
+    // @DataMember
+    public var notPromoted:[PromotionNotPromotedDto] = []
+
+    // @DataMember
+    public var requiresConfirmation:Bool?
+
+    // @DataMember
     public var contentMirrored:[PromotionItemDto] = []
 
     // @DataMember
@@ -38206,6 +38783,27 @@ public class PromotionResultDto : Codable
     // @DataMember
     public var wasDryRun:Bool?
 
+    // @DataMember
+    public var promoted:Bool?
+
+    // @DataMember
+    public var message:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class BuiltInRepairDto : Codable
+{
+    // @DataMember
+    public var env:String?
+
+    // @DataMember
+    public var items:[PromotionItemChangeDto] = []
+
+    // @DataMember
+    public var isNoOp:Bool?
+
     required public init(){}
 }
 
@@ -38214,6 +38812,9 @@ public class ProjectEnvironmentsDto : Codable
 {
     // @DataMember
     public var environments:[String] = []
+
+    // @DataMember
+    public var promotionOrder:[String] = []
 
     required public init(){}
 }
@@ -38626,6 +39227,17 @@ public class AccountTeamRoleDto : Codable
     public var Description:String?
     public var isSystem:Bool?
     public var policies:[String]?
+
+    required public init(){}
+}
+
+public class TeamInvitationDto : Codable
+{
+    public var id:String?
+    public var email:String?
+    public var roles:[String] = []
+    public var sentOn:Date?
+    public var expiresOn:Date?
 
     required public init(){}
 }
@@ -39457,6 +40069,21 @@ public class AppliedCollectionDto : Codable
 
     // @DataMember
     public var linkedFields:[String] = []
+
+    required public init(){}
+}
+
+// @DataContract
+public class EndUserOwnRecordsReportDto : Codable
+{
+    // @DataMember(Name="dryRun")
+    public var dryRun:Bool?
+
+    // @DataMember(Name="env")
+    public var env:String?
+
+    // @DataMember(Name="schemas")
+    public var schemas:[EndUserOwnRecordsRowDto] = []
 
     required public init(){}
 }
@@ -41538,6 +42165,9 @@ public class TenantLogEntryDto : Codable
     public var env:String?
 
     // @DataMember
+    public var origin:String?
+
+    // @DataMember
     public var meta:IReadOnlyDictionary<String, String>?
 
     required public init(){}
@@ -41796,6 +42426,9 @@ public class AiRoleDto : Codable
 
     // @DataMember
     public var isSystem:Bool?
+
+    // @DataMember
+    public var environments:[String] = []
 
     required public init(){}
 }
@@ -43867,6 +44500,150 @@ public class UsageBillingIngestionFailureDto : Codable
 }
 
 // @DataContract
+public class PromotionSummaryDto : Codable
+{
+    // @DataMember
+    public var added:Int?
+
+    // @DataMember
+    public var changed:Int?
+
+    // @DataMember
+    public var unchanged:Int?
+
+    // @DataMember
+    public var deleted:Int?
+
+    // @DataMember
+    public var kept:Int?
+
+    // @DataMember
+    public var skipped:Int?
+
+    // @DataMember
+    public var recordsAtRisk:Int?
+
+    // @DataMember
+    public var integrationsSeeded:Int?
+
+    // @DataMember
+    public var integrationsSkipped:Int?
+
+    // @DataMember
+    public var integrationsMapped:Int?
+
+    // @DataMember
+    public var integrationsRemoved:Int?
+
+    // @DataMember
+    public var isNoOp:Bool?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionItemChangeDto : Codable
+{
+    // @DataMember
+    public var type:String?
+
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var matchedBy:String?
+
+    // @DataMember
+    public var previousTargetId:String?
+
+    // @DataMember
+    public var builtIn:Bool?
+
+    // @DataMember
+    public var recordCount:Int?
+
+    // @DataMember
+    public var note:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionIntegrationChangeDto : Codable
+{
+    // @DataMember
+    public var module:String?
+
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var provider:String?
+
+    // @DataMember
+    public var status:String?
+
+    // @DataMember
+    public var defaultAction:String?
+
+    // @DataMember
+    public var action:String?
+
+    // @DataMember
+    public var targetId:String?
+
+    // @DataMember
+    public var mapToId:String?
+
+    // @DataMember
+    public var holdsSecret:Bool?
+
+    // @DataMember
+    public var isFake:Bool?
+
+    // @DataMember
+    public var realSender:Bool?
+
+    // @DataMember
+    public var targets:[PromotionIntegrationTargetDto] = []
+
+    // @DataMember
+    public var warning:String?
+
+    // @DataMember
+    public var note:String?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionNotPromotedDto : Codable
+{
+    // @DataMember
+    public var area:String?
+
+    // @DataMember
+    public var scope:String?
+
+    // @DataMember
+    public var reason:String?
+
+    // @DataMember
+    public var count:Int?
+
+    required public init(){}
+}
+
+// @DataContract
 public class PromotionItemDto : Codable
 {
     // @DataMember
@@ -44631,6 +45408,27 @@ public class TermMultiParentDto : Codable
 
     // @DataMember
     public var names:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
+public class EndUserOwnRecordsRowDto : Codable
+{
+    // @DataMember(Name="schemaId")
+    public var schemaId:String?
+
+    // @DataMember(Name="schemaName")
+    public var schemaName:String?
+
+    // @DataMember(Name="hasRecordOwner")
+    public var hasRecordOwner:Bool?
+
+    // @DataMember(Name="endUserOwnRecords")
+    public var endUserOwnRecords:Bool?
+
+    // @DataMember(Name="action")
+    public var action:String?
 
     required public init(){}
 }
@@ -45820,6 +46618,24 @@ public class UsageBillingClusterChargeDto : Codable
 
     // @DataMember
     public var cents:Int?
+
+    required public init(){}
+}
+
+// @DataContract
+public class PromotionIntegrationTargetDto : Codable
+{
+    // @DataMember
+    public var id:String?
+
+    // @DataMember
+    public var name:String?
+
+    // @DataMember
+    public var provider:String?
+
+    // @DataMember
+    public var isDefault:Bool?
 
     required public init(){}
 }
