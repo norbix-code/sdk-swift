@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-19 11:32:44
+Date: 2026-10-21 18:13:33
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -3912,6 +3912,12 @@ public class CommitUploadRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var fileName:String?
 
+    // @DataMember
+    public var ownerUserId:String?
+
+    // @DataMember
+    public var reassignOwner:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -3920,6 +3926,8 @@ public class CommitUploadRequest : CodeMashRequestBase, IReturn
         case contentType
         case sizeBytes
         case fileName
+        case ownerUserId
+        case reassignOwner
     }
 
     required public init(from decoder: Decoder) throws {
@@ -3930,6 +3938,8 @@ public class CommitUploadRequest : CodeMashRequestBase, IReturn
         contentType = try container.decodeIfPresent(String.self, forKey: .contentType)
         sizeBytes = try container.decodeIfPresent(Int.self, forKey: .sizeBytes)
         fileName = try container.decodeIfPresent(String.self, forKey: .fileName)
+        ownerUserId = try container.decodeIfPresent(String.self, forKey: .ownerUserId)
+        reassignOwner = try container.decodeIfPresent(Bool.self, forKey: .reassignOwner)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -3940,6 +3950,8 @@ public class CommitUploadRequest : CodeMashRequestBase, IReturn
         if contentType != nil { try container.encode(contentType, forKey: .contentType) }
         if sizeBytes != nil { try container.encode(sizeBytes, forKey: .sizeBytes) }
         if fileName != nil { try container.encode(fileName, forKey: .fileName) }
+        if ownerUserId != nil { try container.encode(ownerUserId, forKey: .ownerUserId) }
+        if reassignOwner != nil { try container.encode(reassignOwner, forKey: .reassignOwner) }
     }
 }
 
@@ -4344,6 +4356,56 @@ public class GetPublicFileRequest : RequestBase, IReturn
 /**
 * Files
 */
+// @Route("/{version}/files/{filesIntegrationId}/register", "POST")
+// @Api(Description="Files")
+// @DataContract
+public class RegisterFilesRequest : CodeMashRequestBase, IReturn
+{
+    public typealias Return = RegisterFilesResponse
+
+    // @DataMember
+    public var filesIntegrationId:String?
+
+    // @DataMember
+    public var items:[RegisterFileItem]?
+
+    // @DataMember
+    public var reassignOwner:Bool?
+
+    // @DataMember
+    public var dryRun:Bool?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case filesIntegrationId
+        case items
+        case reassignOwner
+        case dryRun
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
+        items = try container.decodeIfPresent([RegisterFileItem].self, forKey: .items) ?? []
+        reassignOwner = try container.decodeIfPresent(Bool.self, forKey: .reassignOwner)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
+        if items != nil { try container.encode(items, forKey: .items) }
+        if reassignOwner != nil { try container.encode(reassignOwner, forKey: .reassignOwner) }
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+    }
+}
+
+/**
+* Files
+*/
 // @Route("/{version}/files/{filesIntegrationId}/upload-url", "POST")
 // @Api(Description="Files")
 // @DataContract
@@ -4363,6 +4425,12 @@ public class RequestUploadUrlRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var expirationSeconds:Int?
 
+    // @DataMember
+    public var ownerUserId:String?
+
+    // @DataMember
+    public var reassignOwner:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
@@ -4370,6 +4438,8 @@ public class RequestUploadUrlRequest : CodeMashRequestBase, IReturn
         case path
         case contentType
         case expirationSeconds
+        case ownerUserId
+        case reassignOwner
     }
 
     required public init(from decoder: Decoder) throws {
@@ -4379,6 +4449,8 @@ public class RequestUploadUrlRequest : CodeMashRequestBase, IReturn
         path = try container.decodeIfPresent(String.self, forKey: .path)
         contentType = try container.decodeIfPresent(String.self, forKey: .contentType)
         expirationSeconds = try container.decodeIfPresent(Int.self, forKey: .expirationSeconds)
+        ownerUserId = try container.decodeIfPresent(String.self, forKey: .ownerUserId)
+        reassignOwner = try container.decodeIfPresent(Bool.self, forKey: .reassignOwner)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -4388,6 +4460,8 @@ public class RequestUploadUrlRequest : CodeMashRequestBase, IReturn
         if path != nil { try container.encode(path, forKey: .path) }
         if contentType != nil { try container.encode(contentType, forKey: .contentType) }
         if expirationSeconds != nil { try container.encode(expirationSeconds, forKey: .expirationSeconds) }
+        if ownerUserId != nil { try container.encode(ownerUserId, forKey: .ownerUserId) }
+        if reassignOwner != nil { try container.encode(reassignOwner, forKey: .reassignOwner) }
     }
 }
 
@@ -4439,11 +4513,19 @@ public class UseFileRequest : CodeMashRequestBase, IReturn
     // @DataMember
     public var path:String?
 
+    // @DataMember
+    public var ownerUserId:String?
+
+    // @DataMember
+    public var reassignOwner:Bool?
+
     required public init(){ super.init() }
 
     private enum CodingKeys : String, CodingKey {
         case filesIntegrationId
         case path
+        case ownerUserId
+        case reassignOwner
     }
 
     required public init(from decoder: Decoder) throws {
@@ -4451,6 +4533,8 @@ public class UseFileRequest : CodeMashRequestBase, IReturn
         let container = try decoder.container(keyedBy: CodingKeys.self)
         filesIntegrationId = try container.decodeIfPresent(String.self, forKey: .filesIntegrationId)
         path = try container.decodeIfPresent(String.self, forKey: .path)
+        ownerUserId = try container.decodeIfPresent(String.self, forKey: .ownerUserId)
+        reassignOwner = try container.decodeIfPresent(Bool.self, forKey: .reassignOwner)
     }
 
     public override func encode(to encoder: Encoder) throws {
@@ -4458,6 +4542,8 @@ public class UseFileRequest : CodeMashRequestBase, IReturn
         var container = encoder.container(keyedBy: CodingKeys.self)
         if filesIntegrationId != nil { try container.encode(filesIntegrationId, forKey: .filesIntegrationId) }
         if path != nil { try container.encode(path, forKey: .path) }
+        if ownerUserId != nil { try container.encode(ownerUserId, forKey: .ownerUserId) }
+        if reassignOwner != nil { try container.encode(reassignOwner, forKey: .reassignOwner) }
     }
 }
 
@@ -4766,6 +4852,40 @@ public class MarkAllOwnPushMessagesReadRequest : CodeMashRequestBase, IReturn
 
     public override func encode(to encoder: Encoder) throws {
         try super.encode(to: encoder)
+    }
+}
+
+/**
+* Send your app's own log entries to the project's logs.
+*/
+// @Route("/{version}/logs", "POST")
+// @Api(Description="Send your app's own log entries to the project's logs.")
+public class WriteLogs : CodeMashRequestBase, IReturn
+{
+    public typealias Return = WriteLogsResponse
+
+    /**
+    * 1–100 entries.
+    */
+    // @ApiMember(Description="1–100 entries.", IsRequired=true)
+    public var entries:[WriteLogEntry] = []
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case entries
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        entries = try container.decodeIfPresent([WriteLogEntry].self, forKey: .entries) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if entries.count > 0 { try container.encode(entries, forKey: .entries) }
     }
 }
 
@@ -6136,6 +6256,45 @@ public class ListFilesResponse : ResponseBase
     }
 }
 
+public class RegisterFilesResponse : ResponseBase
+{
+    public var dryRun:Bool?
+    public var registered:Int?
+    public var unchanged:Int?
+    public var failed:Int?
+    public var items:[RegisterFileResult]?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case dryRun
+        case registered
+        case unchanged
+        case failed
+        case items
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        dryRun = try container.decodeIfPresent(Bool.self, forKey: .dryRun)
+        registered = try container.decodeIfPresent(Int.self, forKey: .registered)
+        unchanged = try container.decodeIfPresent(Int.self, forKey: .unchanged)
+        failed = try container.decodeIfPresent(Int.self, forKey: .failed)
+        items = try container.decodeIfPresent([RegisterFileResult].self, forKey: .items) ?? []
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if dryRun != nil { try container.encode(dryRun, forKey: .dryRun) }
+        if registered != nil { try container.encode(registered, forKey: .registered) }
+        if unchanged != nil { try container.encode(unchanged, forKey: .unchanged) }
+        if failed != nil { try container.encode(failed, forKey: .failed) }
+        if items != nil { try container.encode(items, forKey: .items) }
+    }
+}
+
 public class RequestUploadUrlResponse : ResponseBase
 {
     public var url:String?
@@ -6227,6 +6386,29 @@ public class GetOwnPushMessagesResponse : ResponseBase
         try super.encode(to: encoder)
         var container = encoder.container(keyedBy: CodingKeys.self)
         if list != nil { try container.encode(list, forKey: .list) }
+    }
+}
+
+public class WriteLogsResponse : ResponseBase
+{
+    public var accepted:Int?
+
+    required public init(){ super.init() }
+
+    private enum CodingKeys : String, CodingKey {
+        case accepted
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        accepted = try container.decodeIfPresent(Int.self, forKey: .accepted)
+    }
+
+    public override func encode(to encoder: Encoder) throws {
+        try super.encode(to: encoder)
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        if accepted != nil { try container.encode(accepted, forKey: .accepted) }
     }
 }
 
@@ -7363,6 +7545,74 @@ public class PagingArgs : Codable
 }
 
 // @DataContract
+public class RegisterFileItem : Codable
+{
+    // @DataMember
+    public var path:String?
+
+    // @DataMember
+    public var ownerUserId:String?
+
+    // @DataMember
+    public var contentType:String?
+
+    // @DataMember
+    public var sizeBytes:Int?
+
+    // @DataMember
+    public var fileName:String?
+
+    required public init(){}
+}
+
+public class WriteLogEntry : Codable
+{
+    /**
+    * information (default), warning or error.
+    */
+    // @ApiMember(Description="information (default), warning or error.")
+    public var level:String?
+
+    /**
+    * A short line, 1–200 characters — what the Logs list shows.
+    */
+    // @ApiMember(Description="A short line, 1–200 characters — what the Logs list shows.", IsRequired=true)
+    public var title:String?
+
+    /**
+    * Details, at most 8 000 characters.
+    */
+    // @ApiMember(Description="Details, at most 8 000 characters.")
+    public var message:String?
+
+    /**
+    * Your own code for this kind of line, e.g. order:paid — lower case letters, digits and _ . : -, at most 64. Stored as app:<code>; app:log when empty.
+    */
+    // @ApiMember(Description="Your own code for this kind of line, e.g. order:paid — lower case letters, digits and _ . : -, at most 64. Stored as app:<code>; app:log when empty.")
+    public var eventCode:String?
+
+    /**
+    * Groups your lines into one flow in the Logs details view: at most 64 letters, digits, _ or -. Empty = the id of this request.
+    */
+    // @ApiMember(Description="Groups your lines into one flow in the Logs details view: at most 64 letters, digits, _ or -. Empty = the id of this request.")
+    public var correlationId:String?
+
+    /**
+    * When it happened (UTC). Empty = when Norbix received it. At most 7 days old and at most 5 minutes ahead.
+    */
+    // @ApiMember(Description="When it happened (UTC). Empty = when Norbix received it. At most 7 days old and at most 5 minutes ahead.")
+    public var timestamp:Date?
+
+    /**
+    * Extra fields, at most 20; key at most 64, value at most 2 000 characters. Values under secret-looking keys (password, token, apiKey …) are masked.
+    */
+    // @ApiMember(Description="Extra fields, at most 20; key at most 64, value at most 2 000 characters. Values under secret-looking keys (password, token, apiKey …) are masked.")
+    public var meta:[String:String]?
+
+    required public init(){}
+}
+
+// @DataContract
 public class PaymentOrderLineInput : Codable
 {
     // @DataMember
@@ -7838,6 +8088,22 @@ public class PublicFolderDto : Codable
     required public init(){}
 }
 
+public class RegisterFileResult : Codable
+{
+    public var index:Int?
+    public var path:String?
+    public var ownerUserId:String?
+    public var status:String?
+    public var fileId:String?
+    public var verified:Bool?
+    public var warning:String?
+    public var errorCode:String?
+    public var errorStatus:Int?
+    public var error:String?
+
+    required public init(){}
+}
+
 // @DataContract
 public class IntegrationTestResultItemDto : Codable
 {
@@ -8224,6 +8490,9 @@ public class SchemaSettingsDto : Codable
 
     // @DataMember
     public var uniqueIndexes:[SchemaUniqueIndexDto]?
+
+    // @DataMember
+    public var endUserOwnRecords:Bool?
 
     required public init(){}
 }
