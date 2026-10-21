@@ -31,8 +31,8 @@ public final class LogsModule: Sendable {
     /// `CM-ERRORS-LOGGING-003` when the project's per-minute quota is used up.
     /// A POST is not resent on a 429 unless you set an `Idempotency-Key`
     /// header yourself (then the retry waits the `Retry-After` the gateway
-    /// sent). `NorbixError` does not carry response headers, so after the
-    /// error wait about a minute before sending again.
+    /// sent). Otherwise wait `NorbixError.retryAfterSeconds` (the gateway's
+    /// `Retry-After`) before sending again.
     public func writeLogs(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/logs",

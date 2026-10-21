@@ -16,6 +16,11 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
     public let rawBody: String?
     /// Every error the gateway sent, in the order it sent them.
     public let errors: [NorbixErrorItem]
+    /// Seconds to wait before sending again, from the answer's `Retry-After`
+    /// header: the number itself, or the seconds until the HTTP date it names
+    /// (never below 0). `nil` when the header is absent or unreadable. A 429
+    /// `CM-ERRORS-LOGGING-003` from `writeLogs` carries it.
+    public let retryAfterSeconds: Int?
 
     public init(
         message: String,
@@ -23,7 +28,8 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
         code: String = "NORBIX_ERROR",
         details: [String: String] = [:],
         rawBody: String? = nil,
-        errors: [NorbixErrorItem] = []
+        errors: [NorbixErrorItem] = [],
+        retryAfterSeconds: Int? = nil
     ) {
         self.message = message
         self.status = status
@@ -31,6 +37,7 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
         self.details = details
         self.rawBody = rawBody
         self.errors = errors
+        self.retryAfterSeconds = retryAfterSeconds
     }
 
     /// Same value as `status`. The name every Norbix SDK uses for it.
@@ -57,10 +64,12 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
     /// that is not JSON, say.
     ///
     /// Top-level JSON values are flattened into `String` so the resulting
-    /// error stays `Sendable` / `Equatable`.
+    /// error stays `Sendable` / `Equatable`. `retryAfterSeconds` is the
+    /// answer's `Retry-After`, read with `retryAfterSeconds(from:now:)`.
     public static func fromHTTPResponse(
         status: Int,
-        data: Data
+        data: Data,
+        retryAfterSeconds: Int? = nil
     ) -> NorbixError {
         let rawBody = String(data: data, encoding: .utf8)
         guard
@@ -70,7 +79,8 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
                 message: "Request failed (HTTP \(status))",
                 status: status,
                 code: "HTTP_\(status)",
-                rawBody: rawBody
+                rawBody: rawBody,
+                retryAfterSeconds: retryAfterSeconds
             )
         }
 
@@ -95,8 +105,33 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
             code: first?.errorCode ?? text(source["errorCode"]) ?? "HTTP_\(status)",
             details: flat,
             rawBody: rawBody,
-            errors: items
+            errors: items,
+            retryAfterSeconds: retryAfterSeconds
         )
+    }
+
+    /// A `Retry-After` header value as whole seconds: the number itself, or
+    /// the seconds from `now` until the HTTP date it names (never below 0).
+    /// `nil` when the value is absent or unreadable.
+    public static func retryAfterSeconds(from value: String?, now: Date = Date()) -> Int? {
+        guard let text = value?.trimmingCharacters(in: .whitespaces), !text.isEmpty else {
+            return nil
+        }
+        if let number = Double(text) {
+            guard number.isFinite, number >= 0, number <= Double(Int32.max) else { return nil }
+            return Int(number.rounded(.up))
+        }
+        guard let date = httpDateFormatter.date(from: text) else { return nil }
+        return max(0, Int(date.timeIntervalSince(now).rounded(.up)))
+    }
+
+    /// IMF-fixdate (RFC 9110), the HTTP date form `Retry-After` may carry.
+    private static var httpDateFormatter: DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "GMT")
+        formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+        return formatter
     }
 
     /// `true` when the body carries `responseStatus.isSuccess == false`.

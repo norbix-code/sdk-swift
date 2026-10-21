@@ -405,13 +405,14 @@ public final class Transport: @unchecked Sendable {
                 let durationMs = Int(Date().timeIntervalSince(started) * 1000)
 
                 if response.statusCode >= 400 {
+                    let retryAfterHeader = response.value(forHTTPHeaderField: "Retry-After")
                     let retryable = policy.isRetryable(
                         status: response.statusCode,
                         method: method,
                         callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey
                     )
                     if retryable, attempt < policy.maxRetries {
-                        let retryAfter = parseRetryAfter(response.value(forHTTPHeaderField: "Retry-After"))
+                        let retryAfter = parseRetryAfter(retryAfterHeader)
                         attempt += 1
                         let delay = policy.delay(forAttempt: attempt, retryAfter: retryAfter)
                         logger.log(NorbixLogEvent(
@@ -427,7 +428,11 @@ public final class Transport: @unchecked Sendable {
                         try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                         continue
                     }
-                    let error = NorbixError.fromHTTPResponse(status: response.statusCode, data: data)
+                    let error = NorbixError.fromHTTPResponse(
+                        status: response.statusCode,
+                        data: data,
+                        retryAfterSeconds: NorbixError.retryAfterSeconds(from: retryAfterHeader)
+                    )
                     logger.log(NorbixLogEvent(
                         level: .error,
                         message: "✗ \(method) \(url) failed",
