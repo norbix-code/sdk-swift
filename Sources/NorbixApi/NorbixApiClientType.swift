@@ -19,6 +19,7 @@ public protocol NorbixApiClientType: Sendable {
     var database: DatabaseModule { get }
     var echo: EchoModule { get }
     var files: FilesModule { get }
+    var logs: LogsModule { get }
     var membership: MembershipModule { get }
     var payments: PaymentsModule { get }
     var publicProjects: PublicProjectsModule { get }
