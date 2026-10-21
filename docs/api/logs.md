@@ -32,5 +32,15 @@ Refusals throw `NorbixError`:
 The gateway sends a `Retry-After` header (seconds) with the 429. A POST is
 resent on a 429 only when you set an `Idempotency-Key` header yourself (in
 `NorbixConfig.defaultHeaders`); that retry waits the `Retry-After`. Otherwise
-the error reaches you, and `NorbixError` does not carry response headers yet —
-wait about a minute before sending again.
+the error reaches you with the header's value in `NorbixError.retryAfterSeconds`
+(`nil` when the header is absent or unreadable) — wait that long before sending
+again:
+
+```swift
+do {
+    _ = try await client.logs.writeLogs(["entries": entries])
+} catch let error as NorbixError where error.httpStatus == 429 {
+    try await Task.sleep(nanoseconds: UInt64(error.retryAfterSeconds ?? 60) * 1_000_000_000)
+    // then send the entries again
+}
+```
