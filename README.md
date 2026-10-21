@@ -104,8 +104,8 @@ let page = try await hub.logs.getLogs(["level": "Error", "pageSize": 20])
 ```
 
 A 429 `CM-ERRORS-LOGGING-003` means the project's per-minute log quota is used
-up; wait before sending again (`NorbixError` does not carry the gateway's
-`Retry-After` header yet). After saving a logging integration, call
+up; wait `NorbixError.retryAfterSeconds` (from the gateway's `Retry-After`
+header) before sending again. After saving a logging integration, call
 `hub.logs.testLoggingIntegration` — nothing is delivered to it until its last
 test passed. Details: [`docs/api/logs.md`](docs/api/logs.md),
 [`docs/hub/logs.md`](docs/hub/logs.md).
@@ -542,6 +542,21 @@ when the body has no `responseStatus` are the top-level `message` and
 `errorCode` read. `Request failed (HTTP N)` with the code `HTTP_<status>` is
 the last fallback, used when the body says nothing — a 500 page that is not
 JSON, say.
+
+`retryAfterSeconds` (`Int?`) is the answer's `Retry-After` header in whole
+seconds — the number itself, or the seconds until the HTTP date it names (never
+below 0); `nil` when the header is absent or unreadable. A 429 carries it, for
+example `CM-ERRORS-LOGGING-003` from `client.logs.writeLogs` when the project's
+per-minute log quota is used up:
+
+```swift
+do {
+    _ = try await client.logs.writeLogs(["entries": entries])
+} catch let error as NorbixError where error.httpStatus == 429 {
+    try await Task.sleep(nanoseconds: UInt64(error.retryAfterSeconds ?? 60) * 1_000_000_000)
+    // then send the entries again
+}
+```
 
 The Database calls follow rules the gateway checks (bulk writes with an empty
 filter need `"allRecords": true`, `$` operators in an update body are refused,
