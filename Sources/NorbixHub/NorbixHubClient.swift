@@ -50,7 +50,6 @@ public final class NorbixHubClient: Sendable {
     public let membership: MembershipModule
     public let notifications: NotificationsModule
     public let payments: PaymentsModule
-    public let platform: PlatformModule
     public let regions: RegionsModule
     public let scheduler: SchedulerModule
     public let webhooks: WebhooksModule
@@ -86,7 +85,6 @@ public final class NorbixHubClient: Sendable {
         self.membership = MembershipModule(transport: transport)
         self.notifications = NotificationsModule(transport: transport)
         self.payments = PaymentsModule(transport: transport)
-        self.platform = PlatformModule(transport: transport)
         self.regions = RegionsModule(transport: transport)
         self.scheduler = SchedulerModule(transport: transport)
         self.webhooks = WebhooksModule(transport: transport)

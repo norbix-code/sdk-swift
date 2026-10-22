@@ -19,7 +19,6 @@ public protocol NorbixHubClientType: Sendable {
     var membership: MembershipModule { get }
     var notifications: NotificationsModule { get }
     var payments: PaymentsModule { get }
-    var platform: PlatformModule { get }
     var scheduler: SchedulerModule { get }
     var webhooks: WebhooksModule { get }
 
