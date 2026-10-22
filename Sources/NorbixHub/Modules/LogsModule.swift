@@ -9,7 +9,7 @@ import NorbixCore
 ///
 /// Request and response shapes: `GetLogs`, `GetLog`, `CleanLogs`,
 /// `GetLogSettings`, `SaveLogSettings`, `*LoggingIntegrationRequest` & co. in
-/// `references/hub.dtos.swift`.
+/// the Norbix API reference.
 public final class LogsModule: Sendable {
     let transport: Transport
 

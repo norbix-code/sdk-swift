@@ -49,7 +49,7 @@ To update a task, send the same body with `"taskId": "tsk_…"`.
 - `task.type` is the discriminator. `task.campaign` takes the same shape as an
   email campaign (`source` + `templateId` + the source's own fields, for
   example `rolesNames` / `userTags` for `AllUsers`). The typed shape is
-  `EmailCampaignSchedulerTaskRequest` in `references/hub.dtos.swift`.
+  `EmailCampaignSchedulerTaskRequest` in the [API reference](https://docs.norbix.ai/api-reference/).
 
 ## List, read, switch and delete
 

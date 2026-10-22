@@ -5,7 +5,7 @@ Functions, Google Cloud Functions), the marketplace, and cloud functions.
 Norbix does not host code: a trigger's `Code` action, a scheduler
 `CodeFunctionalCall` task or `invokeCodeFunction` runs a function in your
 cloud and sends it one event envelope (`CodeFunctionEventDto` in
-`references/hub.dtos.swift`). Path ids go in the request dictionary (keys are
+the [API reference](https://docs.norbix.ai/api-reference/)). Path ids go in the request dictionary (keys are
 matched to the `{…}` tokens case-insensitively); the other keys are the query
 for `GET` / `DELETE` and the JSON body otherwise.
 
