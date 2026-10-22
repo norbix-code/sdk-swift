@@ -56,4 +56,4 @@ _ = try await hub.logs.testLoggingIntegration(["integrationId": saved?["id"] ?? 
 Request types (`MongoDbLoggingIntegrationRequest`,
 `DataDogLoggingIntegrationRequest` with its `site`,
 `AwsCloudWatchLoggingIntegrationRequest`, …) are in
-`references/hub.dtos.swift`.
+the [API reference](https://docs.norbix.ai/api-reference/).

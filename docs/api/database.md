@@ -144,7 +144,7 @@ tags / currency (`{ value, currency }`); `unique` on string / integer / decimal;
 `multipleOf` / `minimum` / `maximum` on currency; `minItems` / `maxItems` on
 tags and files plus `allowedFileType` / `maxSizeMb` on files; `displayField` on
 every reference kind (`collection`, `user`, `taxonomy`, `role`). The SDK hands
-the shapes back untouched — see `references/api.dtos.swift` (`ObjectFieldDto`,
+the shapes back untouched — see the [API reference](https://docs.norbix.ai/api-reference/) (`ObjectFieldDto`,
 `ArrayFieldDto`, `JsonFieldDto`, `CurrencyDefaultDto`) for the exact members.
 Term rows (`findTerms`, trees) carry `slug` next to `name`.
 

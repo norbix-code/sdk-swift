@@ -5,7 +5,7 @@ DerivedData/
 Package.resolved
 
 # Generation scripts are dev-only — not shipped with the SDK. Generated
-# outputs (references/*.dtos.swift, Sources/*) ARE committed and used by CI.
+# outputs (Sources/*) ARE committed and used by CI.
 scripts/sync_types.py
 scripts/generate_endpoints.py
 

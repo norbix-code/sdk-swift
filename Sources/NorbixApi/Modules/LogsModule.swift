@@ -5,7 +5,7 @@ import NorbixCore
 /// project's Logs.
 ///
 /// Request and response shapes: `WriteLogs`, `WriteLogEntry`,
-/// `WriteLogsResponse` in `references/api.dtos.swift`.
+/// `WriteLogsResponse` in the Norbix API reference.
 public final class LogsModule: Sendable {
     let transport: Transport
 
