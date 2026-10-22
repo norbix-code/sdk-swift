@@ -1,5 +1,5 @@
 /* Options:
-Date: 2026-10-21 18:13:33
+Date: 2026-10-22 07:38:17
 SwiftVersion: 6.0
 Version: 10.20
 Tip: To override a DTO option, remove "//" prefix before updating
@@ -4396,9 +4396,9 @@ public class ImportUsersRequest : CodeMashRequestBase, IReturn
     public typealias Return = ImportUsersResponse
 
     /**
-    * True (default) = check every row and write nothing. False = write.
+    * True = check every row and write nothing. False = write. Empty = true (check only, write nothing).
     */
-    // @ApiMember(Description="True (default) = check every row and write nothing. False = write.")
+    // @ApiMember(Description="True = check every row and write nothing. False = write. Empty = true (check only, write nothing).")
     public var dryRun:Bool?
 
     /**
@@ -4448,9 +4448,9 @@ public class RepairLoginProjectIdsRequest : CodeMashRequestBase, IReturn
     public typealias Return = RepairLoginProjectIdsResponse
 
     /**
-    * True (default) = only count what would change. False = write.
+    * True = only count what would change. False = write. Empty = true (only count).
     */
-    // @ApiMember(Description="True (default) = only count what would change. False = write.")
+    // @ApiMember(Description="True = only count what would change. False = write. Empty = true (only count).")
     public var dryRun:Bool?
 
     required public init(){ super.init() }
@@ -5170,9 +5170,9 @@ public class SavePasskeySettings : CodeMashRequestBase, IReturn
     public var recoveryCodeCount:Int?
 
     /**
-    * Whether recovery codes are generated automatically at signup.
+    * Whether recovery codes are generated automatically at signup. Empty = true (generated).
     */
-    // @ApiMember(Description="Whether recovery codes are generated automatically at signup.")
+    // @ApiMember(Description="Whether recovery codes are generated automatically at signup. Empty = true (generated).")
     public var generateRecoveryCodesAtSignup:Bool?
 
     /**
@@ -6723,10 +6723,10 @@ public class ApplyDatabaseSchemaBundleRequest : CodeMashRequestBase, IReturn
     public var translatable:Bool?
 
     /**
-    * false = leave every collection as a draft instead of publishing v1. Default true.
+    * false = leave every collection as a draft instead of publishing v1. Empty = true (publish v1).
     */
     // @DataMember
-    // @ApiMember(Description="false = leave every collection as a draft instead of publishing v1. Default true.")
+    // @ApiMember(Description="false = leave every collection as a draft instead of publishing v1. Empty = true (publish v1).")
     public var publish:Bool?
 
     required public init(){ super.init() }
@@ -6840,9 +6840,9 @@ public class EndUserOwnRecordsReportRequest : CodeMashRequestBase, IReturn
     public typealias Return = EndUserOwnRecordsReportResponse
 
     /**
-    * True (default) = only list. False = turn the switch on for the schemas in 'enable'.
+    * True = only list. False = turn the switch on for the schemas in 'enable'. Empty = true (only list).
     */
-    // @ApiMember(Description="True (default) = only list. False = turn the switch on for the schemas in 'enable'.")
+    // @ApiMember(Description="True = only list. False = turn the switch on for the schemas in 'enable'. Empty = true (only list).")
     public var dryRun:Bool?
 
     /**
@@ -19925,9 +19925,9 @@ public class SaveWebhookDestinationRequest : CodeMashRequestBase, IReturn
     public var extraHeaders:[String:String]?
 
     /**
-    * Whether this destination is enabled for delivery. Defaults to true.
+    * Whether this destination is enabled for delivery. Empty = true (enabled).
     */
-    // @ApiMember(Description="Whether this destination is enabled for delivery. Defaults to true.")
+    // @ApiMember(Description="Whether this destination is enabled for delivery. Empty = true (enabled).")
     public var isEnabled:Bool?
 
     required public init(){ super.init() }
@@ -20631,9 +20631,9 @@ public class RepairContactRolesRequest : CodeMashRequestBase, IReturn
     public typealias Return = RepairContactRolesResponse
 
     /**
-    * True (default) = only count what would change. False = write.
+    * True = only count what would change. False = write. Empty = true (only count).
     */
-    // @ApiMember(Description="True (default) = only count what would change. False = write.")
+    // @ApiMember(Description="True = only count what would change. False = write. Empty = true (only count).")
     public var dryRun:Bool?
 
     required public init(){ super.init() }
@@ -30024,7 +30024,12 @@ public class PrometheusLoggingIntegrationRequest : LoggingIntegrationRequest
 
 public class DataDogLoggingIntegrationRequest : LoggingIntegrationRequest
 {
+    /**
+    * The Datadog site of your account, one of: datadoghq.com, us3.datadoghq.com, us5.datadoghq.com, datadoghq.eu, ap1.datadoghq.com, ap2.datadoghq.com, ddog-gov.com (DataDogSites.All).
+    */
+    // @ApiMember(Description="The Datadog site of your account, one of: datadoghq.com, us3.datadoghq.com, us5.datadoghq.com, datadoghq.eu, ap1.datadoghq.com, ap2.datadoghq.com, ddog-gov.com (DataDogSites.All).", IsRequired=true)
     public var site:String?
+
     public var serviceName:String?
     public var environment:String?
     public var apiKey:String?
