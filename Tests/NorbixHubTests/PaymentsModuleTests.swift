@@ -29,4 +29,24 @@ final class HubPaymentsModuleTests: XCTestCase {
         XCTAssertEqual(query["integrationId"], "int_stripe")
         XCTAssertEqual(query["limit"], "20")
     }
+
+    /// Owner 2026-10-22: `isSandbox` is optional and empty = true (sandbox) on the gateway.
+    /// The SDK must not fill in a default, or an unset field would mean live money.
+    func testSavePaymentsIntegrationLeavesOutAnUnsetIsSandbox() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"id":"int_montonio"}"#.utf8)
+        let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: mock)
+
+        _ = try await client.payments.savePaymentsIntegration([
+            "integration": ["provider": "Montonio", "accessKey": "ak_test", "secretKey": "sk_test"],
+        ])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/payments/integrations")
+        let data = try XCTUnwrap(mock.lastRequest?.httpBody)
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let integration = try XCTUnwrap(body["integration"] as? [String: Any])
+        XCTAssertEqual(Set(integration.keys), ["provider", "accessKey", "secretKey"])
+        XCTAssertNil(integration["isSandbox"])
+    }
 }
