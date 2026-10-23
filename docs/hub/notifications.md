@@ -103,3 +103,14 @@
 | `setPushIntegrationAsDefault` | `PUT` | `/{version}/notifications/push/integrations/{Id}/default` | `project` |
 | `testPushIntegration` | `POST` | `/{version}/notifications/push/integrations/test` | `project` |
 | `registerDevice` | `POST` | `/{version}/notifications/push/devices` | `project` |
+
+## Cloning a template
+
+`cloneEmailTemplate`, `cloneSmsTemplate` and `clonePushTemplate` copy a
+template and answer the new copy's id (a dictionary with `id`), so you can
+open or edit the copy without listing the templates again:
+
+```swift
+let copy = try await hub.notifications.cloneEmailTemplate(["Id": "tpl_welcome"]) as? [String: Any]
+let template = try await hub.notifications.getEmailTemplate(["id": copy?["id"] ?? ""])
+```
