@@ -327,6 +327,8 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Copies a email template (`Id` = the source template) and answers the
+    /// new copy's id: a dictionary with `id`.
     public func cloneEmailTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/email/templates/{Id}/clone",
@@ -570,6 +572,8 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Copies a push template (`Id` = the source template) and answers the
+    /// new copy's id: a dictionary with `id`.
     public func clonePushTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/push/templates/{Id}/clone",
@@ -1091,6 +1095,8 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Copies a sms template (`Id` = the source template) and answers the
+    /// new copy's id: a dictionary with `id`.
     public func cloneSmsTemplate(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/sms/templates/{Id}/clone",
