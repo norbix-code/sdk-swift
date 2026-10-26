@@ -14,7 +14,7 @@
 | [`files`](./files.md) | 16 |
 | [`logs`](./logs.md) | 15 |
 | [`membership`](./membership.md) | 25 |
-| [`notifications`](./notifications.md) | 101 |
+| [`notifications`](./notifications.md) | 104 |
 | [`payments`](./payments.md) | 16 |
 | [`scheduler`](./scheduler.md) | 8 |
 | [`webhooks`](./webhooks.md) | 8 |

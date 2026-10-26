@@ -322,7 +322,7 @@ import NorbixApi
 
 let client = try NorbixApiClient(projectId: "proj_123")
 let auth = try await client.login(.init(userName: "alice@team.io", password: "secret"))
-print("logged in:", auth["bearerToken"] ?? "")
+print("logged in:", auth.bearerToken, "credential version:", auth.credentialVersion ?? "-")
 
 let me = try await client.membership.getCurrentUser()
 print(me)
@@ -437,6 +437,25 @@ The one-message calls `getSmsCampaignMessage` and `getEmailCampaignMessage`
 (`GET …/campaigns/{campaignId}/messages/{id}`) are gone: the gateway no longer
 serves that route. Use `getSmsCampaignMessages` / `getEmailCampaignMessages`
 (the list), or the batch notification calls.
+
+### Retry a campaign's failed recipients
+
+`retryFailedEmailNotifications`, `retryFailedSmsNotifications` and
+`retryFailedPushNotifications` (`POST …/campaigns/{Id}/retry-failed`, gateway
+2.3.9) send the rows in the `Failed` state again. `idempotencyKey` (yours, at
+most 64 characters) is required: the same key again replays the first answer
+and sends nothing. The recipient rows now carry `state`, `attempts[]`,
+`deliveryEvents[]` and `deliveryOutcome`; details and the optional selectors
+(`notificationIds`, `categories`, `includeAmbiguous` — may send a duplicate) in
+[`docs/hub/notifications.md`](./docs/hub/notifications.md#retrying-failed-recipients-gateway-239).
+
+```swift
+let answer = try await hub.notifications.retryFailedSmsNotifications([
+    "Id": "cmp_1",
+    "idempotencyKey": "retry-2026-10-26-1",
+]) as? [String: Any]
+print(answer?["selected"] ?? 0, "queued;", answer?["skipped"] ?? [:])
+```
 
 ### Triggers: order and break on failure
 
@@ -557,6 +576,11 @@ do {
     // then send the entries again
 }
 ```
+
+A 401 `CM-ERRORS-MEMBERSHIP-USERS-050` means the login's credentials changed
+(password changed or reset) after this session signed in: call `login` again.
+The sign-in answer carries the new `credentialVersion` (see
+[`docs/api/membership.md`](./docs/api/membership.md#credential-version-gateway-239)).
 
 The Database calls follow rules the gateway checks (bulk writes with an empty
 filter need `"allRecords": true`, `$` operators in an update body are refused,
