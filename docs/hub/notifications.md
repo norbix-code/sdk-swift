@@ -45,6 +45,7 @@
 | `getEmailCampaignBatchNotification` | `GET` | `/{version}/notifications/email/campaigns/{id}/batches/{batchId}/{notificationId}` | `project` |
 | `getEmailCampaignBatchNotifications` | `GET` | `/{version}/notifications/email/campaigns/{id}/batches/{batchId}` | `project` |
 | `getEmailCampaignStatistics` | `GET` | `/{version}/notifications/email/campaigns/{id}/stats` | `project` |
+| `retryFailedEmailNotifications` | `POST` | `/{version}/notifications/email/campaigns/{Id}/retry-failed` | `project` |
 | `previewEmailNotification` | `GET` | `/{version}/notifications/email/preview` | `optional` |
 | `previewPushNotification` | `GET` | `/{version}/notifications/push/preview` | `optional` |
 | `previewSmsNotification` | `GET` | `/{version}/notifications/sms/preview` | `optional` |
@@ -58,6 +59,7 @@
 | `getSmsCampaignBatchNotification` | `GET` | `/{version}/notifications/sms/campaigns/{id}/batches/{batchId}/{notificationId}` | `project` |
 | `getSmsCampaignStatistics` | `GET` | `/{version}/notifications/sms/campaigns/{id}/stats` | `project` |
 | `stopSmsCampaign` | `POST` | `/{version}/notifications/sms/campaigns/{Id}/stop` | `project` |
+| `retryFailedSmsNotifications` | `POST` | `/{version}/notifications/sms/campaigns/{Id}/retry-failed` | `project` |
 | `disableSms` | `PUT` | `/{version}/notifications/sms/disable` | `project` |
 | `getSmsDisableDependencies` | `GET` | `/{version}/notifications/sms/disable-dependencies` | `project` |
 | `enableSms` | `PUT` | `/{version}/notifications/sms/enable` | `project` |
@@ -103,6 +105,7 @@
 | `setPushIntegrationAsDefault` | `PUT` | `/{version}/notifications/push/integrations/{Id}/default` | `project` |
 | `testPushIntegration` | `POST` | `/{version}/notifications/push/integrations/test` | `project` |
 | `registerDevice` | `POST` | `/{version}/notifications/push/devices` | `project` |
+| `retryFailedPushNotifications` | `POST` | `/{version}/notifications/push/campaigns/{Id}/retry-failed` | `project` |
 
 ## Cloning a template
 
@@ -114,3 +117,66 @@ open or edit the copy without listing the templates again:
 let copy = try await hub.notifications.cloneEmailTemplate(["Id": "tpl_welcome"]) as? [String: Any]
 let template = try await hub.notifications.getEmailTemplate(["id": copy?["id"] ?? ""])
 ```
+
+## Retrying failed recipients (gateway 2.3.9)
+
+`retryFailedEmailNotifications`, `retryFailedSmsNotifications` and
+`retryFailedPushNotifications` send a campaign's failed recipients again
+(`POST …/campaigns/{Id}/retry-failed`). Only rows in the `Failed` state are
+sent again; a row that was accepted, is still sending, or was blocked or
+cancelled is skipped and counted under `skipped`.
+
+| Field | Meaning |
+| --- | --- |
+| `Id` | The campaign id (path). |
+| `idempotencyKey` | Required, at most 64 characters, yours. The same key again replays the first answer (`replayed: true`) and sends nothing; the same key with another body is refused with 409. |
+| `databaseIntegrationId` | Optional. Omit for the project default database integration of the environment. |
+| `notificationIds` | Optional. Only these rows. Default: every failed recipient of the campaign. |
+| `categories` | Optional. Only these failure classes: `Transient`, `Permanent`, `Unknown`. Default: all three. |
+| `includeAmbiguous` | Optional, default `false`. Also retry rows whose send timed out after the request had gone out — the provider may already have delivered it, so this **may send a duplicate**. |
+
+The answer is `{ retryRequestId, selected, skipped: { reason: count }, replayed, warning? }`;
+`warning` is the duplicate notice, present only with `includeAmbiguous`.
+
+```swift
+let answer = try await hub.notifications.retryFailedEmailNotifications([
+    "Id": "cmp_1",
+    "idempotencyKey": "retry-2026-10-26-1",   // yours; reuse it to read the first answer again
+    "categories": ["Transient", "Unknown"],   // leave Permanent failures alone
+]) as? [String: Any]
+print(answer?["selected"] ?? 0, "rows queued, request", answer?["retryRequestId"] ?? "")
+```
+
+## Delivery state on recipient rows
+
+The rows answered by `getEmailCampaignBatchNotification(s)`,
+`getEmailCampaignMessages` and their SMS / push twins carry the delivery
+bookkeeping the gateway keeps per recipient:
+
+- `state` — `Pending`, `Sending`, `Retrying`, `Accepted`, `Failed`, `Blocked` or `Cancelled`,
+  and `stateChangedAt` (UTC) for the last change.
+- `attempts[]` — one entry per send attempt (number, time, trigger such as the
+  automatic retry or a manual `retryRequestId`, the outcome and the provider's
+  message); `deliveryEvents[]` — what the provider reported afterwards
+  (delivered, bounced, complained …) when delivery events are switched on.
+- `deliveryOutcome` and `deliveryOutcomeRank` — the best thing known about the
+  row so far, as a word and as a number you can sort by.
+
+`getEmailCampaignStatistics` / `getSmsCampaignStatistics` / push statistics
+gain `failedRetryable` (failed rows a retry would pick up) and `cancelled`.
+
+## Delivery events on integrations
+
+`saveEmailIntegration` / `saveSmsIntegration` take the provider's delivery
+report settings as plain dictionary fields:
+
+| Provider | Fields |
+| --- | --- |
+| `awsSes` | `deliveryEventsEnabled` (Bool), `snsTopicArn` |
+| `sendGrid` | `deliveryEventsEnabled` (Bool), `eventWebhookPublicKey` |
+| `twilio` (SMS) | `deliveryEventsEnabled` (Bool), `statusCallbackUrl` |
+| `azureCommunication` (new email provider) | `endpoint`, `accessKey`, `deliveryEventsEnabled?` (Bool), `eventGridKey?` |
+
+The SDK does not check provider names: pass what the Hub expects and the Hub
+validates. The public webhook routes the providers call back (SES-SNS,
+SendGrid, Twilio, Azure Event Grid) are not SDK operations.

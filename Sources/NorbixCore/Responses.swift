@@ -7,19 +7,58 @@ public struct AuthResponse: Codable, Sendable, Equatable {
     public let email: String?
     public let displayName: String?
     public let expiration: Date?
+    /// The login's credential version (gateway 2.3.9, `meta.credentialVersion`
+    /// on the sign-in answer). It changes when the password is changed or
+    /// reset; a session signed in under an older version is refused with 401
+    /// `CM-ERRORS-MEMBERSHIP-USERS-050` — sign in again. `nil` from a gateway
+    /// that does not send it.
+    public let credentialVersion: String?
 
     public init(
         bearerToken: String,
         userId: String? = nil,
         email: String? = nil,
         displayName: String? = nil,
-        expiration: Date? = nil
+        expiration: Date? = nil,
+        credentialVersion: String? = nil
     ) {
         self.bearerToken = bearerToken
         self.userId = userId
         self.email = email
         self.displayName = displayName
         self.expiration = expiration
+        self.credentialVersion = credentialVersion
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case bearerToken, userId, email, displayName, expiration, meta
+    }
+
+    private static let credentialVersionMetaKey = "credentialVersion"
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        bearerToken = try c.decode(String.self, forKey: .bearerToken)
+        userId = try c.decodeIfPresent(String.self, forKey: .userId)
+        email = try c.decodeIfPresent(String.self, forKey: .email)
+        displayName = try c.decodeIfPresent(String.self, forKey: .displayName)
+        expiration = try c.decodeIfPresent(Date.self, forKey: .expiration)
+        // `meta` is the gateway's free-form string map; only the one key the
+        // SDK knows is read, so an unexpected shape never fails the login.
+        let meta = try? c.decodeIfPresent([String: String].self, forKey: .meta)
+        credentialVersion = meta?[Self.credentialVersionMetaKey]
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(bearerToken, forKey: .bearerToken)
+        try c.encodeIfPresent(userId, forKey: .userId)
+        try c.encodeIfPresent(email, forKey: .email)
+        try c.encodeIfPresent(displayName, forKey: .displayName)
+        try c.encodeIfPresent(expiration, forKey: .expiration)
+        if let credentialVersion {
+            try c.encode([Self.credentialVersionMetaKey: credentialVersion], forKey: .meta)
+        }
     }
 }
 

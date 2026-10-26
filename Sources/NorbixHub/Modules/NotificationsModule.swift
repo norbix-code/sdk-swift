@@ -483,6 +483,25 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Sends the failed recipients of an email campaign again (gateway 2.3.9). Pass `Id`
+    /// (the campaign id) and `idempotencyKey` (yours, at most 64 characters: the same key again replays
+    /// the first answer and sends nothing; the same key with another body is refused with 409).
+    /// Optional: `databaseIntegrationId`, `notificationIds` (only these rows), `categories`
+    /// (`Transient`, `Permanent`, `Unknown`; default all three) and `includeAmbiguous` (also the rows
+    /// whose send timed out after the request went out — this MAY SEND A DUPLICATE). Answers
+    /// `retryRequestId`, `selected`, `skipped` (reason → count), `replayed` and, with
+    /// `includeAmbiguous`, a `warning` line. Only rows in the `Failed` state are sent again.
+    public func retryFailedEmailNotifications(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/email/campaigns/{Id}/retry-failed",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     /// Opens a email notification preview. Pass `hash` (the signed preview
     /// link) to open it without sign-in, or `projectId` + `notificationId` as
     /// a signed-in member with read permission. Auth is sent only when the
@@ -772,6 +791,25 @@ public final class NotificationsModule: Sendable {
         )
     }
 
+    /// Sends the failed recipients of a push campaign again (gateway 2.3.9). Pass `Id`
+    /// (the campaign id) and `idempotencyKey` (yours, at most 64 characters: the same key again replays
+    /// the first answer and sends nothing; the same key with another body is refused with 409).
+    /// Optional: `databaseIntegrationId`, `notificationIds` (only these rows), `categories`
+    /// (`Transient`, `Permanent`, `Unknown`; default all three) and `includeAmbiguous` (also the rows
+    /// whose send timed out after the request went out — this MAY SEND A DUPLICATE). Answers
+    /// `retryRequestId`, `selected`, `skipped` (reason → count), `replayed` and, with
+    /// `includeAmbiguous`, a `warning` line. Only rows in the `Failed` state are sent again.
+    public func retryFailedPushNotifications(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/push/campaigns/{Id}/retry-failed",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     // MARK: - SMS (previewSmsNotification is above, with the other signed-link previews)
     public func getSmsCampaigns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
@@ -876,6 +914,25 @@ public final class NotificationsModule: Sendable {
     public func stopSmsCampaign(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/notifications/sms/campaigns/{Id}/stop",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Sends the failed recipients of a sms campaign again (gateway 2.3.9). Pass `Id`
+    /// (the campaign id) and `idempotencyKey` (yours, at most 64 characters: the same key again replays
+    /// the first answer and sends nothing; the same key with another body is refused with 409).
+    /// Optional: `databaseIntegrationId`, `notificationIds` (only these rows), `categories`
+    /// (`Transient`, `Permanent`, `Unknown`; default all three) and `includeAmbiguous` (also the rows
+    /// whose send timed out after the request went out — this MAY SEND A DUPLICATE). Answers
+    /// `retryRequestId`, `selected`, `skipped` (reason → count), `replayed` and, with
+    /// `includeAmbiguous`, a `warning` line. Only rows in the `Failed` state are sent again.
+    public func retryFailedSmsNotifications(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/notifications/sms/campaigns/{Id}/retry-failed",
             method: "POST",
             request: request,
             scope: .project,
