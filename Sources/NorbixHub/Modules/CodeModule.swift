@@ -506,7 +506,7 @@ public final class CodeModule: Sendable {
     //
     // Workflows are in beta; bugs may occur. Contract: gateway `Code.Workflows.md` §7.
 
-    /// Beta: lists the workflows of the environment. Query: `isEnabled?`, `pageNumber?`, `pageSize?`, `sortBy?`.
+    /// Beta: lists the workflows of the environment. Query: `isEnabled?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows",
@@ -650,7 +650,7 @@ public final class CodeModule: Sendable {
         )
     }
 
-    /// Beta: the runs of a workflow. Path: `id`; query: `status?`, `from?`, `to?`, paging.
+    /// Beta: the runs of a workflow. Path: `id`; query: `status?`, `from?`, `to?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflowRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/{Id}/runs",
@@ -722,7 +722,7 @@ public final class CodeModule: Sendable {
         )
     }
 
-    /// Beta: runs across workflows. Query: `status?`, `waitingKind?`, `assignee?` (`me` or `usr_…`), `workflowId?`, `key?`, paging.
+    /// Beta: runs across workflows. Query: `status?`, `waitingKind?`, `assignee?` (`me` or `usr_…`), `workflowId?`, `key?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflowWaitingRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/runs",
@@ -746,7 +746,7 @@ public final class CodeModule: Sendable {
         )
     }
 
-    /// Beta: the log lines of a run. Path: `runId`; query: `stepId?`, `level?`, paging.
+    /// Beta: the log lines of a run. Path: `runId`; query: `stepId?`, `level?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflowRunLogs(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/runs/{RunId}/logs",

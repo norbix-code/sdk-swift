@@ -49,9 +49,9 @@ final class HubCodeWorkflowsTests: XCTestCase {
 
     func testGetCodeWorkflows() async throws {
         let mock = try await send("GET", "/v3/code/workflows") {
-            try await $0.getCodeWorkflows(["isEnabled": true, "pageNumber": 2, "pageSize": 25])
+            try await $0.getCodeWorkflows(["isEnabled": true, "pageSize": 25, "startingAfter": "wf_0"])
         }
-        XCTAssertEqual(try query(mock), ["isEnabled": "true", "pageNumber": "2", "pageSize": "25"])
+        XCTAssertEqual(try query(mock), ["isEnabled": "true", "pageSize": "25", "startingAfter": "wf_0"])
         XCTAssertNil(mock.lastRequest?.httpBody)
     }
 
@@ -235,14 +235,14 @@ final class HubCodeWorkflowsTests: XCTestCase {
                 "assignee": "me",
                 "workflowId": "wf_1",
                 "key": "order-42",
-                "pageNumber": 1,
+                "endingBefore": "run_9",
             ])
         }
         XCTAssertEqual(
             try query(mock),
             [
                 "status": "Waiting", "waitingKind": "approval", "assignee": "me",
-                "workflowId": "wf_1", "key": "order-42", "pageNumber": "1",
+                "workflowId": "wf_1", "key": "order-42", "endingBefore": "run_9",
             ]
         )
         XCTAssertNil(mock.lastRequest?.httpBody)
