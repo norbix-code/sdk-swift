@@ -18,7 +18,7 @@ both clients use.
 
 | Client | Modules |
 | --- | --- |
-| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `database`, `echo`, `files`, `logs`, `membership`, `payments`, `publicProjects` |
+| `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `files`, `logs`, `membership`, `payments`, `publicProjects` |
 | `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `regions`, `scheduler`, `webhooks` |
 
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
@@ -486,7 +486,7 @@ _ = try await hub.membership.saveMembershipTrigger([
 Norbix does not host code: a trigger's `Code` action, a scheduler task or a
 manual call runs a function in **your** cloud (AWS Lambda, Azure Functions,
 Google Cloud Functions) through a Code integration. `hub.code` covers every
-Code Hub endpoint (38); the five cloud-function routes list the functions an
+Code Hub endpoint (70, with the 26 Workflows Beta routes); the five cloud-function routes list the functions an
 integration may call, their aliases and versions, invoke one by hand, give a
 sample envelope for a local run and the last runs of a trigger or task —
 `getCodeFunctions`, `getCodeFunctionQualifiers`, `invokeCodeFunction`,
@@ -502,6 +502,11 @@ let result = try await hub.code.invokeCodeFunction([
 ```
 
 Details and the envelope the function receives: [docs/hub/code.md](./docs/hub/code.md).
+
+Workflows (beta; bugs may occur): `hub.code` has the 26 `code/workflows` routes
+(definitions, drafts and versions, runs, logs, resume); `client.code` on the Api
+client has the four end-user routes — `getCodeWorkflowWaitingRuns`,
+`resumeCodeWorkflowRun` and the two signed resume links, which need no session.
 
 ## Environment configuration
 
