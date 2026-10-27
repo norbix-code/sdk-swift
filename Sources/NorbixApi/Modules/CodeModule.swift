@@ -11,7 +11,7 @@ public final class CodeModule: Sendable {
         self.transport = transport
     }
 
-    /// Beta: runs across workflows. Query: `status?`, `waitingKind?`, `assignee?` (`me` or `usr_…`), `workflowId?`, `key?`, paging.
+    /// Beta: runs across workflows. Query: `status?`, `waitingKind?`, `assignee?` (`me` or `usr_…`), `workflowId?`, `key?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflowWaitingRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/runs",
