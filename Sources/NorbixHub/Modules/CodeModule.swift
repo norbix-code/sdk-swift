@@ -1,7 +1,8 @@
 import Foundation
 import NorbixCore
 
-/// Code integrations, the marketplace and cloud functions (`/{version}/code/*`).
+/// Code integrations, the marketplace, cloud functions and workflows (`/{version}/code/*`).
+/// Workflows are in beta; bugs may occur.
 public final class CodeModule: Sendable {
     let transport: Transport
 
@@ -501,4 +502,321 @@ public final class CodeModule: Sendable {
         )
     }
 
+    // MARK: - Workflows (beta)
+    //
+    // Workflows are in beta; bugs may occur. Contract: gateway `Code.Workflows.md` §7.
+
+    /// Beta: lists the workflows of the environment. Query: `isEnabled?`, `pageNumber?`, `pageSize?`, `sortBy?`.
+    public func getCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: saves the draft of a workflow. Body: `definition` (the workflow definition JSON).
+    public func saveCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: one workflow. Path: `id`; query: `pinnedVersion?`.
+    public func getCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: deletes a workflow. Path: `id`.
+    public func deleteCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the unpublished draft of a workflow. Path: `id`.
+    public func getCodeWorkflowDraft(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/draft",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: throws the draft of a workflow away. Path: `id`.
+    public func discardCodeWorkflowDraft(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/draft",
+            method: "DELETE",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: publishes the draft as the next version. Path: `id`.
+    public func publishCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/publish",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the published versions of a workflow. Path: `id`.
+    public func getCodeWorkflowVersions(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/versions",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the diff of two versions. Path: `id`; query: `fromVersion`, `toVersion`.
+    public func getCodeWorkflowVersionDiff(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/versions/diff",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: turns one workflow on. Path: `id`.
+    public func enableCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/enable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: turns one workflow off. Path: `id`.
+    public func disableCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/disable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: starts a run. Path: `id`; body: `payload?`, `waitSeconds?` (0–30), `runVersion?` (`draft` or a version number).
+    public func invokeCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/invoke",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the runs of a workflow. Path: `id`; query: `status?`, `from?`, `to?`, paging.
+    public func getCodeWorkflowRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/runs",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: resumes the waiting run of a workflow by its key. Path: `id`; body: `key`, `stepId?`, `decision?`, `payload?`.
+    public func resumeCodeWorkflowRunByKey(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/resume",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: validates a definition without saving it. Body: `definition`.
+    public func validateCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/validate",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the JSON schema of a workflow definition.
+    public func getCodeWorkflowSchema(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/schema",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: turns workflows on for the environment.
+    public func enableCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/enable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: turns workflows off for the environment.
+    public func disableCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/disable",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: runs across workflows. Query: `status?`, `waitingKind?`, `assignee?` (`me` or `usr_…`), `workflowId?`, `key?`, paging.
+    public func getCodeWorkflowWaitingRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: one run. Path: `runId`.
+    public func getCodeWorkflowRun(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs/{RunId}",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: the log lines of a run. Path: `runId`; query: `stepId?`, `level?`, paging.
+    public func getCodeWorkflowRunLogs(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs/{RunId}/logs",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: resumes a waiting run. Path: `runId`; body: `stepId?`, `decision?` (`approved` / `rejected`), `payload?`.
+    public func resumeCodeWorkflowRun(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs/{RunId}/resume",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: retries the failed step of a run. Path: `runId`; body: `stepId?`.
+    public func retryCodeWorkflowRunStep(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs/{RunId}/retry",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: cancels a run. Path: `runId`; body: `reason?`.
+    public func cancelCodeWorkflowRun(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/runs/{RunId}/cancel",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: checks and shows a signed resume link; nothing changes. Path: `token`.
+    /// The token is the key: auth is sent only when the client has one (`.optional` scope).
+    public func openCodeWorkflowResumeLink(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/resume/{Token}",
+            method: "GET",
+            request: request,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: answers a signed resume link (the decision is in the token). Path: `token`.
+    /// The token is the key: auth is sent only when the client has one (`.optional` scope).
+    public func useCodeWorkflowResumeLink(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/resume/{Token}",
+            method: "POST",
+            request: request,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
 }

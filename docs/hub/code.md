@@ -1,7 +1,8 @@
 # HUB · Code
 
 Code integrations (the credentials of your own cloud: AWS Lambda, Azure
-Functions, Google Cloud Functions), the marketplace, and cloud functions.
+Functions, Google Cloud Functions), the marketplace, cloud functions and
+workflows (beta).
 Norbix does not host code: a trigger's `Code` action, a scheduler
 `CodeFunctionalCall` task or `invokeCodeFunction` runs a function in your
 cloud and sends it one event envelope (`CodeFunctionEventDto` in
@@ -55,6 +56,32 @@ for `GET` / `DELETE` and the JSON body otherwise.
 | `invokeCodeFunction` | `POST` | `/{version}/code/functions/invoke` | `project` |
 | `getCodeFunctionEventSample` | `GET` | `/{version}/code/functions/event-sample` | `project` |
 | `getCodeFunctionRuns` | `GET` | `/{version}/code/functions/runs` | `project` |
+| `getCodeWorkflows` | `GET` | `/{version}/code/workflows` | `project` |
+| `saveCodeWorkflow` | `PUT` | `/{version}/code/workflows` | `project` |
+| `getCodeWorkflow` | `GET` | `/{version}/code/workflows/{Id}` | `project` |
+| `deleteCodeWorkflow` | `DELETE` | `/{version}/code/workflows/{Id}` | `project` |
+| `getCodeWorkflowDraft` | `GET` | `/{version}/code/workflows/{Id}/draft` | `project` |
+| `discardCodeWorkflowDraft` | `DELETE` | `/{version}/code/workflows/{Id}/draft` | `project` |
+| `publishCodeWorkflow` | `POST` | `/{version}/code/workflows/{Id}/publish` | `project` |
+| `getCodeWorkflowVersions` | `GET` | `/{version}/code/workflows/{Id}/versions` | `project` |
+| `getCodeWorkflowVersionDiff` | `GET` | `/{version}/code/workflows/{Id}/versions/diff` | `project` |
+| `enableCodeWorkflow` | `PUT` | `/{version}/code/workflows/{Id}/enable` | `project` |
+| `disableCodeWorkflow` | `PUT` | `/{version}/code/workflows/{Id}/disable` | `project` |
+| `invokeCodeWorkflow` | `POST` | `/{version}/code/workflows/{Id}/invoke` | `project` |
+| `getCodeWorkflowRuns` | `GET` | `/{version}/code/workflows/{Id}/runs` | `project` |
+| `resumeCodeWorkflowRunByKey` | `POST` | `/{version}/code/workflows/{Id}/resume` | `project` |
+| `validateCodeWorkflow` | `POST` | `/{version}/code/workflows/validate` | `project` |
+| `getCodeWorkflowSchema` | `GET` | `/{version}/code/workflows/schema` | `project` |
+| `enableCodeWorkflows` | `PUT` | `/{version}/code/workflows/enable` | `project` |
+| `disableCodeWorkflows` | `PUT` | `/{version}/code/workflows/disable` | `project` |
+| `getCodeWorkflowWaitingRuns` | `GET` | `/{version}/code/workflows/runs` | `project` |
+| `getCodeWorkflowRun` | `GET` | `/{version}/code/workflows/runs/{RunId}` | `project` |
+| `getCodeWorkflowRunLogs` | `GET` | `/{version}/code/workflows/runs/{RunId}/logs` | `project` |
+| `resumeCodeWorkflowRun` | `POST` | `/{version}/code/workflows/runs/{RunId}/resume` | `project` |
+| `retryCodeWorkflowRunStep` | `POST` | `/{version}/code/workflows/runs/{RunId}/retry` | `project` |
+| `cancelCodeWorkflowRun` | `POST` | `/{version}/code/workflows/runs/{RunId}/cancel` | `project` |
+| `openCodeWorkflowResumeLink` | `GET` | `/{version}/code/workflows/resume/{Token}` | `optional` |
+| `useCodeWorkflowResumeLink` | `POST` | `/{version}/code/workflows/resume/{Token}` | `optional` |
 
 
 ## Marketplace function runs
@@ -105,3 +132,22 @@ The envelope the function receives: `event`, `source`, `context`
 (`projectId`, `environment`, `hubUrl`, `apiUrl`, `runAs.accessToken` — a
 15-minute token for the run-as user) and `data` with one slot per source
 (`database`, `user`, `file`, `payment`, `ai`, `task`, `payload`).
+
+## Workflows (beta)
+
+Workflows are in beta; bugs may occur. The 26 `code/workflows` routes of the
+gateway contract `Code.Workflows.md` §7 are in the table above; each one is
+asserted (verb, path, path / query / body) in
+`Tests/NorbixHubTests/CodeWorkflowsTests.swift`. The two signed resume-link
+routes (`openCodeWorkflowResumeLink`, `useCodeWorkflowResumeLink`) use the
+`optional` scope: the token in the link is the key, and auth is sent only when
+the client has one. The Api client has the four end-user routes
+([api/code.md](../api/code.md)).
+
+```swift
+let saved = try await hub.code.saveCodeWorkflow(["definition": definition])
+_ = try await hub.code.publishCodeWorkflow(["id": "wf_1"])
+let run = try await hub.code.invokeCodeWorkflow(["id": "wf_1", "payload": ["orderId": "ord_1"], "waitSeconds": 10])
+let waiting = try await hub.code.getCodeWorkflowWaitingRuns(["assignee": "me"])
+_ = try await hub.code.resumeCodeWorkflowRun(["runId": "run_1", "decision": "approved"])
+```

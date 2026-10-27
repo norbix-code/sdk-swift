@@ -16,6 +16,7 @@ public protocol NorbixApiClientType: Sendable {
     var ai: AiModule { get }
     var apiKeys: ApiKeysModule { get }
     var auth: AuthModule { get }
+    var code: CodeModule { get }
     var database: DatabaseModule { get }
     var echo: EchoModule { get }
     var files: FilesModule { get }
