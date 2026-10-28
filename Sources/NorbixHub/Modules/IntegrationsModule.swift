@@ -16,7 +16,9 @@ public final class IntegrationsModule: Sendable {
     /// optional `integrationId` (an existing integration). The answer carries
     /// `integrationId` (save with it), `env`, `module`, `cloud`, `issuer`,
     /// `subject`, `audience`, `available` (with `unavailableReason` when false)
-    /// and the cloud setup `script`.
+    /// and the cloud setup `script`. `templates`: ready CloudFormation / Bicep /
+    /// Terraform files for this integration (`[[String: Any]]` with `kind`,
+    /// `fileName`, `content`).
     public func getKeylessIntegrationSetup(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/integrations/keyless/setup",

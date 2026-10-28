@@ -12,7 +12,7 @@ final class HubIntegrationsModuleTests: XCTestCase {
     /// module / cloud / integration id on the query, no body, and the answer.
     func testGetKeylessIntegrationSetupSendsAGetWithTheQuery() async throws {
         let mock = MockHTTPExecutor()
-        mock.responseBody = Data(#"{"integrationId":"int_1","module":"files","cloud":"aws","available":true,"subject":"p/proj/e/PROD/files/i/int_1","audience":"sts.amazonaws.com","script":"aws iam create-role ..."}"#.utf8)
+        mock.responseBody = Data(#"{"integrationId":"int_1","module":"files","cloud":"aws","available":true,"subject":"p/proj/e/PROD/files/i/int_1","audience":"sts.amazonaws.com","script":"aws iam create-role ...","templates":[{"kind":"terraform","fileName":"norbix-files-aws.tf","content":"resource \"aws_iam_role\" ..."}]}"#.utf8)
         let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: mock)
 
         let result = try await client.integrations.getKeylessIntegrationSetup(["module": "files", "cloud": "aws", "integrationId": "int_1"])
@@ -28,5 +28,9 @@ final class HubIntegrationsModuleTests: XCTestCase {
         let answer = try XCTUnwrap(result as? [String: Any])
         XCTAssertEqual(answer["subject"] as? String, "p/proj/e/PROD/files/i/int_1")
         XCTAssertEqual(answer["available"] as? Bool, true)
+        let template = try XCTUnwrap((answer["templates"] as? [[String: Any]])?.first)
+        XCTAssertEqual(template["kind"] as? String, "terraform")
+        XCTAssertEqual(template["fileName"] as? String, "norbix-files-aws.tf")
+        XCTAssertEqual(template["content"] as? String, #"resource "aws_iam_role" ..."#)
     }
 }
