@@ -46,6 +46,7 @@ public final class NorbixHubClient: Sendable {
     public let email: EmailModule
     public let environments: EnvironmentsModule
     public let files: FilesModule
+    public let integrations: IntegrationsModule
     public let logs: LogsModule
     public let membership: MembershipModule
     public let notifications: NotificationsModule
@@ -81,6 +82,7 @@ public final class NorbixHubClient: Sendable {
         self.email = EmailModule(transport: transport)
         self.environments = EnvironmentsModule(transport: transport)
         self.files = FilesModule(transport: transport)
+        self.integrations = IntegrationsModule(transport: transport)
         self.logs = LogsModule(transport: transport)
         self.membership = MembershipModule(transport: transport)
         self.notifications = NotificationsModule(transport: transport)

@@ -19,7 +19,7 @@ both clients use.
 | Client | Modules |
 | --- | --- |
 | `NorbixApiClient` | `accessToken`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `files`, `logs`, `membership`, `payments`, `publicProjects` |
-| `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `logs`, `membership`, `notifications`, `payments`, `regions`, `scheduler`, `webhooks` |
+| `NorbixHubClient` | `accessToken`, `account`, `ai`, `apiKeys`, `auth`, `code`, `database`, `echo`, `email`, `environments`, `files`, `integrations`, `logs`, `membership`, `notifications`, `payments`, `regions`, `scheduler`, `webhooks` |
 
 Built for Apple platforms (iOS, macOS, tvOS, watchOS, visionOS) with standard
 Swift tooling: **Swift Package Manager**, **XCTest**, GitHub Actions CI, and
@@ -109,6 +109,21 @@ header) before sending again. After saving a logging integration, call
 `hub.logs.testLoggingIntegration` — nothing is delivered to it until its last
 test passed. Details: [`docs/api/logs.md`](docs/api/logs.md),
 [`docs/hub/logs.md`](docs/hub/logs.md).
+
+## Keyless cloud connections
+
+The AWS (S3, SES, Lambda) and Azure (Blob, Communication Services, Functions)
+save requests take `authMode`: `Keyless` (the gateway default when left out) or
+`AccessKey`. Keyless stores no secret: ask for the setup, run the script it
+returns in the cloud account, then save with the same integration id and the
+role ARN (AWS) or tenant + client id (Azure). A key mode needs
+`acceptKeyRisk: true`, or the save is refused (`CM-ERRORS-INTEGRATIONS-034`).
+
+```swift
+let setup = try await hub.integrations.getKeylessIntegrationSetup(["module": "files", "cloud": "aws"]) as? [String: Any]
+// setup?["available"], setup?["unavailableReason"], setup?["subject"],
+// setup?["audience"], setup?["script"], setup?["integrationId"]
+```
 
 ## Self-hosted / on-prem deployments
 
