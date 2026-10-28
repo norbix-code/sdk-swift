@@ -122,7 +122,8 @@ role ARN (AWS) or tenant + client id (Azure). A key mode needs
 ```swift
 let setup = try await hub.integrations.getKeylessIntegrationSetup(["module": "files", "cloud": "aws"]) as? [String: Any]
 // setup?["available"], setup?["unavailableReason"], setup?["subject"],
-// setup?["audience"], setup?["script"], setup?["integrationId"]
+// setup?["audience"], setup?["script"], setup?["integrationId"],
+// setup?["templates"] — templates: ready CloudFormation / Bicep / Terraform files for this integration
 ```
 
 ## Self-hosted / on-prem deployments
