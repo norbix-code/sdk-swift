@@ -497,6 +497,32 @@ _ = try await hub.membership.saveMembershipTrigger([
 ])
 ```
 
+A Membership trigger's Email, Push or SMS action can send to the person the
+event is about — the new user, the invited address, the deleted login — one
+recipient per firing. Send only `recipientsSourceType`: the subject fields
+(`subjectAuthId`, `subjectEmail`, `subjectPhone`, `subjectLanguage`) are filled
+by the gateway on the campaign the trigger starts and ignored on a save. Any
+other trigger type or a workflow step fails with `CM-ERRORS-TRIGGERS-020`. With
+no address, phone or device for the channel nothing is sent and the trigger is
+marked as needing attention.
+
+```swift
+_ = try await hub.membership.saveMembershipTrigger([
+    "trigger": [
+        "type": "Membership",
+        "name": "welcome the new user",
+        "when": "OnRegistered",
+        "isEnabled": true,
+        "action": [
+            "type": "Email",
+            "integrationId": "int_email",
+            "templateId": "tpl_123",
+            "deliverySettings": ["recipientsSourceType": "TriggerSubject"],
+        ],
+    ],
+])
+```
+
 ### Code — cloud functions
 
 Norbix does not host code: a trigger's `Code` action, a scheduler task or a
