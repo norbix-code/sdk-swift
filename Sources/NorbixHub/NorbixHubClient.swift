@@ -53,6 +53,7 @@ public final class NorbixHubClient: Sendable {
     public let payments: PaymentsModule
     public let regions: RegionsModule
     public let scheduler: SchedulerModule
+    public let triggers: TriggersModule
     public let webhooks: WebhooksModule
 
     public init(
@@ -89,6 +90,7 @@ public final class NorbixHubClient: Sendable {
         self.payments = PaymentsModule(transport: transport)
         self.regions = RegionsModule(transport: transport)
         self.scheduler = SchedulerModule(transport: transport)
+        self.triggers = TriggersModule(transport: transport)
         self.webhooks = WebhooksModule(transport: transport)
     }
 
