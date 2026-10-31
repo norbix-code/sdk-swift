@@ -136,7 +136,10 @@ cancelled is skipped and counted under `skipped`.
 | `includeAmbiguous` | Optional, default `false`. Also retry rows whose send timed out after the request had gone out — the provider may already have delivered it, so this **may send a duplicate**. |
 
 The answer is `{ retryRequestId, selected, skipped: { reason: count }, replayed, warning? }`;
-`warning` is the duplicate notice, present only with `includeAmbiguous`.
+`warning` is the duplicate notice, present only with `includeAmbiguous`. Besides the
+reasons for rows left out, `skipped` can carry `optedOut`, `compliance`, `undeliverable`: the
+people the send gates stopped during the retry. Those keys are added to the stored
+answer later and are part of `selected`.
 
 ```swift
 let answer = try await hub.notifications.retryFailedEmailNotifications([
