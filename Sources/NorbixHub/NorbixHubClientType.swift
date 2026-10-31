@@ -20,6 +20,7 @@ public protocol NorbixHubClientType: Sendable {
     var notifications: NotificationsModule { get }
     var payments: PaymentsModule { get }
     var scheduler: SchedulerModule { get }
+    var triggers: TriggersModule { get }
     var webhooks: WebhooksModule { get }
 
     var isAuthenticated: Bool { get }

@@ -393,4 +393,27 @@ public final class MembershipModule: Sendable {
         )
     }
 
+    /// The service users a trigger, task or workflow can run as, the default first.
+    public func getExecutionIdentities(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/execution-identities",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Creates a service user (`name`) with roles (`roleIds`) in one call.
+    public func createExecutionIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/execution-identities",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
 }

@@ -523,6 +523,17 @@ _ = try await hub.membership.saveMembershipTrigger([
 ])
 ```
 
+### Trigger runs and execution identities
+
+A trigger save and a scheduler task save take `executionIdentityId`: an id from
+`hub.membership.getExecutionIdentities()`, or nothing for the environment's default
+identity. `hub.membership.createExecutionIdentity(["name": ..., "roleIds": ...])`
+makes one, and `hub.triggers.checkTriggerExecutionIdentity(...)` answers what an identity
+lacks for an action without saving. A Code or Marketplace action no longer takes
+`runAsUserId`. `hub.triggers.getTriggerRuns(["triggerType": ..., "triggerId": ...])`
+lists one trigger's runs for 30 days; `getTriggerRun(["id": ..., "triggerType": ...])`
+reads one, and the type is required. Template updates answer `id` and `warnings`.
+
 ### Code — cloud functions
 
 Norbix does not host code: a trigger's `Code` action, a scheduler task or a
