@@ -10,6 +10,31 @@ import NorbixCore
 /// cloud-function tests also check where the parameters go (query / body).
 final class HubCodeModuleTests: XCTestCase {
 
+    func testGetMarketplaceListingsSendsKindInTheQuery() async throws {
+        let mock = MockHTTPExecutor()
+        _ = try await makeClient(mock).code.getMarketplaceListings(["kind": "Workflow"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/listings")
+        XCTAssertEqual(try query(mock), ["kind": "Workflow"])
+    }
+
+    func testInstallMarketplaceWorkflowPutsTheListingInThePathAndTheRestInTheBody() async throws {
+        let mock = MockHTTPExecutor()
+        _ = try await makeClient(mock).code.installMarketplaceWorkflow([
+            "listingViewId": "ml_workflow_order_thanks_v1",
+            "name": "Thanks",
+            "references": ["orders": "orders", "emailIntegration": "int_1"],
+        ])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/code/marketplace/listings/ml_workflow_order_thanks_v1/install-workflow")
+        let sent = try body(mock)
+        XCTAssertNil(sent["listingViewId"])
+        XCTAssertEqual(sent["name"] as? String, "Thanks")
+        XCTAssertEqual(sent["references"] as? [String: String], ["orders": "orders", "emailIntegration": "int_1"])
+    }
+
     private func makeClient(_ mock: MockHTTPExecutor) throws -> NorbixHubClient {
         try NorbixHubClient(
             projectId: "proj",

@@ -142,6 +142,18 @@ public final class CodeModule: Sendable {
         )
     }
 
+    /// Beta: fills a workflow listing's references and saves a new workflow's draft; nothing runs and nothing is published. Path: `listingViewId`; body: `references` (a value for every declared key), `name?`, `executionIdentityId?`.
+    public func installMarketplaceWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/marketplace/listings/{ListingViewId}/install-workflow",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func getMarketplaceListingFunctionTokens(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/marketplace/listings/{ListingViewId}/functions/{FunctionKey}/tokens",
