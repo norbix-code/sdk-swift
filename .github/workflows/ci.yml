@@ -15,10 +15,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-14 ships Xcode 15.4 / Swift 5.10: the oldest toolchain that can
-        # read `swift-tools-version: 5.9`. macos-26 has the newest Xcode. The
-        # manifest must resolve on both (it broke on Swift 6 in 2026-09).
-        os: [macos-14, macos-26]
+        # macos-15 is the oldest macOS runner GitHub still offers (macos-14 was
+        # retired in 2026-11); macos-26 has the newest Xcode. The manifest
+        # (`swift-tools-version: 5.9`) must resolve on both (it broke on
+        # Swift 6 in 2026-09).
+        os: [macos-15, macos-26]
     steps:
       - uses: actions/checkout@v7
       # Note: SDK generation (sync_types + generate_endpoints) is a developer
