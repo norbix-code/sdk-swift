@@ -64,6 +64,26 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         try await check("POST", "/v3/account/stripe/get-portal-url") { try await $0.account.getStripeBillingPortalUrl() }
     }
 
+    func testGetManagedServiceBundlesWorksWithATokenAndNoAccountId() async throws {
+        try await check("GET", "/v3/account/stripe/bundles") { try await $0.account.getManagedServiceBundles() }
+    }
+
+    func testChangeManagedServiceBundleWorksWithATokenAndNoAccountId() async throws {
+        try await check("POST", "/v3/account/stripe/change-bundle") {
+            try await $0.account.changeManagedServiceBundle(["bundle": "Growth", "billingPeriod": "Annual"])
+        }
+    }
+
+    func testGetFlexClustersWorksWithATokenAndNoAccountId() async throws {
+        try await check("GET", "/v3/account/flex-clusters") { try await $0.account.getFlexClusters() }
+    }
+
+    func testUpgradeFlexClusterWorksWithATokenAndNoAccountId() async throws {
+        try await check("POST", "/v3/account/flex-clusters/fc_1/upgrade") {
+            try await $0.account.upgradeFlexCluster(["flexClusterId": "fc_1", "tierCode": "M10"])
+        }
+    }
+
     func testDeleteNotificationsGroupWorksWithATokenAndNoAccountId() async throws {
         try await check("DELETE", "/v3/account/projects/proj_1/notifications/settings/group") { try await $0.account.deleteNotificationsGroup(p) }
     }

@@ -10,6 +10,10 @@
 | `getAccountStatus` | `GET` | `/{version}/account/status` | `project` |
 | `createStripeCheckoutSession` | `POST` | `/{version}/account/stripe/create-checkout-session` | `project` |
 | `getStripeBillingPortalUrl` | `POST` | `/{version}/account/stripe/get-portal-url` | `project` |
+| `getManagedServiceBundles` | `GET` | `/{version}/account/stripe/bundles` | `project` |
+| `changeManagedServiceBundle` | `POST` | `/{version}/account/stripe/change-bundle` | `project` |
+| `getFlexClusters` | `GET` | `/{version}/account/flex-clusters` | `project` |
+| `upgradeFlexCluster` | `POST` | `/{version}/account/flex-clusters/{flexClusterId}/upgrade` | `project` |
 | `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `unauthenticated` |
 | `verifyAccount` | `GET` | `/{version}/account/verify` | `unauthenticated` |
 | `deleteNotificationsGroup` | `DELETE` | `/{version}/account/projects/{projectId}/notifications/settings/group` | `project` |
@@ -73,6 +77,40 @@ need no token and no `accountId`: the gateway routes are anonymous, and the SDK
 sends no `Authorization` header. `verifyAccount` takes the account id once, in
 the request — pass `accountId` and `token` from the verification email; they go
 in the query. `hub.regions.getAccountRegions` is anonymous too.
+
+## Bundles and Flex clusters
+
+A Managed Service subscription is one of three bundles (`Starter`, `Growth`,
+`Scale`), paid `Monthly` or `Annual`. Each bundle allows a number of enabled
+projects.
+
+- `getManagedServiceBundles()` answers `bundles`, each with `bundle`,
+  `projectCap` and the `monthly` and `annual` prices (`amount` in minor units,
+  lower-case `currency`).
+- `changeManagedServiceBundle` takes `bundle` and `billingPeriod`. It is
+  refused with `CM-ERRORS-ACCOUNT-023` when the account has more enabled
+  projects than the new bundle allows.
+- `createStripeCheckoutSession` for a Managed Service subscription needs
+  `bundle` and `billingPeriod`. `projectCap` is no longer accepted.
+- `getAccountStatus()` also answers `bundle`, `billingPeriod`, `isTrial`,
+  `renewsOn` and `enabledProjects`.
+- `getFlexClusters()` answers `clusters` (the account's Norbix-managed Atlas
+  clusters with their `databases`, `usage` and `nearLimits`), `canCreateNew`
+  and `cannotCreateReason` (`TrialOneCluster` or `ClusterLimitReached`).
+- `upgradeFlexCluster` takes `flexClusterId` (it goes in the path) and
+  `tierCode` (`M10`); the upgrade is queued.
+
+```swift
+let bundles = try await hub.account.getManagedServiceBundles()
+_ = try await hub.account.changeManagedServiceBundle(["bundle": "Growth", "billingPeriod": "Annual"])
+
+let flex = try await hub.account.getFlexClusters()
+_ = try await hub.account.upgradeFlexCluster(["flexClusterId": "fc_1", "tierCode": "M10"])
+```
+
+To put a new managed database on a cluster the account already has, send
+`flexClusterId` in the `MongoDbAtlasFlexManaged` database integration request;
+to name a new cluster, send `clusterDisplayName`.
 
 ## Developer MCP endpoint
 

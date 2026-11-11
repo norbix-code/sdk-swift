@@ -81,6 +81,8 @@ public final class AccountModule: Sendable {
         )
     }
 
+    /// Opens a Stripe checkout for a subscription. A Managed Service checkout needs both
+    /// `bundle` (`Starter`, `Growth` or `Scale`) and `billingPeriod` (`Monthly` or `Annual`).
     public func createStripeCheckoutSession(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/create-checkout-session",
@@ -95,6 +97,63 @@ public final class AccountModule: Sendable {
     public func getStripeBillingPortalUrl(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/get-portal-url",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Lists the three Managed Service bundles (`Starter`, `Growth`, `Scale`). The answer carries
+    /// `bundles`, each with `bundle`, `projectCap` (how many enabled projects the bundle allows)
+    /// and the `monthly` and `annual` prices: `amount` in minor units (cents) and a lower-case
+    /// `currency`.
+    public func getManagedServiceBundles(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/stripe/bundles",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Moves the account to another bundle or billing period: pass
+    /// `["bundle": "Growth", "billingPeriod": "Annual"]`. Refused with `CM-ERRORS-ACCOUNT-023`
+    /// when the account has more enabled projects than the new bundle allows.
+    public func changeManagedServiceBundle(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/stripe/change-bundle",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Lists the account's Norbix-managed Atlas clusters. The answer carries `clusters` (each with
+    /// `id`, `displayName`, `tierCode` `FLEX` or `M10`, `status`, its `databases`, `usage` and
+    /// `nearLimits`), `canCreateNew` and, when that is false, `cannotCreateReason`
+    /// (`TrialOneCluster` or `ClusterLimitReached`).
+    public func getFlexClusters(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/flex-clusters",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Queues the upgrade of a cluster to a bigger tier: pass
+    /// `["flexClusterId": id, "tierCode": "M10"]`. The id goes in the path, `tierCode` in the body.
+    public func upgradeFlexCluster(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/flex-clusters/{flexClusterId}/upgrade",
             method: "POST",
             request: request,
             scope: .project,
