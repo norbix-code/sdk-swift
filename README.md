@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/norbix-code/sdk-swift/actions/workflows/ci.yml/badge.svg)](https://github.com/norbix-code/sdk-swift/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/norbix-code/sdk-swift)](https://github.com/norbix-code/sdk-swift/releases)
-[![Swift](https://img.shields.io/badge/swift-5.9+-orange.svg)](https://swift.org)
+[![Swift](https://img.shields.io/badge/swift-6.0+-orange.svg)](https://swift.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 Official Swift SDK for [Norbix](https://norbix.ai). The SDK ships as **two
@@ -26,6 +26,8 @@ Swift tooling: **Swift Package Manager**, **XCTest**, GitHub Actions CI, and
 semantic-release based tagging.
 
 ## Install (Swift Package Manager)
+
+Needs the Swift 6 toolchain (Xcode 16 or newer). Swift 5 toolchains are not supported.
 
 In Xcode:
 

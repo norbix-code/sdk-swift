@@ -15,10 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-15 is the oldest macOS runner GitHub still offers (macos-14 was
-        # retired in 2026-11); macos-26 has the newest Xcode. The manifest
-        # (`swift-tools-version: 5.9`) must resolve on both (it broke on
-        # Swift 6 in 2026-09).
+        # The package needs the Swift 6 toolchain (`swift-tools-version: 6.0`;
+        # Swift 5 was dropped in 2026-11, owner decision). macos-15 has the
+        # oldest Xcode with Swift 6, macos-26 the newest. The manifest must
+        # resolve on both.
         os: [macos-15, macos-26]
     steps:
       - uses: actions/checkout@v7
