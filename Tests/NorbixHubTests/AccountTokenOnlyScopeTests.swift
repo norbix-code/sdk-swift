@@ -29,7 +29,7 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.httpMethod, verb, file: file, line: line)
         XCTAssertEqual(mock.lastRequest?.url?.path, path, file: file, line: line)
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token", file: file, line: line)
-        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "X-CM-AccountId"), file: file, line: line)
+        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "norbix-account-id"), file: file, line: line)
     }
 
     func testGetAccountProfileWorksWithATokenAndNoAccountId() async throws {
@@ -221,7 +221,7 @@ final class HubAccountNoTokenScopeTests: XCTestCase {
         let request = try XCTUnwrap(mock.lastRequest, file: file, line: line)
         XCTAssertNil(request.value(forHTTPHeaderField: "Authorization"), file: file, line: line)
         XCTAssertNil(request.value(forHTTPHeaderField: "X-Api-Key"), file: file, line: line)
-        XCTAssertNil(request.value(forHTTPHeaderField: "X-CM-AccountId"), file: file, line: line)
+        XCTAssertNil(request.value(forHTTPHeaderField: "norbix-account-id"), file: file, line: line)
         return request
     }
 

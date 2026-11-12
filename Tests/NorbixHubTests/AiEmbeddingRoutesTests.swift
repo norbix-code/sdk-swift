@@ -27,7 +27,7 @@ final class HubAiEmbeddingRoutesTests: XCTestCase {
             XCTAssertEqual(mock.lastRequest?.httpMethod, c.verb, c.name)
             XCTAssertEqual(mock.lastRequest?.url?.path, c.path, c.name)
             XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer token", c.name)
-            XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "X-CM-ProjectId"), "proj", c.name)
+            XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-project-id"), "proj", c.name)
         }
     }
 }

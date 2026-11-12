@@ -313,9 +313,16 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue("Bearer \(resolvedToken)", forHTTPHeaderField: "Authorization")
         }
 
-        httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "X-CM-ProjectId")
-        if let accountId = snapshot.accountId {
-            httpRequest.setValue(accountId, forHTTPHeaderField: "X-CM-AccountId")
+        // Project and account scope. The gateway reads the caller's project
+        // id only from `norbix-project-id` and the account id only from
+        // `norbix-account-id` (the old `X-CM-ProjectId` / `X-CM-AccountId`
+        // names are not read), so each is sent under that name, and only
+        // when set — like the TypeScript SDK.
+        if !snapshot.projectId.isEmpty {
+            httpRequest.setValue(snapshot.projectId, forHTTPHeaderField: "norbix-project-id")
+        }
+        if let accountId = snapshot.accountId, !accountId.isEmpty {
+            httpRequest.setValue(accountId, forHTTPHeaderField: "norbix-account-id")
         }
 
         // Environment selector: per-call override wins over the client default.
