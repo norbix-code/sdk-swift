@@ -6,7 +6,8 @@ import NorbixCore
 /// PUT. The gateway moved these routes from GET to PUT; it still answers a
 /// GET on the same path for a while, but marks it deprecated. Each case
 /// calls the SDK method against the fake transport and checks the verb and
-/// the path. No real server is called.
+/// the path. No real server is called. Membership and Database are always
+/// on and have no switch.
 final class ModuleEnableDisableVerbTests: XCTestCase {
 
     private func makeClient(_ mock: MockHTTPExecutor) throws -> NorbixHubClient {
@@ -22,8 +23,6 @@ final class ModuleEnableDisableVerbTests: XCTestCase {
 
     private var cases: [(name: String, path: String, call: Call)] {
         [
-            ("enableDatabase", "/v3/database/enable", { _ = try await $0.database.enableDatabase() }),
-            ("disableDatabase", "/v3/database/disable", { _ = try await $0.database.disableDatabase() }),
             ("enableFiles", "/v3/files/enable", { _ = try await $0.files.enableFiles() }),
             ("disableFiles", "/v3/files/disable", { _ = try await $0.files.disableFiles() }),
             ("enablePush", "/v3/notifications/push/enable", { _ = try await $0.notifications.enablePush() }),
@@ -36,8 +35,6 @@ final class ModuleEnableDisableVerbTests: XCTestCase {
             ("disablePayments", "/v3/payments/disable", { _ = try await $0.payments.disablePayments() }),
             ("enableLogging", "/v3/logs/enable", { _ = try await $0.logs.enableLogging() }),
             ("disableLogging", "/v3/logs/disable", { _ = try await $0.logs.disableLogging() }),
-            ("enableMembership", "/v3/membership/enable", { _ = try await $0.membership.enableMembership() }),
-            ("disableMembership", "/v3/membership/disable", { _ = try await $0.membership.disableMembership() }),
             ("enableScheduler", "/v3/scheduler/enable", { _ = try await $0.scheduler.enableScheduler() }),
             ("disableScheduler", "/v3/scheduler/disable", { _ = try await $0.scheduler.disableScheduler() }),
         ]

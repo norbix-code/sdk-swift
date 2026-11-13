@@ -39,28 +39,6 @@ final class HubDatabaseModuleTests: XCTestCase {
         XCTAssertNotNil(try makeClient(MockHTTPExecutor()).database)
     }
 
-    func testDisableDatabaseSendsToPutRoute() async throws {
-        let mock = MockHTTPExecutor()
-        let client = try makeClient(mock)
-
-        _ = try await client.database.disableDatabase(["databaseIntegrationId": "dbi_1"])
-
-        XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/disable")
-        try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
-    }
-
-    func testEnableDatabaseSendsToPutRoute() async throws {
-        let mock = MockHTTPExecutor()
-        let client = try makeClient(mock)
-
-        _ = try await client.database.enableDatabase(["databaseIntegrationId": "dbi_1"])
-
-        XCTAssertEqual(mock.lastRequest?.httpMethod, "PUT")
-        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/enable")
-        try assertBody(mock, "databaseIntegrationId", equals: "dbi_1")
-    }
-
     func testDeleteSchemaTriggerSendsToDeleteRoute() async throws {
         let mock = MockHTTPExecutor()
         let client = try makeClient(mock)
