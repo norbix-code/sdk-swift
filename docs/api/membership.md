@@ -20,6 +20,41 @@
 | `unblockUser` | `PATCH` | `/{version}/membership/users/unblock` | `project` |
 | `updateUser` | `PUT` | `/{version}/membership/users` | `project` |
 | `updateUserPreferences` | `PUT` | `/{version}/membership/users/{id}/preferences` | `project` |
+| `startLinkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity/start` | `project` |
+| `linkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity` | `project` |
+| `exchangeSocialSignInCode` | `POST` | `/{version}/membership/auth/social/{Provider}/exchange` | `optional` |
+| `socialSignInUrl` | — | builds `GET /{version}/membership/auth/social/{provider}?projectId=…` (a URL, not a call) | — |
+
+## Social sign-in and link identity
+
+Project users can sign in with Google, Apple, Microsoft, GitHub, Facebook, X or
+Okta. The project's enabled providers are in the public config
+(`publicProjects.getPublicProjectConfig` → `auth.socialSignIn`: `provider`,
+`displayName`, `startPath`).
+
+```swift
+// 1. Open the start URL with ASWebAuthenticationSession (not a WKWebView). It is not a call: it redirects.
+let start = client.membership.socialSignInUrl("google", returnUrl: "https://app.example.com/oauth/callback")
+
+// 2. The return page gets ?code=…&provider=google (or ?error=…). Trade the code within 2 minutes:
+let token = try await client.membership.exchangeSocialSignInCode(["provider": "google", "code": code]) as? [String: Any]
+// token?["bearerToken"]: the project JWT (14 days, no refresh token)
+
+// Link another provider to the signed-in user (yourself only):
+let link = try await client.membership.startLinkIdentity([
+    "userId": "usr_…", "provider": "github", "returnUrl": "https://app.example.com/settings",
+]) as? [String: Any]
+// open link?["authorizeUrl"]; it comes back with ?intent=link&code=…
+_ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkCode])
+```
+
+- `socialSignInUrl(_:mode:returnUrl:)` puts the project id and a non-PROD env
+  in the query, because a navigation sends no headers. The start and the
+  provider callback have no call method.
+- `linkIdentity` now takes `userId` and `code` (the link code); `provider` /
+  `providerToken` are gone.
+- Refusals: `CM-ERRORS-MEMBERSHIP-051` (code used, expired or unknown), `-055`
+  (409, the provider account belongs to another user), `-056` (403, not yourself).
 
 ## Credential version (gateway 2.3.9)
 
