@@ -107,4 +107,46 @@ final class MembershipSocialTests: XCTestCase {
         XCTAssertEqual(try body(mock), ["code": "link-code"])
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"), "Bearer jwt-1")
     }
+
+    private let verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+    private let challenge = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
+
+    func testPkceMatchesTheRfc7636AppendixBVector() throws {
+        XCTAssertEqual(try PkcePair.challenge(of: verifier), challenge)
+        XCTAssertThrowsError(try PkcePair.challenge(of: "short"))
+    }
+
+    func testPkceCreateMakesAVerifierAndItsChallenge() throws {
+        let a = PkcePair.create()
+        let b = PkcePair.create()
+        XCTAssertEqual(a.codeVerifier.count, 43)
+        XCTAssertEqual(try PkcePair.challenge(of: a.codeVerifier), a.codeChallenge)
+        XCTAssertNotEqual(a.codeVerifier, b.codeVerifier)
+    }
+
+    func testSocialSignInUrlCarriesTheCodeChallengeLast() throws {
+        let url = try makeClient(MockHTTPExecutor()).membership.socialSignInUrl(
+            "google", mode: "app", returnUrl: "https://app.test/cb", codeChallenge: challenge
+        )
+        XCTAssertEqual(
+            url,
+            "https://api.test/v3/membership/auth/social/google?projectId=pr_1&mode=app"
+                + "&returnUrl=https%3A%2F%2Fapp.test%2Fcb&codeChallenge=\(challenge)"
+        )
+    }
+
+    func testExchangeAndLinkCarryPkceInTheBody() async throws {
+        let mock = MockHTTPExecutor()
+        let membership = try makeClient(mock).membership
+        _ = try await membership.exchangeSocialSignInCode(["provider": "google", "code": "c", "codeVerifier": verifier])
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/membership/auth/social/google/exchange")
+        XCTAssertEqual(try body(mock), ["code": "c", "codeVerifier": verifier])
+        mock.responseBody = Data(#"{"authorizeUrl":"https://a"}"#.utf8)
+        _ = try await membership.startLinkIdentity(["userId": "usr_1", "provider": "github", "codeChallenge": challenge])
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/membership/auth/usr_1/link-identity/start")
+        XCTAssertEqual(try body(mock), ["provider": "github", "codeChallenge": challenge])
+        _ = try await membership.linkIdentity(["userId": "usr_1", "code": "l", "codeVerifier": verifier])
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/membership/auth/usr_1/link-identity")
+        XCTAssertEqual(try body(mock), ["code": "l", "codeVerifier": verifier])
+    }
 }
