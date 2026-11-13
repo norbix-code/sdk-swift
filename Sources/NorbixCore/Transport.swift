@@ -529,6 +529,39 @@ public final class Transport: @unchecked Sendable {
         }
     }
 
+    /// The full URL of a `GET` route that a browser navigates to (a link or a
+    /// redirect, not a call). A navigation carries no headers, so the project
+    /// id and a non-PROD env go into the query (`?projectId=…&env=…`), followed
+    /// by `query` in order; `nil` values are left out. Path values and query
+    /// values are percent-encoded (RFC 3986 unreserved characters stay).
+    public func navigationUrl(
+        path: String,
+        pathParams: [String: String] = [:],
+        query: [(String, String?)] = []
+    ) -> String {
+        let snapshot = config
+        var normalizedPath = path.replacingOccurrences(of: "{version}", with: snapshot.version)
+        for (key, value) in pathParams {
+            normalizedPath = normalizedPath.replacingOccurrences(of: "{\(key)}", with: Self.percentEncode(value))
+        }
+        let root = snapshot.baseUrl.hasSuffix("/") ? String(snapshot.baseUrl.dropLast()) : snapshot.baseUrl
+        var items: [(String, String?)] = [("projectId", snapshot.projectId.isEmpty ? nil : snapshot.projectId)]
+        if !snapshot.env.isEmpty && snapshot.env != "PROD" { items.append(("env", snapshot.env)) }
+        items.append(contentsOf: query)
+        let encoded = items
+            .compactMap { key, value in value.map { "\(Self.percentEncode(key))=\(Self.percentEncode($0))" } }
+            .joined(separator: "&")
+        return encoded.isEmpty ? "\(root)\(normalizedPath)" : "\(root)\(normalizedPath)?\(encoded)"
+    }
+
+    private static let unreserved = CharacterSet(
+        charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"
+    )
+
+    private static func percentEncode(_ value: String) -> String {
+        value.addingPercentEncoding(withAllowedCharacters: unreserved) ?? value
+    }
+
     private func buildUrlAndBody(
         baseUrl: String,
         path: String,

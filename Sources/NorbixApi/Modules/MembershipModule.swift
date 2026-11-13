@@ -206,14 +206,67 @@ public final class MembershipModule: Sendable {
         )
     }
 
-    public func linkIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+    /// `POST /{version}/membership/auth/{UserId}/link-identity/start` — starts
+    /// linking a social provider to the signed-in user (yourself only).
+    /// Request: `userId`, `provider`, optional `mode` and `returnUrl`. Answers
+    /// `authorizeUrl`; send the browser there.
+    public func startLinkIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
-            path: "/{version}/membership/auth/{userId}/link-identity",
+            path: "/{version}/membership/auth/{UserId}/link-identity/start",
             method: "POST",
             request: request,
             scope: .project,
             timeout: timeout,
             bearerToken: bearerToken
+        )
+    }
+
+    /// `POST /{version}/membership/auth/{UserId}/link-identity` — finishes a
+    /// link as the same signed-in user who started it. Request: `userId` and
+    /// `code`, the one-time link code from the return page.
+    public func linkIdentity(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/auth/{UserId}/link-identity",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// `POST /{version}/membership/auth/social/{Provider}/exchange` — trades the
+    /// one-time code from the social sign-in return page (2 minutes, once) for
+    /// the project JWT. Request: `provider` and `code`. Answers `bearerToken`,
+    /// `userId`, `displayName`, `expiresAt`, `meta.credentialVersion`.
+    public func exchangeSocialSignInCode(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/auth/social/{Provider}/exchange",
+            method: "POST",
+            request: request,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// The URL that starts a project social sign-in:
+    /// `GET {api}/{version}/membership/auth/social/{provider}?projectId=…[&env=…][&mode=…][&returnUrl=…]`.
+    ///
+    /// Not a call: open it with `ASWebAuthenticationSession` (the system
+    /// browser, not a `WKWebView`) and the gateway redirects to the provider.
+    /// A navigation carries no headers, so the project id and a non-PROD env
+    /// travel in the query. `provider`: google, apple, microsoft, github,
+    /// facebook, x or okta. `mode`: the integration's OAuth mode (default: the
+    /// only one, else the first by name). `returnUrl`: the page to come back to
+    /// — absolute https (http only on localhost), origin in the project's
+    /// allowed origins. It gets `?code=…&provider=…` (or `?error=…`); trade the
+    /// code with `exchangeSocialSignInCode` within 2 minutes.
+    public func socialSignInUrl(_ provider: String, mode: String? = nil, returnUrl: String? = nil) -> String {
+        transport.navigationUrl(
+            path: "/{version}/membership/auth/social/{provider}",
+            pathParams: ["provider": provider],
+            query: [("mode", mode), ("returnUrl", returnUrl)]
         )
     }
 

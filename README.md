@@ -716,6 +716,14 @@ Project owners configure the assistant on the Hub: `hub.account`
 `setLlmIntegrationAsDefault`). Tables: `docs/api/ai.md`, `docs/hub/ai.md`,
 `docs/hub/account.md`.
 
+## Social sign-in and link identity
+
+Google, Apple, Microsoft, GitHub, Facebook, X and Okta for project users:
+`client.membership.socialSignInUrl` (the start URL, opened with
+`ASWebAuthenticationSession`), `exchangeSocialSignInCode`, `startLinkIdentity`
+and `linkIdentity`. See
+[docs/api/membership.md](docs/api/membership.md#social-sign-in-and-link-identity).
+
 ## Project settings, public config, MCP endpoint and AI service users
 
 - `hub.account`: `updateProjectAdminUrl`, `updateProjectLegalDocuments`,
