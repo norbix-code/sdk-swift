@@ -253,7 +253,7 @@ public final class MembershipModule: Sendable {
     }
 
     /// The URL that starts a project social sign-in:
-    /// `GET {api}/{version}/membership/auth/social/{provider}?projectId=…[&env=…][&mode=…][&returnUrl=…]`.
+    /// `GET {api}/{version}/membership/auth/social/{provider}?projectId=…[&env=…][&mode=…][&returnUrl=…][&codeChallenge=…]`.
     ///
     /// Not a call: open it with `ASWebAuthenticationSession` (the system
     /// browser, not a `WKWebView`) and the gateway redirects to the provider.
@@ -263,12 +263,16 @@ public final class MembershipModule: Sendable {
     /// only one, else the first by name). `returnUrl`: the page to come back to
     /// — absolute https (http only on localhost), origin in the project's
     /// allowed origins. It gets `?code=…&provider=…` (or `?error=…`); trade the
-    /// code with `exchangeSocialSignInCode` within 2 minutes.
-    public func socialSignInUrl(_ provider: String, mode: String? = nil, returnUrl: String? = nil) -> String {
+    /// code with `exchangeSocialSignInCode` within 2 minutes. `codeChallenge`:
+    /// PKCE S256 from `PkcePair.create()`; the exchange then needs
+    /// `"codeVerifier"`.
+    public func socialSignInUrl(
+        _ provider: String, mode: String? = nil, returnUrl: String? = nil, codeChallenge: String? = nil
+    ) -> String {
         transport.navigationUrl(
             path: "/{version}/membership/auth/social/{provider}",
             pathParams: ["provider": provider],
-            query: [("mode", mode), ("returnUrl", returnUrl)]
+            query: [("mode", mode), ("returnUrl", returnUrl), ("codeChallenge", codeChallenge)]
         )
     }
 

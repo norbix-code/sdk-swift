@@ -33,19 +33,27 @@ Okta. The project's enabled providers are in the public config
 `displayName`, `startPath`).
 
 ```swift
-// 1. Open the start URL with ASWebAuthenticationSession (not a WKWebView). It is not a call: it redirects.
-let start = client.membership.socialSignInUrl("google", returnUrl: "https://app.example.com/oauth/callback")
+// 1. PKCE: keep the verifier in memory; only the challenge travels.
+let pkce = PkcePair.create()
+// Open the start URL with ASWebAuthenticationSession (not a WKWebView). It is not a call: it redirects.
+let start = client.membership.socialSignInUrl(
+    "google", returnUrl: "https://app.example.com/oauth/callback", codeChallenge: pkce.codeChallenge
+)
 
 // 2. The return page gets ?code=…&provider=google (or ?error=…). Trade the code within 2 minutes:
-let token = try await client.membership.exchangeSocialSignInCode(["provider": "google", "code": code]) as? [String: Any]
+let token = try await client.membership.exchangeSocialSignInCode(
+    ["provider": "google", "code": code, "codeVerifier": pkce.codeVerifier]
+) as? [String: Any]
 // token?["bearerToken"]: the project JWT (14 days, no refresh token)
 
 // Link another provider to the signed-in user (yourself only):
+let linkPkce = PkcePair.create()
 let link = try await client.membership.startLinkIdentity([
     "userId": "usr_…", "provider": "github", "returnUrl": "https://app.example.com/settings",
+    "codeChallenge": linkPkce.codeChallenge,
 ]) as? [String: Any]
 // open link?["authorizeUrl"]; it comes back with ?intent=link&code=…
-_ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkCode])
+_ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkCode, "codeVerifier": linkPkce.codeVerifier])
 ```
 
 - `socialSignInUrl(_:mode:returnUrl:)` puts the project id and a non-PROD env
@@ -56,8 +64,17 @@ _ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkC
   exchange is how a user signs in again.
 - `linkIdentity` now takes `userId` and `code` (the link code); `provider` /
   `providerToken` are gone.
+- PKCE (S256) is optional but strongly recommended: `PkcePair.create()`
+  gives `codeVerifier` and `codeChallenge` (32 random bytes, base64url;
+  CryptoKit SHA-256). A code started with a challenge needs its verifier; a
+  verifier for a code started without one is refused too.
 - Refusals: `CM-ERRORS-MEMBERSHIP-051` (code used, expired or unknown), `-055`
-  (409, the provider account belongs to another user), `-056` (403, not yourself).
+  (409, the provider account belongs to another user), `-056` (403, not
+  yourself), `-058` (PKCE: `context.Reason` `verifier_missing`,
+  `verifier_wrong` or `challenge_missing`; the code is used up — start
+  again), `-059` (the challenge is not a 43-character S256). A refused
+  `returnUrl` sends the browser to the mode's failure page with
+  `error=return_url_not_allowed`.
 
 ## Credential version (gateway 2.3.9)
 
