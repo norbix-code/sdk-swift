@@ -8,28 +8,6 @@ public final class DatabaseModule: Sendable {
         self.transport = transport
     }
 
-    public func disableDatabase(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/database/disable",
-            method: "PUT",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
-    public func enableDatabase(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/database/enable",
-            method: "PUT",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     public func deleteSchemaTrigger(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/database/schemas/triggers/{triggerId}",

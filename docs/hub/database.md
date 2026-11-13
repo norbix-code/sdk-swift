@@ -2,8 +2,6 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `disableDatabase` | `PUT` | `/{version}/database/disable` | `project` |
-| `enableDatabase` | `PUT` | `/{version}/database/enable` | `project` |
 | `deleteSchemaTrigger` | `DELETE` | `/{version}/database/schemas/triggers/{triggerId}` | `project` |
 | `disableSchemaTrigger` | `PATCH` | `/{version}/database/schemas/triggers/{triggerId}/disable` | `project` |
 | `enableSchemaTrigger` | `PATCH` | `/{version}/database/schemas/triggers/{triggerId}/enable` | `project` |

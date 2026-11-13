@@ -2,8 +2,6 @@
 
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
-| `disableMembership` | `PUT` | `/{version}/membership/disable` | `project` |
-| `enableMembership` | `PUT` | `/{version}/membership/enable` | `project` |
 | `deleteMembershipTrigger` | `DELETE` | `/{version}/membership/triggers/{triggerId}` | `project` |
 | `disableMembershipTrigger` | `PATCH` | `/{version}/membership/triggers/{triggerId}/disable` | `project` |
 | `enableMembershipTrigger` | `PATCH` | `/{version}/membership/triggers/{triggerId}/enable` | `project` |
@@ -26,4 +24,3 @@
 | `getMembershipIntegration` | `GET` | `/{version}/membership/integrations/{id}` | `project` |
 | `getMembershipIntegrations` | `GET` | `/{version}/membership/integrations` | `project` |
 | `saveMembershipIntegration` | `POST` | `/{version}/membership/integrations` | `project` |
-| `setMembershipIntegrationAsDefault` | `PUT` | `/{version}/membership/integrations/{Id}/default` | `project` |
