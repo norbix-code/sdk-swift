@@ -22,7 +22,7 @@
 | `updateUserPreferences` | `PUT` | `/{version}/membership/users/{id}/preferences` | `project` |
 | `startLinkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity/start` | `project` |
 | `linkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity` | `project` |
-| `exchangeSocialSignInCode` | `POST` | `/{version}/membership/auth/social/{Provider}/exchange` | `optional` |
+| `exchangeSocialSignInCode` | `POST` | `/{version}/membership/auth/social/{Provider}/exchange` | `unauthenticated` |
 | `socialSignInUrl` | — | builds `GET /{version}/membership/auth/social/{provider}?projectId=…` (a URL, not a call) | — |
 
 ## Social sign-in and link identity
@@ -51,6 +51,9 @@ _ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkC
 - `socialSignInUrl(_:mode:returnUrl:)` puts the project id and a non-PROD env
   in the query, because a navigation sends no headers. The start and the
   provider callback have no call method.
+- `exchangeSocialSignInCode` sends no credentials, even when the client has a
+  key or a JWT: the gateway refuses an old token on any route, and the
+  exchange is how a user signs in again.
 - `linkIdentity` now takes `userId` and `code` (the link code); `provider` /
   `providerToken` are gone.
 - Refusals: `CM-ERRORS-MEMBERSHIP-051` (code used, expired or unknown), `-055`

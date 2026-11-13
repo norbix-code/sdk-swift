@@ -238,13 +238,15 @@ public final class MembershipModule: Sendable {
     /// `POST /{version}/membership/auth/social/{Provider}/exchange` — trades the
     /// one-time code from the social sign-in return page (2 minutes, once) for
     /// the project JWT. Request: `provider` and `code`. Answers `bearerToken`,
-    /// `userId`, `displayName`, `expiresAt`, `meta.credentialVersion`.
+    /// `userId`, `displayName`, `expiresAt`, `meta.credentialVersion`. Sends no
+    /// credentials: the gateway judges any token it gets, even here, and
+    /// refuses an old one.
     public func exchangeSocialSignInCode(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/membership/auth/social/{Provider}/exchange",
             method: "POST",
             request: request,
-            scope: .optional,
+            scope: .unauthenticated,
             timeout: timeout,
             bearerToken: bearerToken
         )

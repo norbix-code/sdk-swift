@@ -66,7 +66,20 @@ final class MembershipSocialTests: XCTestCase {
                        "https://api.test/v3/membership/auth/social/google/exchange")
         XCTAssertEqual(try body(mock), ["code": "one-time"])
         XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-project-id"), "pr_1")
+        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"),
+                     "an old JWT on the client must not be sent")
         XCTAssertEqual((res as? [String: Any])?["bearerToken"] as? String, "a.b.c")
+    }
+
+    /// The gateway judges any token it gets, even on this open route: a JWT from
+    /// before a password change is refused 401. The exchange is how a user signs
+    /// in again, so a client with an API key sends no credentials either.
+    func testExchangeSocialSignInCodeSendsNoApiKey() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixApiClient(projectId: "pr_1", apiKey: "ak-1", baseUrl: "https://api.test", executor: mock)
+        _ = try await client.membership.exchangeSocialSignInCode(["provider": "google", "code": "c"])
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/membership/auth/social/google/exchange")
+        XCTAssertNil(mock.lastRequest?.value(forHTTPHeaderField: "Authorization"))
     }
 
     func testStartLinkIdentityPostsProviderModeAndReturnUrl() async throws {
