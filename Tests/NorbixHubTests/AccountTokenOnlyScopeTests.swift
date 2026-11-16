@@ -184,10 +184,6 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         try await check("POST", "/v3/account/team/member/invite") { try await $0.account.sendInviteToTeamMember() }
     }
 
-    func testGetLicensesWorksWithATokenAndNoAccountId() async throws {
-        try await check("GET", "/v3/account/licenses") { try await $0.account.getLicenses() }
-    }
-
     func testRegionsUpdateProjectRegionsWorksWithATokenAndNoAccountId() async throws {
         try await check("PATCH", "/v3/account/projects/proj_1/settings/regions") { try await $0.regions.updateProjectRegions(projectId: "proj_1", primaryRegion: "nb-eu-germany") }
     }

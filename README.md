@@ -128,9 +128,9 @@ let setup = try await hub.integrations.getKeylessIntegrationSetup(["module": "fi
 // setup?["templates"] — templates: ready CloudFormation / Bicep / Terraform files for this integration
 ```
 
-## Self-hosted / on-prem deployments
+## Custom base URL
 
-Both clients accept a `baseUrl` parameter. Use it for self-hosted Norbix or
+Both clients accept a `baseUrl` parameter. Use it for a custom domain or
 local development:
 
 ```swift
@@ -221,8 +221,8 @@ region code as a subdomain:
 - `https://api.norbix.ai` → `https://nb-eu-germany.api.norbix.ai`
 - `https://hub.norbix.ai` → `https://nb-eu-germany.hub.norbix.ai`
 
-`setRegion(nil)` restores the default URL. A custom `baseUrl` (self-hosted
-/ on-prem / local development) is **never rewritten**: the `nb-region`
+`setRegion(nil)` restores the default URL. A custom `baseUrl` (custom domain
+/ local development) is **never rewritten**: the `nb-region`
 header is still sent, but the URL stays exactly as you configured it.
 
 ### Managing a project's regions (Hub)

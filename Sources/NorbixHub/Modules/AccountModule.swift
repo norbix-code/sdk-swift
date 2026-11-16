@@ -491,17 +491,6 @@ public final class AccountModule: Sendable {
         )
     }
 
-    public func getLicenses(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/account/licenses",
-            method: "GET",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     public func getProjectAiSettings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/projects/{projectId}/ai/settings",
