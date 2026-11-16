@@ -43,7 +43,6 @@
 | `createAccount` | `POST` | `/{version}/account` | `unauthenticated` |
 | `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `project` |
 | `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `project` |
-| `getLicenses` | `GET` | `/{version}/account/licenses` | `project` |
 | `getProjectAiSettings` | `GET` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `updateProjectAiSettings` | `PUT` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `createProjectAiAssistant` | `POST` | `/{version}/account/projects/{projectId}/ai/assistants` | `project` |

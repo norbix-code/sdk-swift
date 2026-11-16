@@ -14,7 +14,7 @@ import NorbixCore
 /// let me = try await client.membership.getCurrentUser()
 /// ```
 ///
-/// Self-hosted deployments override `baseUrl`:
+/// A custom domain or a local instance overrides `baseUrl`:
 ///
 /// ```swift
 /// let client = try NorbixApiClient(

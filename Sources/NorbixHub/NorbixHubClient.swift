@@ -18,7 +18,7 @@ import NorbixCore
 /// let account = try await hub.account.getAccount()
 /// ```
 ///
-/// Self-hosted deployments override `baseUrl`:
+/// A custom domain or a local instance overrides `baseUrl`:
 ///
 /// ```swift
 /// let hub = try NorbixHubClient(
