@@ -15,10 +15,77 @@ public enum NorbixDefaults {
     /// `https://{region}.hub.norbix.ai`). Only the SDK defaults are composed —
     /// a user-supplied custom base URL is never rewritten and is returned
     /// unchanged. Returns the input unchanged when `region` is unset.
+    ///
+    /// API calls of a project whose id decodes do not use this address: they
+    /// go to the project's own host (`projectBaseUrl`), which carries no
+    /// region label.
     public static func regionalBaseUrl(_ baseUrl: String, region: String?) -> String {
         guard let region, !region.isEmpty else { return baseUrl }
         guard baseUrl == apiBaseUrl || baseUrl == hubBaseUrl else { return baseUrl }
         return baseUrl.replacingOccurrences(of: "https://", with: "https://\(region).")
+    }
+
+    private static let projectIdPrefix = Array("pr_".utf8)
+
+    /// The DNS label of a project: `pr_5XvmrTA6JVggZdmEE5bGdm` →
+    /// `pr-022c4aca9f9e4df787ab0a20c83c44b6`.
+    ///
+    /// Norbix serves every project on `pr-<32 hex>.api.norbix.ai`. The label
+    /// is the project id (`pr_` + base62) written as the hex of the same
+    /// GUID, so it is built here with no call. Returns `nil` for anything
+    /// that is not a Norbix project id (a test id, another prefix, a value
+    /// that is not a version-4 GUID) — it never throws.
+    public static func projectHostLabel(_ projectId: String?) -> String? {
+        guard let projectId else { return nil }
+        let utf8 = Array(projectId.utf8)
+        guard utf8.starts(with: projectIdPrefix) else { return nil }
+        let digits = utf8.dropFirst(projectIdPrefix.count)
+        // 62^22 is just above 2^128: a GUID never needs more than 22 digits.
+        guard !digits.isEmpty, digits.count <= 22 else { return nil }
+
+        // The number, least significant byte first — .NET's
+        // `Guid.ToByteArray()` bytes b0…b15. Swift has no 128-bit integer on
+        // every platform this package supports, so: bytes × 62 + digit.
+        var bytes = [UInt8](repeating: 0, count: 16)
+        for ch in digits {
+            let digit: Int
+            switch ch {
+            case 0x30...0x39: digit = Int(ch) - 0x30          // 0-9
+            case 0x41...0x5A: digit = Int(ch) - 0x41 + 10     // A-Z
+            case 0x61...0x7A: digit = Int(ch) - 0x61 + 36     // a-z
+            default: return nil
+            }
+            var carry = digit
+            for i in 0..<16 {
+                let value = Int(bytes[i]) * 62 + carry
+                bytes[i] = UInt8(value & 0xFF)
+                carry = value >> 8
+            }
+            // 2^128 or more: not a GUID.
+            guard carry == 0 else { return nil }
+        }
+
+        // Only a version-4 GUID is a Norbix id (the gateway refuses the rest).
+        guard bytes[7] >> 4 == 4, bytes[8] >> 6 == 2 else { return nil }
+
+        // .NET "N" format: the first three groups are stored little-endian.
+        let order = [3, 2, 1, 0, 5, 4, 7, 6, 8, 9, 10, 11, 12, 13, 14, 15]
+        let hex = Array("0123456789abcdef".utf8)
+        var label = Array("pr-".utf8)
+        label.reserveCapacity(35)
+        for i in order {
+            label.append(hex[Int(bytes[i] >> 4)])
+            label.append(hex[Int(bytes[i] & 0x0F)])
+        }
+        return String(decoding: label, as: UTF8.self)
+    }
+
+    /// The project's own API base URL (`https://pr-<32 hex>.api.norbix.ai`),
+    /// or `nil` when the id is not a Norbix project id. It carries no region
+    /// label: the project's DNS record already points at its region.
+    public static func projectBaseUrl(_ projectId: String?) -> String? {
+        guard let label = projectHostLabel(projectId) else { return nil }
+        return apiBaseUrl.replacingOccurrences(of: "https://", with: "https://\(label).")
     }
 }
 
