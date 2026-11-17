@@ -218,8 +218,12 @@ When a client uses an SDK-default base URL, configuring a region (at init
 or via `setRegion`) also composes the regional endpoint by prefixing the
 region code as a subdomain:
 
-- `https://api.norbix.ai` → `https://nb-eu-germany.api.norbix.ai`
-- `https://hub.norbix.ai` → `https://nb-eu-germany.hub.norbix.ai`
+- Hub: `https://hub.norbix.ai` → `https://nb-eu-germany.hub.norbix.ai`
+- API: calls of a Norbix project go to the project's own host, which has
+  **no region label** (see [Project host](#project-host)) — the project's
+  DNS record already points at its region. Only a project id that is not a
+  Norbix id (a test id like `p1`) and the social sign-in link use
+  `https://nb-eu-germany.api.norbix.ai`.
 
 `setRegion(nil)` restores the default URL. A custom `baseUrl` (custom domain
 / local development) is **never rewritten**: the `nb-region`
@@ -255,6 +259,43 @@ _ = try await hub.account.createProject([
     // ...other project fields
 ])
 ```
+
+## Project host
+
+When `NorbixApiClient` uses its built-in address (`https://api.norbix.ai`),
+every API call goes to the project's own host:
+
+```
+https://pr-<32 hex>.api.norbix.ai
+```
+
+The label is the project id written as hex (`pr_5XvmrTA6JVggZdmEE5bGdm` →
+`pr-022c4aca9f9e4df787ab0a20c83c44b6`); the SDK builds it locally, with no
+extra call. `NorbixDefaults.projectHostLabel(_:)` returns it (or `nil`).
+
+What changes:
+
+- Data, files, membership, login (`/auth`), payments, code, logs and AI calls
+  use the project host. With a region set the host is the same — no region
+  label — and the `nb-region` header is still sent.
+- `setScope(projectId:)` moves the calls to the new project's host; host and
+  `norbix-project-id` header always name the same project.
+
+What does not change:
+
+- The `norbix-project-id` header is still sent.
+- `NorbixHubClient` stays on `https://hub.norbix.ai` (or
+  `https://<region>.hub.norbix.ai`).
+- A custom `baseUrl` (argument, config or `NORBIX_API_URL`) is never
+  rewritten. (A value equal to the built-in address, `https://api.norbix.ai`,
+  counts as the default.)
+- A project id that is not a Norbix id (for example `p1`) keeps the shared
+  host.
+- The link from `membership.socialSignInUrl` stays on the shared host, because
+  the sign-in callback returns there.
+
+If your network restricts outgoing traffic, allow `*.api.norbix.ai` (not only
+`api.norbix.ai`).
 
 ## Language
 

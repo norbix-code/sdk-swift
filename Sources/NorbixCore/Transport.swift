@@ -53,6 +53,12 @@ public final class Transport: @unchecked Sendable {
     private var _config: NorbixConfig
     private let executor: HTTPExecuting
     private let logger: NorbixLogger
+    /// True for an API client on the SDK's built-in default address: every
+    /// call then goes to the project's own host
+    /// (`https://pr-<32 hex>.api.norbix.ai`), computed from the project id of
+    /// that call. `config.baseUrl` keeps the shared (or regional) address — it
+    /// serves a project id that does not decode, and browser links.
+    private let usesProjectHost: Bool
 
     /// Thread-safe snapshot/replacement of the active config.
     public var config: NorbixConfig {
@@ -76,11 +82,13 @@ public final class Transport: @unchecked Sendable {
     public init(
         config: NorbixConfig,
         executor: HTTPExecuting = URLSessionHTTPExecutor(),
-        logger: NorbixLogger = OSLogger()
+        logger: NorbixLogger = OSLogger(),
+        usesProjectHost: Bool = false
     ) {
         self._config = config
         self.executor = executor
         self.logger = logger
+        self.usesProjectHost = usesProjectHost
         // Always-on init line, even when verbose is off. Auth is never logged.
         logger.log(NorbixLogEvent(
             level: .info,
@@ -274,8 +282,16 @@ public final class Transport: @unchecked Sendable {
             )
         }
 
+        // The project's own host, from the same snapshot as the
+        // `norbix-project-id` header below: host and header always name the
+        // same project, also right after `setScope`. A project id that does
+        // not decode keeps the shared (or regional) address.
+        let baseUrl = usesProjectHost
+            ? NorbixDefaults.projectBaseUrl(snapshot.projectId) ?? snapshot.baseUrl
+            : snapshot.baseUrl
+
         let built = try buildUrlAndBody(
-            baseUrl: snapshot.baseUrl,
+            baseUrl: baseUrl,
             path: path,
             // A raw body never comes from [request], so its leftovers go to
             // the query, as for a GET.
@@ -335,8 +351,8 @@ public final class Transport: @unchecked Sendable {
         // Region selector: per-call override wins over the client default.
         // There is no default region, so the header is sent only when
         // resolved. A per-call region only sets the header — it never
-        // changes the request URL (the regional base URL is composed once,
-        // at the client level).
+        // changes the request URL (the regional base URL is composed at the
+        // client level, and a project host carries no region label).
         let resolvedRegion = region ?? snapshot.region
         if let resolvedRegion, !resolvedRegion.isEmpty {
             httpRequest.setValue(resolvedRegion, forHTTPHeaderField: "nb-region")
@@ -530,7 +546,10 @@ public final class Transport: @unchecked Sendable {
     }
 
     /// The full URL of a `GET` route that a browser navigates to (a link or a
-    /// redirect, not a call). A navigation carries no headers, so the project
+    /// redirect, not a call). It stays on the shared (or regional) address,
+    /// never the project's own host: the gateway's callback returns to the
+    /// shared address and its cookie belongs to that host alone.
+    /// A navigation carries no headers, so the project
     /// id and a non-PROD env go into the query (`?projectId=…&env=…`), followed
     /// by `query` in order; `nil` values are left out. Path values and query
     /// values are percent-encoded (RFC 3986 unreserved characters stay).

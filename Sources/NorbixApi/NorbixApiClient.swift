@@ -50,16 +50,25 @@ public final class NorbixApiClient: Sendable {
         executor: HTTPExecuting = URLSessionHTTPExecutor(),
         logger: NorbixLogger = OSLogger()
     ) {
-        // Regional base URL: composed only when the config still points at
-        // the SDK default — a user-supplied custom base URL is never
-        // rewritten.
+        // Only when the config still points at the SDK default — a
+        // user-supplied custom base URL is never rewritten:
+        // - every call goes to the project's own host
+        //   (`https://pr-<32 hex>.api.norbix.ai`, no region label), which the
+        //   transport computes per call from the current project id;
+        // - `config.baseUrl` holds the shared or regional address, used when
+        //   the project id does not decode and for browser links.
         var config = config
         let managed = config.baseUrl == NorbixDefaults.apiBaseUrl
         self.managedBaseUrl = managed
         if managed {
             config.baseUrl = NorbixDefaults.regionalBaseUrl(config.baseUrl, region: config.region)
         }
-        let transport = Transport(config: config, executor: executor, logger: logger)
+        let transport = Transport(
+            config: config,
+            executor: executor,
+            logger: logger,
+            usesProjectHost: managed
+        )
         self.transport = transport
         self.accessToken = AccessTokenModule(transport: transport)
         self.ai = AiModule(transport: transport)
@@ -174,9 +183,14 @@ public final class NorbixApiClient: Sendable {
         }
     }
 
+    /// Switch the project (and account) for subsequent requests. On the SDK
+    /// default base URL the calls move to the new project's own host too:
+    /// host and `norbix-project-id` header always name the same project.
     public func setScope(projectId: String, accountId: String? = nil) {
-        transport.config.projectId = projectId
-        transport.config.accountId = accountId
+        transport.updateConfig { config in
+            config.projectId = projectId
+            config.accountId = accountId
+        }
     }
 
     /// Switch the project environment for subsequent requests (`norbix-env`
@@ -196,7 +210,9 @@ public final class NorbixApiClient: Sendable {
     /// unset. When the client still points at the SDK default base URL, the
     /// regional base URL (`https://{region}.api.norbix.ai`) is (re)composed
     /// under the same rule as construction; a custom base URL is never
-    /// rewritten.
+    /// rewritten. The regional address serves a project id that does not
+    /// decode and browser links only: calls of a Norbix project stay on the
+    /// project's own host, which has no region label.
     public func setRegion(_ region: String?) {
         let resolved = (region?.isEmpty == false) ? region : nil
         let managed = managedBaseUrl
