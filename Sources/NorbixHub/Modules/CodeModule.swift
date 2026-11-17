@@ -722,7 +722,10 @@ public final class CodeModule: Sendable {
         )
     }
 
-    /// Beta: turns workflows off for the environment.
+    /// Beta: `PUT /{version}/code/workflows/disable` — refused since 2026-11-17
+    /// (`CM-ERRORS-WORKFLOWS-045`): workflows are part of every project and cannot be switched
+    /// off. Kept so existing code compiles; use `disableCodeWorkflow` to stop one workflow.
+    @available(*, deprecated, message: "Refused by the gateway since 2026-11-17 (CM-ERRORS-WORKFLOWS-045); use disableCodeWorkflow for one workflow.")
     public func disableCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/disable",

@@ -774,6 +774,17 @@ final class HubDatabaseModuleTests: XCTestCase {
         assertQuery(mock, contains: "databaseIntegrationId=dbi_1")
     }
 
+    func testGetNetworkAddressesSendsToGetRoute() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try makeClient(mock)
+
+        _ = try await client.database.getNetworkAddresses(["regionCode": "nb-eu-germany"])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "GET")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/database/network-addresses")
+        assertQuery(mock, contains: "regionCode=nb-eu-germany")
+    }
+
     func testTestDatabaseIntegrationSendsToPostRoute() async throws {
         let mock = MockHTTPExecutor()
         let client = try makeClient(mock)

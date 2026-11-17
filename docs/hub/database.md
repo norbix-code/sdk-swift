@@ -66,6 +66,7 @@
 | `getDatabaseTaxonomyTermTree` | `GET` | `/{version}/database/taxonomies/{TaxonomyName}/terms/tree` | `project` |
 | `getDatabaseMergedTermTree` | `GET` | `/{version}/database/taxonomies/{TaxonomyName}/merged-tree` | `project` |
 | `getAllowedFlexTiers` | `GET` | `/{version}/database/integrations/flex-tiers` | `project` |
+| `getNetworkAddresses` | `GET` | `/{version}/database/network-addresses` | `project` |
 | `testDatabaseIntegration` | `POST` | `/{version}/database/integrations/test` | `project` |
 | `revealManagedFlexConnectionString` | `GET` | `/{version}/database/integrations/{Id}/connection-string` | `project` |
 
