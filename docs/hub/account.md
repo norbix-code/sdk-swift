@@ -94,17 +94,21 @@ projects.
 - `getAccountStatus()` also answers `bundle`, `billingPeriod`, `isTrial`,
   `renewsOn` and `enabledProjects`.
 - `getFlexClusters()` answers `clusters` (the account's Norbix-managed Atlas
-  clusters with their `databases`, `usage` and `nearLimits`), `canCreateNew`
+  clusters with their `databases`, `usage`, `nearLimits`, `nextTierCode` — the
+  next upgrade step, empty when there is none — and `topTierCode`, the plan's
+  highest tier), `canCreateNew`
   and `cannotCreateReason` (`TrialOneCluster` or `ClusterLimitReached`).
 - `upgradeFlexCluster` takes `flexClusterId` (it goes in the path) and
-  `tierCode` (`M10`); the upgrade is queued.
+  `tierCode` — the cluster's `nextTierCode`: one step on FLEX → M10 → M20 →
+  M30 → M40, within the plan (trial: FLEX only · Starter: up to M20 · Growth:
+  up to M30 · Scale: up to M40); the upgrade is queued.
 
 ```swift
 let bundles = try await hub.account.getManagedServiceBundles()
 _ = try await hub.account.changeManagedServiceBundle(["bundle": "Growth", "billingPeriod": "Annual"])
 
 let flex = try await hub.account.getFlexClusters()
-_ = try await hub.account.upgradeFlexCluster(["flexClusterId": "fc_1", "tierCode": "M10"])
+_ = try await hub.account.upgradeFlexCluster(["flexClusterId": "fxc_1", "tierCode": "M20"]) // the cluster's nextTierCode
 ```
 
 To put a new managed database on a cluster the account already has, send

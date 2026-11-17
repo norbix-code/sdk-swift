@@ -846,6 +846,23 @@ public final class DatabaseModule: Sendable {
         )
     }
 
+    /// Lists the IP addresses Norbix connects to databases from, per region (`regions`: each with
+    /// `regionCode` and `addresses`). Add them to your MongoDB Atlas IP access list when you
+    /// connect your own database with a connection string. `["regionCode": "nb-eu-germany"]` for
+    /// one region; empty for every region.
+    ///
+    /// `GET /{version}/database/network-addresses` · request DTO `GetNetworkAddresses`.
+    public func getNetworkAddresses(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/database/network-addresses",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     /// Tests a database connection before it is saved.
     ///
     /// `POST /{version}/database/integrations/test` · request DTO `TestDatabaseIntegration`.

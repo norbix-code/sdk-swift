@@ -135,8 +135,9 @@ public final class AccountModule: Sendable {
     }
 
     /// Lists the account's Norbix-managed Atlas clusters. The answer carries `clusters` (each with
-    /// `id`, `displayName`, `tierCode` `FLEX` or `M10`, `status`, its `databases`, `usage` and
-    /// `nearLimits`), `canCreateNew` and, when that is false, `cannotCreateReason`
+    /// `id`, `displayName`, `tierCode` `FLEX` … `M40`, `nextTierCode` (the next upgrade step,
+    /// empty when there is none), `topTierCode` (the plan's highest tier), `status`, its
+    /// `databases`, `usage` and `nearLimits`), `canCreateNew` and, when that is false, `cannotCreateReason`
     /// (`TrialOneCluster` or `ClusterLimitReached`).
     public func getFlexClusters(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
@@ -149,8 +150,10 @@ public final class AccountModule: Sendable {
         )
     }
 
-    /// Queues the upgrade of a cluster to a bigger tier: pass
-    /// `["flexClusterId": id, "tierCode": "M10"]`. The id goes in the path, `tierCode` in the body.
+    /// Queues the upgrade of a cluster by one step on the ladder FLEX → M10 → M20 → M30 → M40,
+    /// within the plan (trial: FLEX only, Starter: up to M20, Growth: up to M30, Scale: up to
+    /// M40): pass `["flexClusterId": id, "tierCode": nextTierCode]` with the cluster's
+    /// `nextTierCode` from `getFlexClusters`. The id goes in the path, `tierCode` in the body.
     public func upgradeFlexCluster(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/flex-clusters/{flexClusterId}/upgrade",
