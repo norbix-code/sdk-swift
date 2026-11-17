@@ -63,6 +63,43 @@ public final class MembershipModule: Sendable {
         )
     }
 
+    /// Lists every membership trigger event (`when`: `OnRegistered`, `OnInvited`, `OnVerified`,
+    /// `OnUpdated`, `OnDeleted`, `OnBlocked`, `OnReactivated`, `OnUserCreated`) and the values it
+    /// carries by name — e.g. "Registered user → e-mail address" is key `User.Email`, resolver `New`.
+    /// Bind a template token to one as `["key": <token>, "value": <key>, "resolver": <resolver>]`,
+    /// never resolver `Custom` (that sends the key as fixed text). Read-only.
+    ///
+    /// `GET /{version}/membership/triggers/event-values` · request DTO `GetMembershipTriggerEventValues`.
+    public func getMembershipTriggerEventValues(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/triggers/event-values",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// For one membership e-mail (`setting`: `Welcome`, `Verification`, `PasswordReset`,
+    /// `Invitation`, `Deactivation`, `LoginAlert`) lists every token its template uses: `Auto`
+    /// (Norbix fills it), `NeedsValue` (a binding must give it a value) or `NotAvailable`.
+    /// Optional `templateId` = the template about to be chosen. Bindings are saved with the
+    /// authorization settings (`PUT /{version}/membership/authorization`, `bindings`); the save is
+    /// refused with `CM-ERRORS-MEMBERSHIP-060` while a token has no value.
+    ///
+    /// `GET /{version}/membership/settings/email-bindings` · request DTO `GetMembershipEmailBindings`.
+    public func getMembershipEmailBindings(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/settings/email-bindings",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func saveMembershipTrigger(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/membership/triggers",

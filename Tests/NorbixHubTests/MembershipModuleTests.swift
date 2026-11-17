@@ -46,4 +46,29 @@ final class HubMembershipModuleTests: XCTestCase {
         let settings = try XCTUnwrap(action["deliverySettings"] as? [String: Any])
         XCTAssertEqual(settings["recipientsSourceType"] as? String, "TriggerSubject")
     }
+
+    func testGetMembershipTriggerEventValuesSendsToGetRoute() async throws {
+        let executor = MockHTTPExecutor()
+        let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: executor)
+
+        _ = try await client.membership.getMembershipTriggerEventValues()
+
+        let request = try XCTUnwrap(executor.lastRequest)
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.url?.path, "/v3/membership/triggers/event-values")
+    }
+
+    func testGetMembershipEmailBindingsSendsSettingAndTemplate() async throws {
+        let executor = MockHTTPExecutor()
+        let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: executor)
+
+        _ = try await client.membership.getMembershipEmailBindings(["setting": "Welcome", "templateId": "tmpl_1"])
+
+        let request = try XCTUnwrap(executor.lastRequest)
+        XCTAssertEqual(request.httpMethod, "GET")
+        XCTAssertEqual(request.url?.path, "/v3/membership/settings/email-bindings")
+        let query = request.url?.query ?? ""
+        XCTAssertTrue(query.contains("setting=Welcome"), query)
+        XCTAssertTrue(query.contains("templateId=tmpl_1"), query)
+    }
 }

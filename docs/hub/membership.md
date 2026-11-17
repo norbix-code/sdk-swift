@@ -7,6 +7,8 @@
 | `enableMembershipTrigger` | `PATCH` | `/{version}/membership/triggers/{triggerId}/enable` | `project` |
 | `getMembershipTrigger` | `GET` | `/{version}/membership/triggers/{id}` | `project` |
 | `getMembershipTriggers` | `GET` | `/{version}/membership/triggers` | `project` |
+| `getMembershipTriggerEventValues` | `GET` | `/{version}/membership/triggers/event-values` | `project` |
+| `getMembershipEmailBindings` | `GET` | `/{version}/membership/settings/email-bindings` | `project` |
 | `saveMembershipTrigger` | `POST` | `/{version}/membership/triggers` | `project` |
 | `createRole` | `POST` | `/{version}/membership/roles` | `project` |
 | `deleteRole` | `DELETE` | `/{version}/membership/roles` | `project` |
