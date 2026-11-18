@@ -14,6 +14,8 @@
 | `changeManagedServiceBundle` | `POST` | `/{version}/account/stripe/change-bundle` | `project` |
 | `checkBundleDiscount` | `POST` | `/{version}/account/stripe/discount/check` | `project` |
 | `applyBundleDiscount` | `POST` | `/{version}/account/stripe/discount` | `project` |
+| `getTrialAvailability` | `GET` | `/{version}/account/trial-availability` | `project` |
+| `joinTrialWaitlist` | `POST` | `/{version}/account/trial-waitlist` | `project` |
 | `getFlexClusters` | `GET` | `/{version}/account/flex-clusters` | `project` |
 | `upgradeFlexCluster` | `POST` | `/{version}/account/flex-clusters/{flexClusterId}/upgrade` | `project` |
 | `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `unauthenticated` |
@@ -146,6 +148,45 @@ do {
     _ = try await hub.account.applyBundleDiscount(["code": "LAUNCH30"])
 } catch let error as NorbixError where error.code == "CM-ERRORS-ACCOUNT-027" {
     let reason = error.errors.first?.context["reason"] // e.g. "already_used"
+}
+```
+
+## Trial limits and the waiting list
+
+- `getTrialAvailability` takes an optional `region` (sent in the query string)
+  and asks whether a free Managed Service trial can start there now, before
+  opening a checkout. `limitsOn` false means this installation has no trial
+  limits: start the trial as before. `trialsOpen` false means the region's
+  trials are full: offer buy now without a trial (`createStripeCheckoutSession`
+  with `withoutTrial` true) or the waiting list when `waitlistOpen` is true.
+  `onWaitlist` says the owner email is already on the list. `refusal` says why
+  this account's trial was refused after checkout (`CardAlreadyHadTrial`), or
+  is empty.
+- `joinTrialWaitlist` takes `region`, `consent` (must be true) and
+  `consentVersion` (the consent text shown) and puts the account owner's email
+  on the region's waiting list. When a slot frees, Norbix emails an invitation
+  link valid a few days. `status` is `added`, `alreadyListed` or
+  `alreadyCustomer` (an email that already had a trial or pays is never
+  added); `message` can be shown as is. Fails with `CM-ERRORS-ACCOUNT-044`
+  (list switched off), `CM-ERRORS-ACCOUNT-043` (unknown region) or a
+  validation error when `consent` is not true.
+- `createStripeCheckoutSession` takes optional `region`, `withoutTrial` and
+  `trialInvite`. A trial checkout in a full region fails with
+  `CM-ERRORS-ACCOUNT-040`. The invitation token from the waiting-list email
+  goes in `trialInvite` and starts the trial once even when the region is
+  full; an expired invitation or someone else's fails with
+  `CM-ERRORS-ACCOUNT-042`.
+
+The website's waiting-list intake route (`/{version}/account/trial-waitlist/intake`)
+is called by the website server with a shared key and has no method here.
+
+```swift
+let availability = try await hub.account.getTrialAvailability(["region": "nb-eu-germany"])
+if let map = availability as? [String: Any], map["trialsOpen"] as? Bool == false,
+   map["waitlistOpen"] as? Bool == true {
+    _ = try await hub.account.joinTrialWaitlist([
+        "region": "nb-eu-germany", "consent": true, "consentVersion": "2026-11",
+    ])
 }
 ```
 

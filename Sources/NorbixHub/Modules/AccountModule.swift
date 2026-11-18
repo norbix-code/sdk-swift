@@ -84,7 +84,10 @@ public final class AccountModule: Sendable {
     /// Opens a Stripe checkout for a subscription. A Managed Service checkout needs both
     /// `bundle` (`Starter`, `Growth` or `Scale`) and `billingPeriod` (`Monthly` or `Annual`).
     /// An optional `discountCode` is checked first; a refused code fails the call with
-    /// `CM-ERRORS-ACCOUNT-027` and no checkout is made.
+    /// `CM-ERRORS-ACCOUNT-027` and no checkout is made. Optional `region`, `withoutTrial` (buy
+    /// now, no trial) and `trialInvite` (the waiting-list invitation token) steer the trial; a
+    /// trial checkout in a full region fails with `CM-ERRORS-ACCOUNT-040`, a bad invitation with
+    /// `CM-ERRORS-ACCOUNT-042`.
     public func createStripeCheckoutSession(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/create-checkout-session",
@@ -160,6 +163,44 @@ public final class AccountModule: Sendable {
     public func applyBundleDiscount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/discount",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Asks whether a free Managed Service trial can start in a region now, before opening a
+    /// checkout: pass `["region": "nb-eu-germany"]` (sent in the query string). The answer carries
+    /// `limitsOn` (false = this installation has no trial limits, start the trial as before),
+    /// `region`, `trialsOpen` (false = the region's trials are full: offer buy now without a
+    /// trial, a checkout with `withoutTrial` true, or the waiting list when `waitlistOpen` is
+    /// true), `onWaitlist` (the owner email is already on the list) and `refusal` (why this
+    /// account's trial was refused after checkout, `CardAlreadyHadTrial`, or empty). A trial
+    /// checkout in a full region fails with `CM-ERRORS-ACCOUNT-040`; an invitation token from the
+    /// waiting list goes in the checkout's `trialInvite` to start the trial once even when full.
+    public func getTrialAvailability(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/trial-availability",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Puts the account owner's email on the trial waiting list for a region: pass `region`,
+    /// `consent` (must be true) and `consentVersion` (the consent text shown). When a slot frees,
+    /// Norbix emails an invitation link valid a few days. The answer carries `status` (`added`,
+    /// `alreadyListed` or `alreadyCustomer`: an email that already had a trial or pays is never
+    /// added) and `message`, which can be shown as is. Fails with `CM-ERRORS-ACCOUNT-044` (list
+    /// switched off), `CM-ERRORS-ACCOUNT-043` (unknown region) or a validation error when
+    /// `consent` is not true.
+    public func joinTrialWaitlist(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/trial-waitlist",
             method: "POST",
             request: request,
             scope: .project,

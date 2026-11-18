@@ -86,6 +86,18 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         }
     }
 
+    func testGetTrialAvailabilityWorksWithATokenAndNoAccountId() async throws {
+        try await check("GET", "/v3/account/trial-availability") {
+            try await $0.account.getTrialAvailability(["region": "nb-eu-germany"])
+        }
+    }
+
+    func testJoinTrialWaitlistWorksWithATokenAndNoAccountId() async throws {
+        try await check("POST", "/v3/account/trial-waitlist") {
+            try await $0.account.joinTrialWaitlist(["region": "nb-eu-germany", "consent": true])
+        }
+    }
+
     func testGetFlexClustersWorksWithATokenAndNoAccountId() async throws {
         try await check("GET", "/v3/account/flex-clusters") { try await $0.account.getFlexClusters() }
     }
