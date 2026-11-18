@@ -13,7 +13,7 @@ public final class EmailModule: Sendable {
             path: "/{version}/email/one-click-unsubscribe",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )

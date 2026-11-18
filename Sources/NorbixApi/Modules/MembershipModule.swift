@@ -46,7 +46,7 @@ public final class MembershipModule: Sendable {
             path: "/{version}/membership/auth/register/user-name",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -57,7 +57,7 @@ public final class MembershipModule: Sendable {
             path: "/{version}/membership/auth/register/email",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -292,7 +292,7 @@ public final class MembershipModule: Sendable {
             path: "/{version}/membership/userauth/password/reset/request",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
@@ -303,7 +303,7 @@ public final class MembershipModule: Sendable {
             path: "/{version}/membership/userauth/password/reset/confirm",
             method: "POST",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
