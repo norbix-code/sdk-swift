@@ -13,7 +13,7 @@ public final class EchoModule: Sendable {
             path: "/{version}/echo",
             method: "GET",
             request: request,
-            scope: .project,
+            scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
         )
