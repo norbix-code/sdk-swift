@@ -12,6 +12,8 @@
 | `getStripeBillingPortalUrl` | `POST` | `/{version}/account/stripe/get-portal-url` | `project` |
 | `getManagedServiceBundles` | `GET` | `/{version}/account/stripe/bundles` | `project` |
 | `changeManagedServiceBundle` | `POST` | `/{version}/account/stripe/change-bundle` | `project` |
+| `checkBundleDiscount` | `POST` | `/{version}/account/stripe/discount/check` | `project` |
+| `applyBundleDiscount` | `POST` | `/{version}/account/stripe/discount` | `project` |
 | `getFlexClusters` | `GET` | `/{version}/account/flex-clusters` | `project` |
 | `upgradeFlexCluster` | `POST` | `/{version}/account/flex-clusters/{flexClusterId}/upgrade` | `project` |
 | `createTeamMemberFromInvitation` | `POST` | `/{version}/account/team/member` | `unauthenticated` |
@@ -114,6 +116,38 @@ _ = try await hub.account.upgradeFlexCluster(["flexClusterId": "fxc_1", "tierCod
 To put a new managed database on a cluster the account already has, send
 `flexClusterId` in the `MongoDbAtlasFlexManaged` database integration request;
 to name a new cluster, send `clusterDisplayName`.
+
+## Bundle discount codes
+
+- `checkBundleDiscount` takes `code` and, optionally, `bundle` and
+  `billingPeriod` (the plan about to be bought; left out, the current plan).
+  It changes nothing. The answer's `discount` has `code`, `percentOff`
+  (20 = 20%) or `amountOff` (minor units, with `currency`), `months` (null =
+  forever) and `endsAt` (null before checkout).
+- `applyBundleDiscount` takes `code` and puts it on the running Managed Service
+  subscription. The discount shows a moment later, through the Stripe webhook,
+  as `discount` in `getAccountStatus()`. Refused with `CM-ERRORS-PROJECTS-039`
+  when the account has no subscription.
+- `createStripeCheckoutSession` takes an optional `discountCode`; it is checked
+  first and a refused code fails the call with no checkout made.
+- `getAccountStatus()` also answers `discount` (same shape as above) while one
+  is on the subscription.
+
+A refused code fails with `CM-ERRORS-ACCOUNT-027` (HTTP 400). The reason is in
+the error context, `reason`: `not_found`, `not_started`, `expired`,
+`not_for_bundle`, `monthly_only`, `wrong_billing_period`,
+`already_has_discount` or `already_used`.
+
+```swift
+do {
+    let answer = try await hub.account.checkBundleDiscount([
+        "code": "LAUNCH30", "bundle": "Growth", "billingPeriod": "Monthly",
+    ])
+    _ = try await hub.account.applyBundleDiscount(["code": "LAUNCH30"])
+} catch let error as NorbixError where error.code == "CM-ERRORS-ACCOUNT-027" {
+    let reason = error.errors.first?.context["reason"] // e.g. "already_used"
+}
+```
 
 ## Developer MCP endpoint
 
