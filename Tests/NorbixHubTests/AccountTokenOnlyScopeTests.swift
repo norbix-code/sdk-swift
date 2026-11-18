@@ -74,6 +74,18 @@ final class HubAccountTokenOnlyScopeTests: XCTestCase {
         }
     }
 
+    func testCheckBundleDiscountWorksWithATokenAndNoAccountId() async throws {
+        try await check("POST", "/v3/account/stripe/discount/check") {
+            try await $0.account.checkBundleDiscount(["code": "LAUNCH30"])
+        }
+    }
+
+    func testApplyBundleDiscountWorksWithATokenAndNoAccountId() async throws {
+        try await check("POST", "/v3/account/stripe/discount") {
+            try await $0.account.applyBundleDiscount(["code": "LAUNCH30"])
+        }
+    }
+
     func testGetFlexClustersWorksWithATokenAndNoAccountId() async throws {
         try await check("GET", "/v3/account/flex-clusters") { try await $0.account.getFlexClusters() }
     }

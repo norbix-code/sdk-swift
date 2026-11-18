@@ -83,6 +83,8 @@ public final class AccountModule: Sendable {
 
     /// Opens a Stripe checkout for a subscription. A Managed Service checkout needs both
     /// `bundle` (`Starter`, `Growth` or `Scale`) and `billingPeriod` (`Monthly` or `Annual`).
+    /// An optional `discountCode` is checked first; a refused code fails the call with
+    /// `CM-ERRORS-ACCOUNT-027` and no checkout is made.
     public func createStripeCheckoutSession(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/create-checkout-session",
@@ -126,6 +128,38 @@ public final class AccountModule: Sendable {
     public func changeManagedServiceBundle(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/account/stripe/change-bundle",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Checks a bundle discount code without changing anything: pass `["code": "LAUNCH30"]`, and
+    /// optionally `bundle` and `billingPeriod` for the plan about to be bought (left out, the
+    /// current plan is used). The answer carries `discount` with `code`, `percentOff` or
+    /// `amountOff` (minor units, with `currency`), `months` (null = forever) and `endsAt`.
+    /// A refused code fails with `CM-ERRORS-ACCOUNT-027`; the reason (`not_found`, `expired`,
+    /// `already_used`, ...) is in `NorbixError.errors.first?.context["reason"]`.
+    public func checkBundleDiscount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/stripe/discount/check",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Puts a discount code on the account's running Managed Service subscription: pass
+    /// `["code": "LAUNCH30"]`. The discount shows on `getAccountStatus` (`discount`) a moment
+    /// later, through the Stripe webhook. Refused with `CM-ERRORS-ACCOUNT-027` (reason in the
+    /// error context, `reason`) or `CM-ERRORS-PROJECTS-039` when there is no subscription.
+    public func applyBundleDiscount(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/account/stripe/discount",
             method: "POST",
             request: request,
             scope: .project,
