@@ -1,0 +1,72 @@
+name: CodeQL
+
+# GitHub's SAST engine. Replaces the repository's "default setup", which ran
+# the Swift analysis on every pull request: on GitHub's macOS runners a full
+# Swift build under CodeQL is slow and was cancelled after 15 minutes
+# (sdk-swift#64), so a pull request showed a red check that said nothing about
+# the change.
+#
+# - actions (the workflow files): every pull request and push, a few seconds.
+# - swift: once a week and on demand (Actions → CodeQL → Run workflow), with
+#   time to finish. Not a pull-request check.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: codeql-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  actions:
+    name: Analyze (actions)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: actions
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:actions
+
+  swift:
+    name: Analyze (swift, weekly)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: swift
+          build-mode: manual
+
+      - name: Build
+        run: swift build
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: /language:swift
