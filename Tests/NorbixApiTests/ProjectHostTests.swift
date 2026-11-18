@@ -2,8 +2,10 @@ import XCTest
 @testable import NorbixApi
 import NorbixCore
 
-/// On the SDK's default address every API call of a project goes to the
-/// project's own host — devops docs/tasks/clients-project-host.md.
+/// A project's API calls go to its own host wherever the address serves one
+/// (the SDK default, a norbix.ai address written out, a `{projectHostLabel}`
+/// template, a pasted project host); any other address is used as given —
+/// devops docs/tasks/clients-project-host.md, rounds 1 and 2.
 final class ProjectHostTests: XCTestCase {
     private let virginia = "pr_5XvmrTA6JVggZdmEE5bGdm"
     private let virginiaHost = "pr-022c4aca9f9e4df787ab0a20c83c44b6.api.norbix.ai"
@@ -150,9 +152,9 @@ final class ProjectHostTests: XCTestCase {
         XCTAssertEqual(url.path, "/v3/membership/auth/social/google")
     }
 
-    // MARK: - A custom base URL is never rewritten
+    // MARK: - Another address is used as given
 
-    func testACustomBaseUrlIsNeverRewritten() async throws {
+    func testAnotherBaseUrlIsUsedAsGiven() async throws {
         let mock = MockHTTPExecutor()
         let client = try NorbixApiClient(
             projectId: virginia, apiKey: "k", region: "nb-eu-germany",
@@ -177,7 +179,7 @@ final class ProjectHostTests: XCTestCase {
         XCTAssertEqual(link.host, "api.norbix.io")
     }
 
-    func testACustomBaseUrlInAConfigIsNeverRewritten() async throws {
+    func testAnotherBaseUrlInAConfigIsUsedAsGiven() async throws {
         let mock = MockHTTPExecutor()
         let config = try NorbixConfig.fromEnvironment(
             target: .api,
@@ -194,5 +196,139 @@ final class ProjectHostTests: XCTestCase {
         XCTAssertEqual(mock.lastRequest?.url?.host, "localhost")
         XCTAssertEqual(mock.lastRequest?.url?.port, 5002)
         XCTAssertEqual(header(mock, "norbix-project-id"), virginia)
+    }
+
+    func testAPlainOwnDomainStagingLocalhostAndHttpNorbixAiAreUsedAsGiven() async throws {
+        for address in [
+            "https://api.customer.com",
+            "https://api.norbix.io",
+            "http://localhost:5002",
+            "http://api.norbix.ai"
+        ] {
+            let mock = MockHTTPExecutor()
+            let client = try NorbixApiClient(
+                projectId: virginia, apiKey: "k", baseUrl: address, executor: mock
+            )
+            _ = try await client.database.find(["collectionName": "orders"])
+
+            let given = try XCTUnwrap(URLComponents(string: address))
+            let url = try XCTUnwrap(mock.lastRequest?.url)
+            XCTAssertEqual(url.scheme, given.scheme, address)
+            XCTAssertEqual(url.host, given.host, address)
+            XCTAssertEqual(url.port, given.port, address)
+            XCTAssertEqual(url.path.hasPrefix("/v3/"), true, address)
+        }
+    }
+
+    // MARK: - A norbix.ai address written out (round 2)
+
+    func testTheDefaultAddressWrittenOutGoesToTheProjectHost() async throws {
+        let mock = MockHTTPExecutor()
+        let config = try NorbixConfig.fromEnvironment(
+            target: .api,
+            environment: [
+                "NORBIX_PROJECT_ID": virginia,
+                "NORBIX_API_KEY": "k",
+                "NORBIX_API_URL": "https://api.norbix.ai"
+            ]
+        )
+        let client = NorbixApiClient(config: config, executor: mock)
+
+        _ = try await client.database.find(["collectionName": "orders"])
+
+        XCTAssertEqual(mock.lastRequest?.url?.host, virginiaHost)
+    }
+
+    func testARegionalNorbixAiAddressWrittenOutGoesToTheProjectHost() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixApiClient(
+            projectId: germany, apiKey: "k",
+            baseUrl: "https://nb-eu-germany.api.norbix.ai", executor: mock
+        )
+
+        _ = try await client.database.find(["collectionName": "orders"])
+        XCTAssertEqual(mock.lastRequest?.url?.scheme, "https")
+        XCTAssertEqual(mock.lastRequest?.url?.host, germanyHost)
+        XCTAssertEqual(mock.lastRequest?.url?.path.hasPrefix("/v3/"), true)
+        XCTAssertEqual(header(mock, "norbix-project-id"), germany)
+
+        let link = try XCTUnwrap(URL(string: client.membership.socialSignInUrl("google")))
+        XCTAssertEqual(link.host, "nb-eu-germany.api.norbix.ai")
+        XCTAssertEqual(link.path, "/v3/membership/auth/social/google")
+    }
+
+    // MARK: - An install on its own domain (round 2)
+
+    private let template = "https://{projectHostLabel}.api.customer.com"
+
+    func testATemplateIsFilledWithTheLabelAndFollowsSetScope() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixApiClient(
+            projectId: virginia, apiKey: "k", baseUrl: template, executor: mock
+        )
+
+        _ = try await client.database.find(["collectionName": "orders"])
+        XCTAssertEqual(mock.lastRequest?.url?.scheme, "https")
+        XCTAssertEqual(mock.lastRequest?.url?.host, "pr-022c4aca9f9e4df787ab0a20c83c44b6.api.customer.com")
+        XCTAssertEqual(mock.lastRequest?.url?.path.hasPrefix("/v3/"), true)
+        XCTAssertEqual(header(mock, "norbix-project-id"), virginia)
+
+        client.setScope(projectId: germany)
+        _ = try await client.database.find(["collectionName": "orders"])
+        XCTAssertEqual(mock.lastRequest?.url?.host, "pr-184336d00e2141c3be5138e8dcf52e81.api.customer.com")
+        XCTAssertEqual(header(mock, "norbix-project-id"), germany)
+
+        let link = try XCTUnwrap(URL(string: client.membership.socialSignInUrl("google")))
+        XCTAssertEqual(link.host, "api.customer.com")
+        XCTAssertEqual(link.path, "/v3/membership/auth/social/google")
+        XCTAssertEqual(link.query, "projectId=\(germany)")
+    }
+
+    func testATemplateFromTheEnvironmentWithAPort() async throws {
+        let mock = MockHTTPExecutor()
+        let config = try NorbixConfig.fromEnvironment(
+            target: .api,
+            environment: [
+                "NORBIX_PROJECT_ID": virginia,
+                "NORBIX_API_KEY": "k",
+                "NORBIX_API_URL": "http://{projectHostLabel}.api.local.norbix.test:8443"
+            ]
+        )
+        let client = NorbixApiClient(config: config, executor: mock)
+
+        _ = try await client.database.find(["collectionName": "orders"])
+
+        let url = try XCTUnwrap(mock.lastRequest?.url)
+        XCTAssertEqual(url.scheme, "http")
+        XCTAssertEqual(url.host, "pr-022c4aca9f9e4df787ab0a20c83c44b6.api.local.norbix.test")
+        XCTAssertEqual(url.port, 8443)
+        XCTAssertEqual(url.path.hasPrefix("/v3/"), true)
+    }
+
+    func testATemplateWithAnIdThatIsNotANorbixIdDropsTheLabel() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixApiClient(
+            projectId: "p1", apiKey: "k", baseUrl: template, executor: mock
+        )
+
+        _ = try await client.database.find(["collectionName": "orders"])
+
+        XCTAssertEqual(mock.lastRequest?.url?.host, "api.customer.com")
+        XCTAssertEqual(header(mock, "norbix-project-id"), "p1")
+    }
+
+    func testAPastedProjectHostFollowsTheClientsProject() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixApiClient(
+            projectId: germany, apiKey: "k",
+            baseUrl: "https://pr-022c4aca9f9e4df787ab0a20c83c44b6.api.customer.com", executor: mock
+        )
+
+        _ = try await client.database.find(["collectionName": "orders"])
+        XCTAssertEqual(mock.lastRequest?.url?.host, "pr-184336d00e2141c3be5138e8dcf52e81.api.customer.com")
+        XCTAssertEqual(header(mock, "norbix-project-id"), germany)
+
+        let link = try XCTUnwrap(URL(string: client.membership.socialSignInUrl("google")))
+        XCTAssertEqual(link.host, "api.customer.com")
     }
 }

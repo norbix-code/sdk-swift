@@ -14,20 +14,24 @@ import NorbixCore
 /// let me = try await client.membership.getCurrentUser()
 /// ```
 ///
-/// A custom domain or a local instance overrides `baseUrl`:
+/// A custom domain or a local instance overrides `baseUrl`. An install on
+/// its own domain that serves project hosts gives a template
+/// (`GET /v3/echo` → `apiUrlTemplate`), filled with the project's label:
 ///
 /// ```swift
 /// let client = try NorbixApiClient(
 ///     projectId: "proj_123",
 ///     apiKey: "sk_live_xxx",
-///     baseUrl: "https://api.norbix.isidos.lt"
+///     baseUrl: "https://{projectHostLabel}.api.customer.com"
 /// )
 /// ```
+///
+/// Which host a call uses is `NorbixDefaults.projectApiBaseUrl(_:projectId:)`.
 public final class NorbixApiClient: Sendable {
     private let transport: Transport
     /// True when the client owns the base URL (the SDK default) and may
-    /// compose a regional variant of it. A user-supplied custom base URL is
-    /// never rewritten.
+    /// compose a regional variant of it. A user-supplied base URL never gets
+    /// a region label; which host its calls use is the project host rule.
     private let managedBaseUrl: Bool
 
     // Modules — flat, no nested .api namespace.
@@ -50,13 +54,13 @@ public final class NorbixApiClient: Sendable {
         executor: HTTPExecuting = URLSessionHTTPExecutor(),
         logger: NorbixLogger = OSLogger()
     ) {
-        // Only when the config still points at the SDK default — a
-        // user-supplied custom base URL is never rewritten:
-        // - every call goes to the project's own host
-        //   (`https://pr-<32 hex>.api.norbix.ai`, no region label), which the
-        //   transport computes per call from the current project id;
-        // - `config.baseUrl` holds the shared or regional address, used when
-        //   the project id does not decode and for browser links.
+        // `config.baseUrl` is the address the client has: the SDK default
+        // (with the region composed) or the user's value as given. Per call
+        // the transport picks the host from it and the current project id
+        // (`NorbixDefaults.projectApiBaseUrl`): the project's own host
+        // wherever the address serves one (norbix.ai, a `{projectHostLabel}`
+        // template, a pasted project host), otherwise the address as given.
+        // Browser links use the shared address.
         var config = config
         let managed = config.baseUrl == NorbixDefaults.apiBaseUrl
         self.managedBaseUrl = managed
@@ -67,7 +71,7 @@ public final class NorbixApiClient: Sendable {
             config: config,
             executor: executor,
             logger: logger,
-            usesProjectHost: managed
+            usesProjectHost: true
         )
         self.transport = transport
         self.accessToken = AccessTokenModule(transport: transport)
@@ -183,9 +187,10 @@ public final class NorbixApiClient: Sendable {
         }
     }
 
-    /// Switch the project (and account) for subsequent requests. On the SDK
-    /// default base URL the calls move to the new project's own host too:
-    /// host and `norbix-project-id` header always name the same project.
+    /// Switch the project (and account) for subsequent requests. Wherever
+    /// the base URL serves project hosts the calls move to the new project's
+    /// own host too: host and `norbix-project-id` header always name the
+    /// same project.
     public func setScope(projectId: String, accountId: String? = nil) {
         transport.updateConfig { config in
             config.projectId = projectId
@@ -209,9 +214,9 @@ public final class NorbixApiClient: Sendable {
     /// unlike `setEnv` there is no default region, so no header is sent when
     /// unset. When the client still points at the SDK default base URL, the
     /// regional base URL (`https://{region}.api.norbix.ai`) is (re)composed
-    /// under the same rule as construction; a custom base URL is never
-    /// rewritten. The regional address serves a project id that does not
-    /// decode and browser links only: calls of a Norbix project stay on the
+    /// under the same rule as construction; a custom base URL gets no region
+    /// label. The regional address serves a project id that does not decode
+    /// and browser links only: calls of a Norbix project stay on the
     /// project's own host, which has no region label.
     public func setRegion(_ region: String?) {
         let resolved = (region?.isEmpty == false) ? region : nil

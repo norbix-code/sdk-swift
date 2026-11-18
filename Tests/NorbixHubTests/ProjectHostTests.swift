@@ -44,4 +44,17 @@ final class ProjectHostTests: XCTestCase {
 
         XCTAssertEqual(mock.lastRequest?.url?.host, "hub.norbix.io")
     }
+
+    func testAnOwnDomainHubUrlStaysAsGiven() async throws {
+        let mock = MockHTTPExecutor()
+        let client = try NorbixHubClient(
+            projectId: germany, apiKey: "k", accountId: "a1",
+            baseUrl: "https://hub.customer.com", executor: mock
+        )
+
+        _ = try await client.regions.getAccountRegions([:])
+
+        XCTAssertEqual(mock.lastRequest?.url?.host, "hub.customer.com")
+        XCTAssertEqual(mock.lastRequest?.value(forHTTPHeaderField: "norbix-project-id"), germany)
+    }
 }

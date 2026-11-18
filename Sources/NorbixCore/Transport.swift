@@ -53,11 +53,11 @@ public final class Transport: @unchecked Sendable {
     private var _config: NorbixConfig
     private let executor: HTTPExecuting
     private let logger: NorbixLogger
-    /// True for an API client on the SDK's built-in default address: every
-    /// call then goes to the project's own host
-    /// (`https://pr-<32 hex>.api.norbix.ai`), computed from the project id of
-    /// that call. `config.baseUrl` keeps the shared (or regional) address — it
-    /// serves a project id that does not decode, and browser links.
+    /// True for an API client: every call goes to the host
+    /// `NorbixDefaults.projectApiBaseUrl` picks from `config.baseUrl` and the
+    /// project id of that call (the project's own host wherever the address
+    /// serves one, otherwise the address as given). Browser links use its
+    /// `shared` address. False for the Hub, whose address is used as given.
     private let usesProjectHost: Bool
 
     /// Thread-safe snapshot/replacement of the active config.
@@ -285,9 +285,9 @@ public final class Transport: @unchecked Sendable {
         // The project's own host, from the same snapshot as the
         // `norbix-project-id` header below: host and header always name the
         // same project, also right after `setScope`. A project id that does
-        // not decode keeps the shared (or regional) address.
+        // not decode keeps the shared address.
         let baseUrl = usesProjectHost
-            ? NorbixDefaults.projectBaseUrl(snapshot.projectId) ?? snapshot.baseUrl
+            ? NorbixDefaults.projectApiBaseUrl(snapshot.baseUrl, projectId: snapshot.projectId).project
             : snapshot.baseUrl
 
         let built = try buildUrlAndBody(
@@ -563,7 +563,10 @@ public final class Transport: @unchecked Sendable {
         for (key, value) in pathParams {
             normalizedPath = normalizedPath.replacingOccurrences(of: "{\(key)}", with: Self.percentEncode(value))
         }
-        let root = snapshot.baseUrl.hasSuffix("/") ? String(snapshot.baseUrl.dropLast()) : snapshot.baseUrl
+        let base = usesProjectHost
+            ? NorbixDefaults.projectApiBaseUrl(snapshot.baseUrl, projectId: snapshot.projectId).shared
+            : snapshot.baseUrl
+        let root = base.hasSuffix("/") ? String(base.dropLast()) : base
         var items: [(String, String?)] = [("projectId", snapshot.projectId.isEmpty ? nil : snapshot.projectId)]
         if !snapshot.env.isEmpty && snapshot.env != "PROD" { items.append(("env", snapshot.env)) }
         items.append(contentsOf: query)
