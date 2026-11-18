@@ -13,11 +13,11 @@ public enum NorbixDefaults {
     /// Composes the regional variant of an SDK-default base URL by prefixing
     /// the region code as a subdomain (`https://{region}.api.norbix.ai` /
     /// `https://{region}.hub.norbix.ai`). Only the SDK defaults are composed —
-    /// a user-supplied custom base URL is never rewritten and is returned
+    /// a user-supplied custom base URL never gets a region label and is returned
     /// unchanged. Returns the input unchanged when `region` is unset.
     ///
     /// API calls of a project whose id decodes do not use this address: they
-    /// go to the project's own host (`projectBaseUrl`), which carries no
+    /// go to the project's own host (`projectApiBaseUrl`), which carries no
     /// region label.
     public static func regionalBaseUrl(_ baseUrl: String, region: String?) -> String {
         guard let region, !region.isEmpty else { return baseUrl }
@@ -86,6 +86,92 @@ public enum NorbixDefaults {
     public static func projectBaseUrl(_ projectId: String?) -> String? {
         guard let label = projectHostLabel(projectId) else { return nil }
         return apiBaseUrl.replacingOccurrences(of: "https://", with: "https://\(label).")
+    }
+
+    /// The placeholder an install on its own domain puts where the project's
+    /// label goes (`https://{projectHostLabel}.api.customer.com`, from
+    /// `GET /v3/echo` → `apiUrlTemplate`).
+    public static let projectHostLabelPlaceholder = "{projectHostLabel}"
+
+    private static let norbixApiDomain = "api.norbix.ai"
+
+    /// Where a project's API calls go, from the API base URL the client has
+    /// (devops docs/tasks/clients-project-host.md, round 2):
+    ///
+    /// - a template with `{projectHostLabel}` (an install on its own domain
+    ///   that serves project hosts) is filled with the project's label;
+    /// - an address that is already a project's host (`https://pr-<hex>.…`)
+    ///   gets the current project's label, so host and `norbix-project-id`
+    ///   always name the same project;
+    /// - a norbix.ai API address over https — `https://api.norbix.ai` or
+    ///   `https://<region>.api.norbix.ai`, built in or written out — becomes
+    ///   the project's own host `https://pr-<hex>.api.norbix.ai` (its DNS
+    ///   record follows the project's region);
+    /// - any other address is used as given.
+    ///
+    /// `shared` is the same address without a project label (the social
+    /// sign-in link is built on it). With a project id that is not a Norbix
+    /// id, `project` is `shared`. Scheme, port and path are kept as given.
+    /// Never throws.
+    public static func projectApiBaseUrl(
+        _ baseUrl: String,
+        projectId: String?
+    ) -> (project: String, shared: String) {
+        let label = projectHostLabel(projectId)
+
+        if baseUrl.contains(projectHostLabelPlaceholder) {
+            let shared = baseUrl.replacingOccurrences(of: "\(projectHostLabelPlaceholder).", with: "")
+            let project = label.map {
+                baseUrl.replacingOccurrences(of: projectHostLabelPlaceholder, with: $0)
+            } ?? shared
+            return (project, shared)
+        }
+
+        guard let components = URLComponents(string: baseUrl),
+              let host = components.host, !host.isEmpty,
+              let hostRange = components.rangeOfHost
+        else {
+            return (baseUrl, baseUrl)
+        }
+        let labels = host.lowercased().split(separator: ".", omittingEmptySubsequences: false).map(String.init)
+
+        // Only the host is swapped; everything else stays byte for byte.
+        // (`rangeOfHost` indexes `components.string`, which is the input for
+        // any URL this rule matches; otherwise the components are rebuilt.)
+        func withHost(_ newHost: String) -> String {
+            if components.string == baseUrl {
+                var copy = baseUrl
+                copy.replaceSubrange(hostRange, with: newHost)
+                return copy
+            }
+            var copy = components
+            copy.host = newHost
+            return copy.string ?? baseUrl
+        }
+
+        if labels.count > 1, isProjectLabel(labels[0]) {
+            let rest = labels.dropFirst().joined(separator: ".")
+            let shared = withHost(rest)
+            return (label.map { withHost("\($0).\(rest)") } ?? shared, shared)
+        }
+
+        let lowerHost = labels.joined(separator: ".")
+        let isNorbixApi = lowerHost == norbixApiDomain
+            || (labels.count == 4 && lowerHost.hasSuffix(".\(norbixApiDomain)"))
+        if isNorbixApi, components.scheme?.lowercased() == "https" {
+            return (label.map { withHost("\($0).\(norbixApiDomain)") } ?? baseUrl, baseUrl)
+        }
+
+        return (baseUrl, baseUrl)
+    }
+
+    /// `pr-` and 32 hex digits, any case.
+    private static func isProjectLabel(_ value: String) -> Bool {
+        let utf8 = Array(value.utf8)
+        guard utf8.count == 35, utf8.starts(with: Array("pr-".utf8)) else { return false }
+        return utf8.dropFirst(3).allSatisfy { ch in
+            (0x30...0x39).contains(ch) || (0x61...0x66).contains(ch)
+        }
     }
 }
 

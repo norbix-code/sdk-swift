@@ -226,8 +226,9 @@ region code as a subdomain:
   `https://nb-eu-germany.api.norbix.ai`.
 
 `setRegion(nil)` restores the default URL. A custom `baseUrl` (custom domain
-/ local development) is **never rewritten**: the `nb-region`
-header is still sent, but the URL stays exactly as you configured it.
+/ local development) never gets a region label: the `nb-region` header is
+still sent. Which host its API calls use is the
+[Project host](#project-host) rule; a custom Hub URL is used as given.
 
 ### Managing a project's regions (Hub)
 
@@ -262,8 +263,8 @@ _ = try await hub.account.createProject([
 
 ## Project host
 
-When `NorbixApiClient` uses its built-in address (`https://api.norbix.ai`),
-every API call goes to the project's own host:
+A project's API calls go to the project's own host wherever the address
+serves one — on the built-in address (`https://api.norbix.ai`) that is:
 
 ```
 https://pr-<32 hex>.api.norbix.ai
@@ -272,6 +273,29 @@ https://pr-<32 hex>.api.norbix.ai
 The label is the project id written as hex (`pr_5XvmrTA6JVggZdmEE5bGdm` →
 `pr-022c4aca9f9e4df787ab0a20c83c44b6`); the SDK builds it locally, with no
 extra call. `NorbixDefaults.projectHostLabel(_:)` returns it (or `nil`).
+
+Which address a project's API calls use, from the API base URL the client has
+(argument, config or `NORBIX_API_URL`):
+
+| base URL | calls go to |
+| --- | --- |
+| none (the default), `https://api.norbix.ai`, `https://nb-eu-germany.api.norbix.ai` | `https://pr-<hex>.api.norbix.ai` |
+| a template, `https://{projectHostLabel}.api.example.com` | `https://pr-<hex>.api.example.com` |
+| a project's host already, `https://pr-<hex>.api.example.com` | the same, with the current project's label |
+| anything else (`https://api.example.com`, staging, localhost, `http://api.norbix.ai`) | as given |
+
+An install on its own domain gives its template in `GET /v3/echo` →
+`apiUrlTemplate` when it serves project hosts; pass that as `baseUrl` (or
+`NORBIX_API_URL`). Without it the install's plain address is used as given.
+
+```swift
+NorbixDefaults.projectApiBaseUrl(
+    "https://{projectHostLabel}.api.example.com",
+    projectId: "pr_5XvmrTA6JVggZdmEE5bGdm"
+)
+// (project: "https://pr-022c….api.example.com", shared: "https://api.example.com")
+NorbixDefaults.projectHostLabelPlaceholder // "{projectHostLabel}"
+```
 
 What changes:
 
@@ -285,14 +309,12 @@ What does not change:
 
 - The `norbix-project-id` header is still sent.
 - `NorbixHubClient` stays on `https://hub.norbix.ai` (or
-  `https://<region>.hub.norbix.ai`).
-- A custom `baseUrl` (argument, config or `NORBIX_API_URL`) is never
-  rewritten. (A value equal to the built-in address, `https://api.norbix.ai`,
-  counts as the default.)
+  `https://<region>.hub.norbix.ai`, or your own Hub URL).
 - A project id that is not a Norbix id (for example `p1`) keeps the shared
-  host.
-- The link from `membership.socialSignInUrl` stays on the shared host, because
-  the sign-in callback returns there.
+  host (a template loses its label: `https://api.example.com`).
+- The link from `membership.socialSignInUrl` stays on the shared host
+  (`https://api.norbix.ai`, the regional one, or the template without the
+  label), because the sign-in callback returns there.
 
 If your network restricts outgoing traffic, allow `*.api.norbix.ai` (not only
 `api.norbix.ai`).
