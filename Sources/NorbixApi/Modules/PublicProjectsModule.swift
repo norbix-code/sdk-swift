@@ -31,8 +31,8 @@ public final class PublicProjectsModule: Sendable {
 
     /// `GET /{version}/public/projects/{ProjectId}/legal/{Kind}`
     ///
-    /// One public legal document of the project. When the project does not
-    /// expose it, the answer has `available = false` — it never says why.
+    /// One public legal document of the project. When the project has not
+    /// saved it, the answer has `available = false` — it never says why.
     ///
     /// - Parameter kind: `terms` or `privacy`.
     public func getPublicProjectLegal(projectId: String, kind: String, timeout: TimeInterval? = nil) async throws -> Any? {
