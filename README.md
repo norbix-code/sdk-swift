@@ -790,9 +790,8 @@ and `linkIdentity`. See
 ## Project settings, public config, MCP endpoint and AI service users
 
 - `hub.account`: `updateProjectAdminUrl`, `updateProjectLegalDocuments`,
-  `updateProjectExposeLegal`, `updateProjectExposeBrand`,
-  `updateProjectExposeAuth`, `getAdminPortalStructure`,
-  `assignAdminPortalServiceUser`.
+  `getAdminPortalStructure`, `assignAdminPortalServiceUser`. Saved legal
+  documents, the brand and the sign-in settings are always public.
 - `api.publicProjects`: `getPublicProjectConfig`, `getPublicProjectLegal` — no
   sign-in; sent with no `Authorization` header.
 - `hub.account`, AI service users: `createAiServiceUser`, `listAiServiceUsers`,
@@ -803,9 +802,6 @@ and `linkIdentity`. See
 
 ```swift
 _ = try await hub.account.updateProjectLegalDocuments(["projectId": projectId, "termsMarkdown": "# Terms"])
-_ = try await hub.account.updateProjectExposeLegal(["projectId": projectId, "exposed": true])
-_ = try await hub.account.updateProjectExposeBrand(["projectId": projectId, "exposed": true])
-_ = try await hub.account.updateProjectExposeAuth(["projectId": projectId, "exposed": true])
 let terms = try await api.publicProjects.getPublicProjectLegal(projectId: projectId, kind: "terms")
 ```
 
