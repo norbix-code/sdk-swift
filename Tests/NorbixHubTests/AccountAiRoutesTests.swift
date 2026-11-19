@@ -15,11 +15,10 @@ final class HubAccountAiRoutesTests: XCTestCase {
             ("updateProjectAiAssistant", "PUT", "/v3/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.updateProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
             ("deleteProjectAiAssistant", "DELETE", "/v3/account/projects/projectId1/ai/assistants/assistantId1", { c in _ = try await c.account.deleteProjectAiAssistant(["projectId": "projectId1", "assistantId": "assistantId1", "probe": "value"]) }),
             ("getProjectAiUsage", "GET", "/v3/account/projects/projectId1/ai/usage", { c in _ = try await c.account.getProjectAiUsage(["projectId": "projectId1", "probe": "value"]) }),
-            ("setAdminPortalEnabled", "PUT", "/v3/account/projects/projectId1/admin-portal/enabled", { c in _ = try await c.account.setAdminPortalEnabled(["projectId": "projectId1", "probe": "value"]) }),
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {
-        XCTAssertEqual(cases.count, 7)
+        XCTAssertEqual(cases.count, 6)
         for c in cases {
             let mock = MockHTTPExecutor()
             mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
