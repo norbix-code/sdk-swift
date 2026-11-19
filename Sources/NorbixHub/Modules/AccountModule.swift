@@ -635,17 +635,6 @@ public final class AccountModule: Sendable {
         )
     }
 
-    public func setAdminPortalEnabled(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
-        try await transport.send(
-            path: "/{version}/account/projects/{projectId}/admin-portal/enabled",
-            method: "PUT",
-            request: request,
-            scope: .project,
-            timeout: timeout,
-            bearerToken: bearerToken
-        )
-    }
-
     /// `PATCH /{version}/account/projects/{projectId}/settings/admin-url`
     ///
     /// Set or clear the project's admin portal URL: `["projectId": id, "url": "https://admin.example.com"]` (`NSNull()` clears it).
