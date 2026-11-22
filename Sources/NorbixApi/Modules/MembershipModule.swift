@@ -1,6 +1,20 @@
 import Foundation
 import NorbixCore
 
+/// The answer of `verifyEmailAddress`: the login whose address is now
+/// verified and when. Both are `nil` from a gateway that does not send them.
+public struct EmailAddressVerifiedResponse: Codable, Sendable, Equatable {
+    /// The login (auth) id whose e-mail address was verified.
+    public let authId: String?
+    /// When the address was verified (UTC).
+    public let verifiedAtUtc: Date?
+
+    public init(authId: String? = nil, verifiedAtUtc: Date? = nil) {
+        self.authId = authId
+        self.verifiedAtUtc = verifiedAtUtc
+    }
+}
+
 public final class MembershipModule: Sendable {
     let transport: Transport
 
@@ -303,6 +317,69 @@ public final class MembershipModule: Sendable {
             path: "/{version}/membership/userauth/password/reset/confirm",
             method: "POST",
             request: request,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Confirm an e-mail + password user's address with the token from the
+    /// verification link (Norbix adds `#token=…` to the project's
+    /// verification callback URL). Public: no token is needed; one is sent
+    /// when the client has it.
+    ///
+    /// Refusals: `CM-ERRORS-MEMBERSHIP-USERS-051` (the link is invalid,
+    /// expired, already used or replaced by a newer one — offer
+    /// `resendEmailAddressVerification`), `-049` (the link belongs to another
+    /// environment).
+    ///
+    /// - Parameters:
+    ///   - token: The token from the verification link.
+    ///   - databaseIntegrationId: The project database to look in, when it is
+    ///     not the environment's default.
+    public func verifyEmailAddress(
+        token: String,
+        databaseIntegrationId: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws -> EmailAddressVerifiedResponse {
+        var req: [String: Any] = ["token": token]
+        if let databaseIntegrationId { req["databaseIntegrationId"] = databaseIntegrationId }
+        return try await transport.send(
+            path: "/{version}/membership/userauth/email-verification/confirm",
+            method: "POST",
+            request: req,
+            scope: .optional,
+            timeout: timeout,
+            bearerToken: bearerToken,
+            as: EmailAddressVerifiedResponse.self
+        )
+    }
+
+    /// Send a new verification link to an e-mail + password user. Public: no
+    /// token is needed. The gateway always answers OK — it never tells
+    /// whether the address is known or already verified — so this returns
+    /// nothing. A new link replaces the one sent before.
+    ///
+    /// Use it after a sign-in refused with
+    /// `NorbixError.emailNotVerifiedErrorCode` (`isEmailNotVerified`).
+    ///
+    /// - Parameters:
+    ///   - email: The address the user signed up with.
+    ///   - databaseIntegrationId: The project database to look in, when it is
+    ///     not the environment's default.
+    public func resendEmailAddressVerification(
+        email: String,
+        databaseIntegrationId: String? = nil,
+        timeout: TimeInterval? = nil,
+        bearerToken: String? = nil
+    ) async throws {
+        var req: [String: Any] = ["email": email]
+        if let databaseIntegrationId { req["databaseIntegrationId"] = databaseIntegrationId }
+        _ = try await transport.send(
+            path: "/{version}/membership/userauth/email-verification/resend",
+            method: "POST",
+            request: req,
             scope: .optional,
             timeout: timeout,
             bearerToken: bearerToken
