@@ -24,6 +24,8 @@
 | `linkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity` | `project` |
 | `exchangeSocialSignInCode` | `POST` | `/{version}/membership/auth/social/{Provider}/exchange` | `unauthenticated` |
 | `socialSignInUrl` | — | builds `GET /{version}/membership/auth/social/{provider}?projectId=…` (a URL, not a call) | — |
+| `verifyEmailAddress(token:)` | `POST` | `/{version}/membership/userauth/email-verification/confirm` | `optional` |
+| `resendEmailAddressVerification(email:)` | `POST` | `/{version}/membership/userauth/email-verification/resend` | `optional` |
 
 ## Social sign-in and link identity
 
@@ -75,6 +77,36 @@ _ = try await client.membership.linkIdentity(["userId": "usr_…", "code": linkC
   again), `-059` (the challenge is not a 43-character S256). A refused
   `returnUrl` sends the browser to the mode's failure page with
   `error=return_url_not_allowed`.
+
+## E-mail verification for password sign-up
+
+When the project has e-mail verification on, a new e-mail + password user gets
+a link to the project's verification callback; Norbix adds `#token=…` to it.
+Both calls are public: no token is needed, one is sent when the client has it.
+
+```swift
+// The callback page reads the token from the URL fragment:
+let verified = try await client.membership.verifyEmailAddress(token: token)
+// verified.authId, verified.verifiedAtUtc
+
+// While the project blocks sign-in until the address is verified, a password
+// sign-in is refused with HTTP 401 CM-ERRORS-MEMBERSHIP-USERS-052:
+do {
+    _ = try await client.login(.init(userName: email, password: password))
+} catch let error as NorbixError where error.isEmailNotVerified {
+    // "Check your inbox" — and offer a new link (always answers OK):
+    try await client.membership.resendEmailAddressVerification(email: email)
+}
+```
+
+- `NorbixError.emailNotVerifiedErrorCode` is `CM-ERRORS-MEMBERSHIP-USERS-052`;
+  `error.isEmailNotVerified` (or `NorbixError.isEmailNotVerifiedError(error)`
+  for any `Error`) checks the code and every entry of `errors`.
+- `verifyEmailAddress` refusals: `CM-ERRORS-MEMBERSHIP-USERS-051` (the link is
+  invalid, expired, used or replaced by a newer one), `-049` (the link is for
+  another environment).
+- Both take an optional `databaseIntegrationId` for a project database that is
+  not the environment's default.
 
 ## Credential version (gateway 2.3.9)
 

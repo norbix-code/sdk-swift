@@ -197,6 +197,27 @@ public struct NorbixError: Error, LocalizedError, Sendable, Equatable {
     }
 }
 
+extension NorbixError {
+    /// The gateway's code for a password sign-in refused because the login's
+    /// e-mail address is not verified yet, while the project blocks sign-in
+    /// until it is (HTTP 401). Show "check your inbox" and offer
+    /// `client.membership.resendEmailAddressVerification(email:)`.
+    public static let emailNotVerifiedErrorCode = "CM-ERRORS-MEMBERSHIP-USERS-052"
+
+    /// `true` when this is the "e-mail not verified" sign-in refusal
+    /// (`emailNotVerifiedErrorCode`), as the error's own code or any entry of
+    /// `errors`.
+    public var isEmailNotVerified: Bool {
+        code == Self.emailNotVerifiedErrorCode
+            || errors.contains { $0.errorCode == Self.emailNotVerifiedErrorCode }
+    }
+
+    /// `true` when `error` is a `NorbixError` that `isEmailNotVerified`.
+    public static func isEmailNotVerifiedError(_ error: Error) -> Bool {
+        (error as? NorbixError)?.isEmailNotVerified ?? false
+    }
+}
+
 /// One error inside the gateway's `responseStatus.errors` list.
 public struct NorbixErrorItem: Sendable, Equatable {
     /// The gateway's own code, e.g. `CM-ERRORS-FILES-016`.
