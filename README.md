@@ -128,6 +128,14 @@ let setup = try await hub.integrations.getKeylessIntegrationSetup(["module": "fi
 // setup?["templates"] — templates: ready CloudFormation / Bicep / Terraform files for this integration
 ```
 
+## Saved secrets of an integration
+
+`try await hub.integrations.getIntegrationSecrets("int_…", env: "TEST")` lists which secrets of an
+integration of any module are saved (`isSet`) and which may be removed (`isOptional`) — never a
+value. Remove optional ones with
+`try await hub.integrations.removeIntegrationSecrets("int_…", keys: ["webhookSigningSecret"])`; a
+needed key answers `CM-ERRORS-SECRETS-012` and nothing changes.
+
 ## Custom base URL
 
 Both clients accept a `baseUrl` parameter. Use it for a custom domain or
