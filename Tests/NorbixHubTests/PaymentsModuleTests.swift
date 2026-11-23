@@ -49,4 +49,22 @@ final class HubPaymentsModuleTests: XCTestCase {
         XCTAssertEqual(Set(integration.keys), ["provider", "accessKey", "secretKey"])
         XCTAssertNil(integration["isSandbox"])
     }
+
+    /// Test payment (review batch 3): the integration id and return URL go in the JSON body.
+    func testStartPaymentsIntegrationTestPaymentPostsTheIntegrationAndReturnUrl() async throws {
+        let mock = MockHTTPExecutor()
+        mock.responseBody = Data(#"{"payUrl":"https://pay.example.test/1","reference":"ref-1","amountMinor":1,"currency":"EUR"}"#.utf8)
+        let client = try NorbixHubClient(projectId: "proj", bearerToken: "token", accountId: "acc", executor: mock)
+
+        _ = try await client.payments.startPaymentsIntegrationTestPayment([
+            "integrationId": "int_neopay", "returnUrl": "https://app.example.test/back",
+        ])
+
+        XCTAssertEqual(mock.lastRequest?.httpMethod, "POST")
+        XCTAssertEqual(mock.lastRequest?.url?.path, "/v3/payments/integrations/test-payment")
+        let data = try XCTUnwrap(mock.lastRequest?.httpBody)
+        let body = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        XCTAssertEqual(body["integrationId"] as? String, "int_neopay")
+        XCTAssertEqual(body["returnUrl"] as? String, "https://app.example.test/back")
+    }
 }

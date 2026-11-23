@@ -197,4 +197,19 @@ public final class PaymentsModule: Sendable {
         )
     }
 
+    /// POST /{version}/payments/integrations/test-payment — opens a real 0.01 test payment
+    /// at the provider. Request: `integrationId`, `returnUrl` (absolute https; http only for
+    /// localhost). Answer: `payUrl` (open it to pay), `reference`, `amountMinor`, `currency`.
+    /// Neopay and Montonio only; another provider answers CM-ERRORS-PAYMENTS-014.
+    public func startPaymentsIntegrationTestPayment(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/payments/integrations/test-payment",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
 }
