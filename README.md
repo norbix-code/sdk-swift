@@ -128,6 +128,16 @@ let setup = try await hub.integrations.getKeylessIntegrationSetup(["module": "fi
 // setup?["templates"] — templates: ready CloudFormation / Bicep / Terraform files for this integration
 ```
 
+## Workflow start event (beta)
+
+`hub.code.setCodeWorkflowStartEvent(["id": "wf_…", "start": ["source": "database", "event":
+"database.record.inserted", "schema": "moto_listings", "condition": "return New.status == \"review\";"]])`
+sets the event that starts a workflow and saves it as a draft; `publishCodeWorkflow` then writes
+the trigger, linked to the workflow (`managedByWorkflowId`). The condition reads `Old`, `New` and
+`Event`, like a trigger's activation code. A different start answers `CM-ERRORS-WORKFLOWS-054`.
+`hub.code.testCodeWorkflow` starts a real run with a test record, user or manual payload;
+`hub.code.saveCodeWorkflowCanvas` saves the visual builder layout.
+
 ## Saved secrets of an integration
 
 `try await hub.integrations.getIntegrationSecrets("int_…", env: "TEST")` lists which secrets of an
