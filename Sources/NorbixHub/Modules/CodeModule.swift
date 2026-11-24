@@ -590,6 +590,30 @@ public final class CodeModule: Sendable {
         )
     }
 
+    /// Beta: sets the event that starts the workflow and saves a draft; publishing writes the trigger. Path: `id`; body: `start` (`source`, `event`, `schema?`, `condition?`). A different start answers `CM-ERRORS-WORKFLOWS-054`.
+    public func setCodeWorkflowStartEvent(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/start-event",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: saves where the visual builder draws the steps (no draft, no version). Path: `id`; body: `canvas` (JSON text).
+    public func saveCodeWorkflowCanvas(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/canvas",
+            method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     /// Beta: publishes the draft as the next version. Path: `id`.
     public func publishCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
@@ -643,6 +667,18 @@ public final class CodeModule: Sendable {
         try await transport.send(
             path: "/{version}/code/workflows/{Id}/disable",
             method: "PUT",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
+    /// Beta: starts a real run with a test event. Path: `id`; body: `source` (`database` / `membership` / `manual`), `event?`, `collection?`, `recordId?`, `userId?`, `edits?`, `payload?`, `runVersion?`.
+    public func testCodeWorkflow(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/code/workflows/{Id}/test",
+            method: "POST",
             request: request,
             scope: .project,
             timeout: timeout,

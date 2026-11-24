@@ -2,7 +2,7 @@ import XCTest
 @testable import NorbixHub
 import NorbixCore
 
-/// `hub.code` — the 26 Workflows Beta routes of the gateway contract
+/// `hub.code` — the 29 Workflows Beta routes of the gateway contract
 /// `Code.Workflows.md` §7, against `MockHTTPExecutor` (the same pattern as
 /// `HubCodeModuleTests`). One test per method: the verb, the full path with
 /// every id substituted, and where each parameter goes (path / query / body).
@@ -94,6 +94,59 @@ final class HubCodeWorkflowsTests: XCTestCase {
         }
         XCTAssertEqual(try query(mock), [:])
         XCTAssertNil(mock.lastRequest?.httpBody)
+    }
+
+    func testSetCodeWorkflowStartEvent() async throws {
+        let mock = try await send("PUT", "/v3/code/workflows/wf_1/start-event") {
+            try await $0.setCodeWorkflowStartEvent([
+                "id": "wf_1",
+                "start": [
+                    "source": "database",
+                    "event": "database.record.inserted",
+                    "schema": "moto_listings",
+                    "condition": "return New.status == \"review\";",
+                ],
+            ])
+        }
+        XCTAssertEqual(try query(mock), [:])
+        let sent = try body(mock)
+        XCTAssertNil(sent["id"])
+        let start = try XCTUnwrap(sent["start"] as? [String: String])
+        XCTAssertEqual(start, [
+            "source": "database",
+            "event": "database.record.inserted",
+            "schema": "moto_listings",
+            "condition": "return New.status == \"review\";",
+        ])
+    }
+
+    func testSaveCodeWorkflowCanvas() async throws {
+        let mock = try await send("PUT", "/v3/code/workflows/wf_1/canvas") {
+            try await $0.saveCodeWorkflowCanvas(["id": "wf_1", "canvas": "{\"nodes\":{}}"])
+        }
+        let sent = try body(mock)
+        XCTAssertEqual(sent.count, 1)
+        XCTAssertEqual(sent["canvas"] as? String, "{\"nodes\":{}}")
+    }
+
+    func testTestCodeWorkflow() async throws {
+        let mock = try await send("POST", "/v3/code/workflows/wf_1/test") {
+            try await $0.testCodeWorkflow([
+                "id": "wf_1",
+                "source": "database",
+                "event": "database.record.updated",
+                "collection": "moto_listings",
+                "recordId": "rec_1",
+                "edits": ["status": "review"],
+            ])
+        }
+        let sent = try body(mock)
+        XCTAssertNil(sent["id"])
+        XCTAssertEqual(sent["source"] as? String, "database")
+        XCTAssertEqual(sent["event"] as? String, "database.record.updated")
+        XCTAssertEqual(sent["collection"] as? String, "moto_listings")
+        XCTAssertEqual(sent["recordId"] as? String, "rec_1")
+        XCTAssertEqual(sent["edits"] as? [String: String], ["status": "review"])
     }
 
     func testPublishCodeWorkflow() async throws {
