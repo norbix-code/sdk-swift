@@ -20,6 +20,7 @@
 | `unblockUser` | `PATCH` | `/{version}/membership/users/unblock` | `project` |
 | `updateUser` | `PUT` | `/{version}/membership/users` | `project` |
 | `updateUserPreferences` | `PUT` | `/{version}/membership/users/{id}/preferences` | `project` |
+| `getUserAiPlan` | `GET` | `/{version}/membership/users/{userId}/ai-plan` | `project` |
 | `startLinkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity/start` | `project` |
 | `linkIdentity` | `POST` | `/{version}/membership/auth/{UserId}/link-identity` | `project` |
 | `exchangeSocialSignInCode` | `POST` | `/{version}/membership/auth/social/{Provider}/exchange` | `unauthenticated` |
@@ -46,7 +47,7 @@ let start = client.membership.socialSignInUrl(
 let token = try await client.membership.exchangeSocialSignInCode(
     ["provider": "google", "code": code, "codeVerifier": pkce.codeVerifier]
 ) as? [String: Any]
-// token?["bearerToken"]: the project JWT (14 days, no refresh token)
+// token?["bearerToken"]: the project JWT (a sliding 30 days, never past 90; no refresh token, renewed through onSessionToken)
 
 // Link another provider to the signed-in user (yourself only):
 let linkPkce = PkcePair.create()
