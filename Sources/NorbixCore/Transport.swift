@@ -27,13 +27,22 @@ public struct LoginCredentials: Sendable {
     public let userName: String
     public let password: String
     public let provider: String
+    /// "Remember me". `true`: the session lives a sliding 30 days; `false`
+    /// (the default): a sliding 12 hours. Never more than 90 days from
+    /// sign-in. The server renews a token in use (see
+    /// `NorbixConfig.onSessionToken`).
+    public let rememberMe: Bool
 
-    public init(userName: String, password: String, provider: String = "credentials") {
+    public init(userName: String, password: String, provider: String = "credentials", rememberMe: Bool = false) {
         self.userName = userName
         self.password = password
         self.provider = provider
+        self.rememberMe = rememberMe
     }
 }
+
+/// The response header that carries a renewed bearer token (sessions, D18).
+public let norbixSessionTokenHeader = "norbix-session-token"
 
 /// Internal HTTP transport used by every module.
 ///
@@ -312,6 +321,14 @@ public final class Transport: @unchecked Sendable {
             httpRequest.setValue(v, forHTTPHeaderField: k)
         }
 
+        // The stored bearer token, when this request carries it: the only
+        // token a renewed one (`norbix-session-token`) may replace. Never an
+        // API key and never a per-call token.
+        var sentStoredToken: String?
+        if scope != .unauthenticated, bearerToken == nil, case .bearerToken(let stored) = snapshot.auth {
+            sentStoredToken = stored
+        }
+
         if scope == .optional {
             // Auth is sent when the client has a token, never required — the
             // signed notification preview links open with the hash alone.
@@ -396,8 +413,29 @@ public final class Transport: @unchecked Sendable {
             policy: snapshot.retryPolicy,
             callerSuppliedIdempotencyKey: callerSuppliedIdempotencyKey,
             verbose: snapshot.verbose,
-            verboseBody: built.body
+            verboseBody: built.body,
+            sentStoredToken: sentStoredToken
         )
+    }
+
+    /// Sessions (D18): an answer to a request that carried the stored bearer
+    /// token may bring a renewed one in `norbix-session-token`. Swap it in
+    /// and tell the app. Never for an API key, a per-call token, or a token
+    /// that was replaced while the request was in flight; an empty value is
+    /// ignored. The token is never logged.
+    private func takeSessionToken(_ response: HTTPURLResponse, sentStoredToken: String?) {
+        guard let sent = sentStoredToken,
+              let renewed = response.value(forHTTPHeaderField: norbixSessionTokenHeader)?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !renewed.isEmpty, renewed != sent else { return }
+        var callback: (@Sendable (String) -> Void)?
+        updateConfig { config in
+            guard case .bearerToken(let current) = config.auth, current == sent else { return }
+            config.auth = .bearerToken(renewed)
+            callback = config.onSessionToken
+        }
+        // Outside the lock: the callback may call back into the client.
+        callback?(renewed)
     }
 
     /// The retry loop. Pure function over a built `URLRequest`.
@@ -408,7 +446,8 @@ public final class Transport: @unchecked Sendable {
         policy: RetryPolicy,
         callerSuppliedIdempotencyKey: Bool,
         verbose: Bool,
-        verboseBody: [String: Any]?
+        verboseBody: [String: Any]?,
+        sentStoredToken: String? = nil
     ) async throws -> (Data, HTTPURLResponse) {
         var attempt = 0
         while true {
@@ -425,6 +464,7 @@ public final class Transport: @unchecked Sendable {
             let started = Date()
             do {
                 let (data, response) = try await executor.execute(httpRequest)
+                takeSessionToken(response, sentStoredToken: sentStoredToken)
                 let durationMs = Int(Date().timeIntervalSince(started) * 1000)
 
                 if response.statusCode >= 400 {

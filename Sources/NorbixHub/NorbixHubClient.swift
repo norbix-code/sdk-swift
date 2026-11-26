@@ -107,6 +107,7 @@ public final class NorbixHubClient: Sendable {
         timeout: TimeInterval = NorbixDefaults.timeout,
         defaultHeaders: [String: String] = [:],
         verbose: Bool = false,
+        onSessionToken: (@Sendable (String) -> Void)? = nil,
         executor: HTTPExecuting = URLSessionHTTPExecutor(),
         logger: NorbixLogger = OSLogger()
     ) throws {
@@ -144,7 +145,8 @@ public final class NorbixHubClient: Sendable {
             version: version ?? processEnv["NORBIX_HUB_VERSION"] ?? NorbixDefaults.hubVersion,
             timeout: timeout,
             defaultHeaders: defaultHeaders,
-            verbose: verbose || envVerbose
+            verbose: verbose || envVerbose,
+            onSessionToken: onSessionToken
         )
 
         self.init(config: config, executor: executor, logger: logger)
@@ -160,7 +162,8 @@ public final class NorbixHubClient: Sendable {
             request: [
                 "userName": credentials.userName,
                 "password": credentials.password,
-                "provider": credentials.provider
+                "provider": credentials.provider,
+                "rememberMe": credentials.rememberMe
             ],
             scope: .unauthenticated,
             as: AuthResponse.self

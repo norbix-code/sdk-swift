@@ -103,6 +103,7 @@ public final class NorbixApiClient: Sendable {
         timeout: TimeInterval = NorbixDefaults.timeout,
         defaultHeaders: [String: String] = [:],
         verbose: Bool = false,
+        onSessionToken: (@Sendable (String) -> Void)? = nil,
         executor: HTTPExecuting = URLSessionHTTPExecutor(),
         logger: NorbixLogger = OSLogger()
     ) throws {
@@ -140,7 +141,8 @@ public final class NorbixApiClient: Sendable {
             version: version ?? processEnv["NORBIX_API_VERSION"] ?? NorbixDefaults.apiVersion,
             timeout: timeout,
             defaultHeaders: defaultHeaders,
-            verbose: verbose || envVerbose
+            verbose: verbose || envVerbose,
+            onSessionToken: onSessionToken
         )
 
         self.init(config: config, executor: executor, logger: logger)
@@ -150,6 +152,9 @@ public final class NorbixApiClient: Sendable {
 
     /// Logs in with credentials and stores the returned bearer token on the client.
     /// Returns a typed `AuthResponse`.
+    /// Sends `rememberMe` (default `false`): the token lives a sliding 12 hours, or 30 days
+    /// with `rememberMe: true`, never more than 90 days from sign-in. The server renews a token
+    /// in use; the client swaps it in and calls `onSessionToken`.
     @discardableResult
     public func login(_ credentials: LoginCredentials) async throws -> AuthResponse {
         let auth: AuthResponse = try await transport.send(
@@ -158,7 +163,8 @@ public final class NorbixApiClient: Sendable {
             request: [
                 "userName": credentials.userName,
                 "password": credentials.password,
-                "provider": credentials.provider
+                "provider": credentials.provider,
+                "rememberMe": credentials.rememberMe
             ],
             scope: .unauthenticated,
             as: AuthResponse.self

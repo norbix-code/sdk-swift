@@ -491,6 +491,32 @@ and [Files by id](./docs/api/files.md#files-by-id).
   token: `hub.account.createAccount`, `createTeamMemberFromInvitation`,
   `getAccountRegions`, `verifyAccount`, and `hub.regions.getAccountRegions`
 
+### Sessions
+
+A project user's sign-in lives a **sliding 12 hours**, or a **sliding 30 days**
+with `rememberMe: true`, and never more than **90 days** from the sign-in.
+"Sliding" means each use moves the end. A social sign-in counts as remembered.
+
+- **`rememberMe`.** `client.login(.init(userName:password:rememberMe:))` takes
+  `rememberMe` (default `false`) and sends it. With the raw
+  `client.auth.authenticate([...])`, put `"rememberMe": true` in the dictionary.
+- **The token is renewed for you.** When less than half of a token's time is
+  left, an answer carries a fresh token in the `norbix-session-token` header.
+  If the request carried the client's stored bearer token (from `bearerToken`,
+  `login` or `setBearerToken`), the client uses the new token from then on and
+  calls `onSessionToken`, so you can save it. The old token keeps working until
+  it expires. An API key, a per-call `bearerToken` and an empty header never
+  swap anything.
+
+```swift
+let client = try NorbixApiClient(
+    projectId: "proj_123",
+    bearerToken: savedToken,
+    onSessionToken: { token in Keychain.save(token, for: "norbix-token") }
+)
+try await client.login(.init(userName: "alice@team.io", password: "secret", rememberMe: true))
+```
+
 ### Preview a notification with its signed link (no sign-in)
 
 The push, email and SMS preview routes open with the signed link (`hash`)

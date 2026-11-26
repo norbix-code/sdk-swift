@@ -250,6 +250,18 @@ public struct NorbixConfig: Sendable {
     public var verbose: Bool
     /// Controls retry behavior for transient failures (5xx + 429).
     public var retryPolicy: RetryPolicy
+    /// Called when the server renews the stored bearer token. A project
+    /// user's token lives a sliding 12 hours (30 days with `rememberMe`),
+    /// never more than 90 days from sign-in. While it is in use, an answer
+    /// can carry a fresh token in the `norbix-session-token` header. The
+    /// client then uses the new token for every later call and calls this so
+    /// the app can save it (the old token still works until it expires).
+    ///
+    /// Only for the stored token (`bearerToken`, `login`, `setBearerToken`):
+    /// never for an API key, a per-call `bearerToken`, or a token that was
+    /// replaced while the request was in flight. An empty header is ignored.
+    /// Called on the thread that ran the request, outside the client's lock.
+    public var onSessionToken: (@Sendable (String) -> Void)?
 
     public init(
         projectId: String,
@@ -263,7 +275,8 @@ public struct NorbixConfig: Sendable {
         timeout: TimeInterval = NorbixDefaults.timeout,
         defaultHeaders: [String: String] = [:],
         verbose: Bool = false,
-        retryPolicy: RetryPolicy = .standard
+        retryPolicy: RetryPolicy = .standard,
+        onSessionToken: (@Sendable (String) -> Void)? = nil
     ) throws {
         guard !projectId.isEmpty else {
             throw NorbixError(
@@ -289,6 +302,7 @@ public struct NorbixConfig: Sendable {
         self.defaultHeaders = defaultHeaders
         self.verbose = verbose
         self.retryPolicy = retryPolicy
+        self.onSessionToken = onSessionToken
     }
 
     /// Builds a config from `ProcessInfo.processInfo.environment`.
