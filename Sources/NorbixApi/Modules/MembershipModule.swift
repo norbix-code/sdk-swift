@@ -386,6 +386,19 @@ public final class MembershipModule: Sendable {
         )
     }
 
+    /// The AI plan one project user has (`UserAiPlanDto`), from the roles the user holds:
+    /// plans are given by role in the project's AI plans. Path: `userId`.
+    public func getUserAiPlan(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/membership/users/{userId}/ai-plan",
+            method: "GET",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func mapAuthToUser(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/membership/users/{userId}/map-auth",

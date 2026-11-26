@@ -47,6 +47,7 @@
 | `createAccount` | `POST` | `/{version}/account` | `unauthenticated` |
 | `getAccountCollaborators` | `GET` | `/{version}/account/collaborators` | `project` |
 | `sendInviteToTeamMember` | `POST` | `/{version}/account/team/member/invite` | `project` |
+| `getTeamMember` | `GET` | `/{version}/account/team/member/{memberId}` | `project` |
 | `getProjectAiSettings` | `GET` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `updateProjectAiSettings` | `PUT` | `/{version}/account/projects/{projectId}/ai/settings` | `project` |
 | `createProjectAiAssistant` | `POST` | `/{version}/account/projects/{projectId}/ai/assistants` | `project` |
