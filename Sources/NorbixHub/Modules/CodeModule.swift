@@ -518,7 +518,7 @@ public final class CodeModule: Sendable {
     //
     // Workflows are in beta; bugs may occur. Contract: gateway `Code.Workflows.md` §7.
 
-    /// Beta: lists the workflows of the environment. Query: `isEnabled?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
+    /// Beta: lists the workflows of the environment, newest first. Query: `isEnabled?`, `search?` (part of the name), paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflows(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows",
@@ -698,7 +698,7 @@ public final class CodeModule: Sendable {
         )
     }
 
-    /// Beta: the runs of a workflow. Path: `id`; query: `status?`, `from?`, `to?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
+    /// Beta: the runs of a workflow. Path: `id`; query: `status?`, `workflowVersion?` (runs of one published version), `from?`, `to?`, paging (`pageSize?`, `startingAfter?`, `endingBefore?`).
     public func getCodeWorkflowRuns(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/code/workflows/{Id}/runs",

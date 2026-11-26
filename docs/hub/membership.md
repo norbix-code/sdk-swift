@@ -26,3 +26,4 @@
 | `getMembershipIntegration` | `GET` | `/{version}/membership/integrations/{id}` | `project` |
 | `getMembershipIntegrations` | `GET` | `/{version}/membership/integrations` | `project` |
 | `saveMembershipIntegration` | `POST` | `/{version}/membership/integrations` | `project` |
+| `getUserAiPlan` | `GET` | `/{version}/membership/users/{userId}/ai-plan` | `project` |
