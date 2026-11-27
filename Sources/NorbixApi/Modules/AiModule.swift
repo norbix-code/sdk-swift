@@ -127,6 +127,23 @@ public final class AiModule: Sendable {
         )
     }
 
+    /// The signed-in user's own decision on an action the chat held: a tool that
+    /// changes something (sends, pays, creates, deletes) is not run by the
+    /// assistant but lands in the chat as an `action.pending` entry. Pass
+    /// `SessionId`, `EntryId` and `"decision": "apply"` to run it once, as the
+    /// user, or `"decision": "dismiss"` to run nothing. The answer's `status` is
+    /// `applied`, `failed` or `skipped`; a second decision is refused with 409.
+    public func decideEndUserChatAction(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
+        try await transport.send(
+            path: "/{version}/ai/chat/sessions/{SessionId}/actions/{EntryId}",
+            method: "POST",
+            request: request,
+            scope: .project,
+            timeout: timeout,
+            bearerToken: bearerToken
+        )
+    }
+
     public func listEndUserChatAttachments(_ request: [String: Any] = [:], timeout: TimeInterval? = nil, bearerToken: String? = nil) async throws -> Any? {
         try await transport.send(
             path: "/{version}/ai/chat/sessions/{SessionId}/attachments",

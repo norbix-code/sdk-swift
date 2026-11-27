@@ -814,6 +814,18 @@ let turn = try await api.ai.startEndUserChatTurn(["sessionId": sessionId, "messa
 let entries = try await api.ai.getEndUserChatEntries(["SessionId": sessionId])
 ```
 
+**Held actions.** A tool that changes something (sends, pays, creates,
+deletes) is not run by the assistant: it lands in the chat as an
+`action.pending` entry with the tool and its exact arguments, and runs only on
+the signed-in user's own decision — never on the model's word.
+`decideEndUserChatAction` with `"decision": "apply"` runs it once, as the user;
+`"dismiss"` runs nothing. The answer's `status` is `applied`, `failed` or
+`skipped`; a second decision is refused with 409.
+
+```swift
+_ = try await api.ai.decideEndUserChatAction(["SessionId": sessionId, "EntryId": entryId, "decision": "apply"])
+```
+
 Project owners configure the assistant on the Hub: `hub.account`
 (`getProjectAiSettings`, `updateProjectAiSettings`, `createProjectAiAssistant`,
 `updateProjectAiAssistant`, `deleteProjectAiAssistant`, `getProjectAiUsage`)

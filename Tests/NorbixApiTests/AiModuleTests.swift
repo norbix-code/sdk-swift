@@ -19,6 +19,7 @@ final class ApiAiModuleTests: XCTestCase {
             ("archiveEndUserChatSession", "PUT", "/v3/ai/chat/sessions/sessionId1/archive", { c in _ = try await c.ai.archiveEndUserChatSession(["SessionId": "sessionId1", "probe": "value"]) }),
             ("getEndUserChatEntries", "GET", "/v3/ai/chat/sessions/sessionId1/entries", { c in _ = try await c.ai.getEndUserChatEntries(["SessionId": "sessionId1", "probe": "value"]) }),
             ("setEndUserChatEntryFeedback", "PUT", "/v3/ai/chat/sessions/sessionId1/entries/entryId1/feedback", { c in _ = try await c.ai.setEndUserChatEntryFeedback(["SessionId": "sessionId1", "EntryId": "entryId1", "probe": "value"]) }),
+            ("decideEndUserChatAction", "POST", "/v3/ai/chat/sessions/sessionId1/actions/entryId1", { c in _ = try await c.ai.decideEndUserChatAction(["SessionId": "sessionId1", "EntryId": "entryId1", "decision": "apply"]) }),
             ("listEndUserChatAttachments", "GET", "/v3/ai/chat/sessions/sessionId1/attachments", { c in _ = try await c.ai.listEndUserChatAttachments(["SessionId": "sessionId1", "probe": "value"]) }),
             ("uploadEndUserChatAttachment", "POST", "/v3/ai/chat/sessions/sessionId1/attachments", { c in _ = try await c.ai.uploadEndUserChatAttachment(["SessionId": "sessionId1", "probe": "value"]) }),
             ("deleteEndUserChatAttachment", "DELETE", "/v3/ai/chat/attachments/attachmentId1", { c in _ = try await c.ai.deleteEndUserChatAttachment(["AttachmentId": "attachmentId1", "probe": "value"]) }),
@@ -28,7 +29,7 @@ final class ApiAiModuleTests: XCTestCase {
     ]
 
     func testEveryRouteHitsTheExpectedPathAndVerb() async throws {
-        XCTAssertEqual(cases.count, 16)
+        XCTAssertEqual(cases.count, 17)
         for c in cases {
             let mock = MockHTTPExecutor()
             mock.responseBody = Data(#"{"responseStatus":{}}"#.utf8)
