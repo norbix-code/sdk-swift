@@ -2,6 +2,8 @@
 
 End-user AI chat for a signed-in project user (`client.ai`). `startEndUserChatTurn` answers at once with a `turnId`; the answer streams over the gateway's SSE endpoint on the user's channel `ai-chat:{projectId}:{authId}` (`ai.chat.turn.*`, `ai.chat.session.*`). A channel that is not the caller's is refused with 403 and `responseStatus.errorCode = "AiChatChannelRefused"` before the stream starts — do not retry it. Path tokens are read from the request dictionary.
 
+**Held actions.** A tool that changes something (sends, pays, creates, deletes) is not run by the assistant: it lands in the chat as an `action.pending` entry with the tool and its exact arguments. `decideEndUserChatAction(["SessionId": …, "EntryId": …, "decision": "apply"])` runs it once, as the signed-in user; `"dismiss"` runs nothing. The answer's `status` is `applied`, `failed` or `skipped`; a second decision is refused with 409. The model never decides.
+
 | Method | Verb | Path | Scope |
 | --- | --- | --- | --- |
 | `getEndUserChatAvailability` | `GET` | `/{version}/ai/chat/availability` | `project` |
@@ -14,6 +16,7 @@ End-user AI chat for a signed-in project user (`client.ai`). `startEndUserChatTu
 | `archiveEndUserChatSession` | `PUT` | `/{version}/ai/chat/sessions/{SessionId}/archive` | `project` |
 | `getEndUserChatEntries` | `GET` | `/{version}/ai/chat/sessions/{SessionId}/entries` | `project` |
 | `setEndUserChatEntryFeedback` | `PUT` | `/{version}/ai/chat/sessions/{SessionId}/entries/{EntryId}/feedback` | `project` |
+| `decideEndUserChatAction` | `POST` | `/{version}/ai/chat/sessions/{SessionId}/actions/{EntryId}` | `project` |
 | `listEndUserChatAttachments` | `GET` | `/{version}/ai/chat/sessions/{SessionId}/attachments` | `project` |
 | `uploadEndUserChatAttachment` | `POST` | `/{version}/ai/chat/sessions/{SessionId}/attachments` | `project` |
 | `deleteEndUserChatAttachment` | `DELETE` | `/{version}/ai/chat/attachments/{AttachmentId}` | `project` |
